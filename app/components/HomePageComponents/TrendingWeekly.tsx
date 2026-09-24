@@ -56,6 +56,15 @@ const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
         }
     };
 
+    const getBrandName = (name?: string | null) => {
+        if (!name) return null;
+        const parts = name.split('-');
+        if (isArabic) {
+            return parts[1]?.trim() || parts[0]?.trim();
+        }
+        return parts[0]?.trim();
+    };
+
     return (
         <section className="container-custom">
             {/* Header */}
@@ -102,7 +111,7 @@ const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
                                         src={getFirstImage(product.images)}
                                         alt={product.name}
                                         sizes="84px"
-                                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
                                         loading="lazy"
                                     />
                                 </Link>
@@ -112,7 +121,7 @@ const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
                                     {/* Brand */}
                                     {product.brand && (
                                         <p className="text-[10px] sm:text-[11px] font-bold text-[#B8860B] dark:text-[#E5B54A] mb-0.5 truncate uppercase tracking-wider">
-                                            {product.brand.name}
+                                            {getBrandName(product.brand.name)}
                                         </p>
                                     )}
                                     {/* Product Name */}

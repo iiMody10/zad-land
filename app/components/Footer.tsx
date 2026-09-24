@@ -80,6 +80,22 @@ const Footer = async ({ t, language }: FooterProps) => {
         { label: isArabic ? 'تواصل معنا' : 'Contact Us', href: '/contact' },
     ];
 
+    const FOOTER_CAT_TRANSLATIONS: Record<string, string> = {
+        'مشروبات باردة': 'Cold Beverages',
+        'مشروب ايس كوفي': 'Iced Coffee',
+        'مشروب غازي': 'Soft Drinks',
+        'معكرونة': 'Pasta',
+        'مفرزات': 'Frozen Foods',
+        'صوصات': 'Sauces & Condiments',
+        'تونة': 'Tuna & Seafood',
+        'أرز': 'Rice',
+        'شوكولاتة وسكاكر': 'Sweets & Confectionery',
+        'منظفات': 'Detergents & Cleaners',
+        'عناية شخصية': 'Personal Care',
+        'حليب وألبان': 'Dairy Products',
+        'بسكويت': 'Biscuits & Cookies',
+    };
+
     return (
         <footer
             className="relative overflow-hidden border-t-2 border-[#B8860B]/70 bg-[#003c30] text-white"
@@ -90,9 +106,9 @@ const Footer = async ({ t, language }: FooterProps) => {
 
             <div className="relative">
                 <div className="container-custom px-4 py-6 sm:py-8 md:py-8">
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.25fr_0.8fr_0.95fr_1.15fr_1fr] lg:gap-0 [direction:ltr]">
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.25fr_0.8fr_0.95fr_1.15fr_1fr] lg:gap-0">
                         {/* Brand */}
-                        <div className="flex flex-col items-center text-center sm:col-span-2 lg:col-span-1 lg:items-start lg:border-r lg:border-[#B8860B]/25 lg:pr-12 lg:text-start [direction:rtl]">
+                        <div className="flex flex-col items-center text-center sm:col-span-2 lg:col-span-1 lg:items-start lg:border-e lg:border-[#B8860B]/25 lg:pe-10 lg:text-start">
                             <Link href="/" className="group mb-3 inline-flex">
                                 <Image
                                     src="/images/logo.png"
@@ -128,7 +144,7 @@ const Footer = async ({ t, language }: FooterProps) => {
                         </div>
 
                         {/* Quick Links */}
-                        <div className="text-center lg:border-r lg:border-[#B8860B]/25 lg:px-6 [direction:rtl]">
+                        <div className="text-center lg:border-e lg:border-[#B8860B]/25 lg:px-6">
                             <h5 className="mb-4 text-sm font-extrabold text-[#E5B54A]">{isArabic ? 'روابط سريعة' : 'Quick Links'}</h5>
                             <ul className="flex flex-col gap-2 text-xs font-medium text-[#E6E8D5]/85 sm:text-sm">
                                 {quickLinks.map((link) => (
@@ -138,17 +154,20 @@ const Footer = async ({ t, language }: FooterProps) => {
                         </div>
 
                         {/* Shop Categories */}
-                        <div className="text-center lg:border-r lg:border-[#B8860B]/25 lg:px-6 [direction:rtl]">
+                        <div className="text-center lg:border-e lg:border-[#B8860B]/25 lg:px-6">
                             <h5 className="mb-4 text-sm font-extrabold text-[#E5B54A]">{shopTitle}</h5>
                             <ul className="flex flex-col gap-2 text-xs font-medium text-[#E6E8D5]/85 sm:text-sm">
                                 {footerCategories.length > 0 ? (
-                                    footerCategories.slice(0, 5).map((category) => (
-                                        <li key={category.id}>
-                                            <Link className="transition-colors hover:text-[#E5B54A]" href={`/categories/${category.slug}`}>
-                                                {category.name}
-                                            </Link>
-                                        </li>
-                                    ))
+                                    footerCategories.slice(0, 5).map((category) => {
+                                        const catLabel = isArabic ? category.name : (FOOTER_CAT_TRANSLATIONS[category.name] || category.name);
+                                        return (
+                                            <li key={category.id}>
+                                                <Link className="transition-colors hover:text-[#E5B54A]" href={`/categories/${category.slug}`}>
+                                                    {catLabel}
+                                                </Link>
+                                            </li>
+                                        );
+                                    })
                                 ) : (
                                     <li><Link className="transition-colors hover:text-[#E5B54A]" href="/products">{t('products.allProducts')}</Link></li>
                                 )}
@@ -156,7 +175,7 @@ const Footer = async ({ t, language }: FooterProps) => {
                         </div>
 
                         {/* Contact */}
-                        <div className="text-center lg:border-r lg:border-[#B8860B]/25 lg:px-6 [direction:rtl]">
+                        <div className="text-center lg:border-e lg:border-[#B8860B]/25 lg:px-6">
                             <h5 className="mb-4 text-sm font-extrabold text-[#E5B54A]">{isArabic ? 'معلومات التواصل' : 'Contact Information'}</h5>
                             <div className="flex flex-col items-center gap-3 text-xs text-[#E6E8D5]/90 sm:text-sm">
                                 <div className="flex items-center gap-2">
@@ -179,7 +198,7 @@ const Footer = async ({ t, language }: FooterProps) => {
                         </div>
 
                         {/* Quality message */}
-                        <div className="flex flex-col items-center justify-center text-center [direction:rtl] lg:items-start lg:justify-self-end lg:ps-8 lg:text-start">
+                        <div className="flex flex-col items-center justify-center text-center lg:items-start lg:justify-self-end lg:ps-8 lg:text-start">
                             <span className="mb-2 text-base font-extrabold text-[#E5B54A] sm:text-lg">
                                 {isArabic ? 'جودة عالمية' : 'Global Quality'}
                             </span>

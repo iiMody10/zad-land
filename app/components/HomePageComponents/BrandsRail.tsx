@@ -94,7 +94,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                         alt=""
                         showSkeleton={false}
                         sizes="(max-width: 768px) 140px, 160px"
-                        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-108"
+                        className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                 </div>
 
@@ -243,7 +243,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                                                 alt={brand.name}
                                                 showSkeleton={false}
                                                 sizes="90px"
-                                                className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                                                className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
                                             />
                                         </div>
                                         {isMersin && (

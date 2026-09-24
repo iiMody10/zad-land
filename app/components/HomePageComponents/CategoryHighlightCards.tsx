@@ -118,7 +118,7 @@ const CategoryHighlightCards = ({ cards = [], language = 'ar' }: CategoryHighlig
             <div className="relative">
                 <div
                     ref={categoriesRailRef}
-                    className={`-mx-2.5 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-2.5 scrollbar-hide sm:-mx-3.5 sm:gap-3 sm:px-3.5 md:mx-0 md:gap-5 lg:gap-6 [direction:ltr] ${hasDesktopOverflow ? 'md:overflow-x-auto md:px-8 md:scroll-smooth' : 'md:grid md:grid-cols-5 md:overflow-visible md:px-0'}`}
+                    className={`-mx-2.5 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-2.5 scrollbar-hide sm:-mx-3.5 sm:gap-3 sm:px-3.5 md:mx-0 md:gap-4 lg:gap-5 ${hasDesktopOverflow ? 'md:overflow-x-auto md:px-8 md:scroll-smooth' : 'md:grid md:grid-cols-5 md:overflow-visible md:px-0'}`}
                 >
                 {CATEGORIES.map((cat) => {
                     const title = isArabic ? cat.titleAr : cat.titleEn;
@@ -126,7 +126,8 @@ const CategoryHighlightCards = ({ cards = [], language = 'ar' }: CategoryHighlig
                         <Link
                             key={cat.id}
                             href={cat.link}
-                            className={`group relative flex w-[140px] shrink-0 snap-start flex-col aspect-[100/136] sm:w-[160px] sm:aspect-[100/132] ${hasDesktopOverflow ? 'md:w-[240px] md:aspect-[1/1.22]' : 'md:w-full md:shrink md:aspect-[1/1.22]'} lg:aspect-[1/1.18] bg-[#FAF6ED] dark:bg-[#1E1E16] rounded-2xl sm:rounded-[22px] md:rounded-3xl lg:rounded-[32px] overflow-hidden border border-[#B8860B]/20 hover:border-[#B8860B]/60 shadow-[0_4px_16px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 active:scale-98 text-center [direction:rtl]`}
+                            dir={isArabic ? 'rtl' : 'ltr'}
+                            className={`group relative flex w-[140px] shrink-0 snap-start flex-col aspect-[100/136] sm:w-[160px] sm:aspect-[100/132] ${hasDesktopOverflow ? 'md:w-[240px] md:aspect-[1/1.22]' : 'md:w-full md:shrink md:aspect-[1/1.22]'} lg:aspect-[1/1.18] bg-[#FAF6ED] dark:bg-[#1E1E16] rounded-2xl sm:rounded-[22px] md:rounded-2xl lg:rounded-3xl overflow-hidden border border-[#B8860B]/25 hover:border-[#B8860B]/70 shadow-xs hover:shadow-sm transition-colors duration-200 active:scale-[0.99] text-center`}
                         >
                             {/* Top Image: Full-bleed top portion with increased height */}
                             <div className="relative w-full h-[68%] sm:h-[70%] overflow-hidden rounded-t-2xl sm:rounded-t-[22px] md:rounded-t-3xl lg:rounded-t-[32px] bg-[#FAF6ED] dark:bg-[#1E1E16]">
@@ -136,13 +137,13 @@ const CategoryHighlightCards = ({ cards = [], language = 'ar' }: CategoryHighlig
                                     fill
                                     priority
                                     sizes="(max-width: 768px) 25vw, 350px"
-                                    className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                    className="object-cover object-center transition-transform duration-300 group-hover:scale-[1.03]"
                                 />
                             </div>
 
                             {/* Bottom Text: Pure cream background with 2 lines of bold, larger Arabic typography */}
                             <div className="w-full h-[32%] sm:h-[30%] flex items-center justify-center px-1 sm:px-2 md:px-4 pb-1 sm:pb-2 text-center bg-[#FAF6ED] dark:bg-[#1E1E16]">
-                                <h3 className="text-[11.5px] sm:text-[13.5px] md:text-base lg:text-lg xl:text-xl font-black text-[#072835] dark:text-gray-100 text-center leading-[1.25] sm:leading-[1.3] md:leading-[1.35] whitespace-pre-line group-hover:text-[#B8860B] transition-colors">
+                                <h3 className="text-[11.5px] sm:text-[13px] md:text-sm lg:text-base font-bold text-[#072835] dark:text-gray-100 text-center leading-[1.25] sm:leading-[1.3] md:leading-[1.35] whitespace-pre-line group-hover:text-[#B8860B] transition-colors">
                                     {title}
                                 </h3>
                             </div>

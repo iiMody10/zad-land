@@ -54,6 +54,15 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
     // Localized title & description
     const displayName = (language === 'ar' ? product.nameAr : product.nameEn) || product.name || product.nameAr || '';
 
+    const displayBrandName = (() => {
+        if (!product.brand?.name) return 'Zad Land';
+        const parts = product.brand.name.split('-');
+        if (language === 'ar') {
+            return parts[1]?.trim() || parts[0]?.trim();
+        }
+        return parts[0]?.trim();
+    })();
+
     const displayDesc = language === 'ar'
         ? (product.descriptionAr || product.description)
         : (product.descriptionEn || product.description);
@@ -115,7 +124,7 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
         <>
             <div 
                 onMouseEnter={() => setIsHovered(true)}
-                className="group relative flex flex-col bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-100 dark:border-white/10 p-2.5 sm:p-4 w-full h-full"
+                className="group relative flex flex-col bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden transition-colors duration-200 border border-gray-200/80 dark:border-white/10 hover:border-[#B8860B]/40 p-2.5 sm:p-4 w-full h-full shadow-xs hover:shadow-sm"
             >
                 
                 {/* Badge matching Theme (#B8860B for trending, #2E7D32 for new arrival) */}
@@ -148,7 +157,7 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
                             <ResilientImage
                                 alt={product.name}
                                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 240px"
-                                className="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105"
+                                className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-[1.03]"
                                 src={primaryImage}
                                 loading="lazy"
                             />
@@ -156,11 +165,11 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
                         
                         {/* Secondary Image Wrapper */}
                         {hasSecondaryImage && isHovered && (
-                            <div className="absolute inset-0 transition-all duration-500 opacity-0 group-hover:opacity-100 z-0">
+                            <div className="absolute inset-0 transition-all duration-300 opacity-0 group-hover:opacity-100 z-0">
                                 <ResilientImage
                                     alt={product.name}
                                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 240px"
-                                    className="w-full h-full object-cover rounded-xl transition-transform duration-500 scale-100 group-hover:scale-105"
+                                    className="w-full h-full object-cover rounded-xl transition-transform duration-300 scale-100 group-hover:scale-[1.03]"
                                     src={secondaryImage}
                                     loading="lazy"
                                     onLoad={() => setIsSecondaryLoaded(true)}
@@ -174,8 +183,8 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
                 <div className={`flex flex-col flex-1 mt-2.5 ${dir === 'rtl' ? 'text-right' : 'text-left'}`}>
                     
                     {/* Brand */}
-                    <span className="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[rgba(7,40,53,0.6)] dark:text-gray-400 mb-0.5 line-clamp-1">
-                        {product.brand?.name || 'Zad Land'}
+                    <span className="text-[9px] sm:text-xs font-bold uppercase tracking-widest text-[#B8860B] dark:text-[#E5B54A] mb-0.5 line-clamp-1">
+                        {displayBrandName}
                     </span>
 
                     {/* Title */}

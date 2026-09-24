@@ -32,19 +32,49 @@ const FeaturedCategoriesGrid = ({ categories, language = 'ar', dir = 'rtl' }: Fe
         return null;
     }
 
+    const CATEGORY_NAMES_EN: Record<string, string> = {
+        'مشروبات باردة': 'Cold Beverages',
+        'مشروب ايس كوفي': 'Iced Coffee',
+        'مشروب غازي': 'Soft Drinks',
+        'مشروب ميلاف': 'Milaf Beverages',
+        'معكرونة': 'Pasta',
+        'مفرزات': 'Frozen Foods',
+        'صوصات': 'Sauces & Condiments',
+        'تونة': 'Tuna & Seafood',
+        'أرز': 'Rice',
+        'زيوت': 'Cooking Oils',
+        'شوكولاتة وسكاكر': 'Confectionery & Sweets',
+        'بسكويت': 'Biscuits & Cookies',
+        'منظفات': 'Detergents & Cleaners',
+        'عناية شخصية': 'Personal Care',
+        'شاي وأعشاب': 'Tea & Herbs',
+        'حليب وألبان': 'Dairy Products',
+        'مكسرات': 'Nuts & Seeds',
+    };
+
     const getDisplayName = (cat: Category) => {
         if (isArabic) {
             return cat.name;
         }
-        return cat.description || cat.nameEn || cat.name;
+        if (CATEGORY_NAMES_EN[cat.name]) {
+            return CATEGORY_NAMES_EN[cat.name];
+        }
+        if (cat.nameEn && !cat.nameEn.startsWith('Products for')) {
+            return cat.nameEn;
+        }
+        if (cat.description && !cat.description.startsWith('Products for')) {
+            return cat.description;
+        }
+        return cat.name;
     };
 
     const getBrandName = (cat: Category) => {
         if (!cat.brand?.name) return null;
+        const parts = cat.brand.name.split('-');
         if (isArabic) {
-            return cat.brand.name.split('-')[1]?.trim() || cat.brand.name.split('-')[0]?.trim();
+            return parts[1]?.trim() || parts[0]?.trim();
         }
-        return cat.brand.name.split('-')[0]?.trim();
+        return parts[0]?.trim();
     };
 
     return (
@@ -92,16 +122,16 @@ const FeaturedCategoriesGrid = ({ categories, language = 'ar', dir = 'rtl' }: Fe
                         <div key={category.id} className="w-[218px] shrink-0 snap-start sm:w-[240px] md:w-auto">
                             <Link
                                 href={`/categories/${category.slug}`}
-                                className="group flex h-full flex-col overflow-hidden rounded-[22px] border border-[#B8860B]/20 bg-[#FFFFFE] shadow-[0_6px_20px_rgba(7,40,53,0.07)] transition-all duration-300 hover:border-[#B8860B]/55 hover:shadow-[0_12px_28px_rgba(7,40,53,0.14)] dark:bg-[#1E1E16] md:hover:-translate-y-1"
+                                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#B8860B]/20 bg-white dark:bg-[#1E1E16] shadow-xs hover:border-[#B8860B]/60 transition-colors duration-200"
                             >
                                 {/* Product/category image */}
-                                <div className="relative aspect-[1.15] w-full overflow-hidden bg-[#F8F7F2] dark:bg-zinc-900">
+                                <div className="relative aspect-[1.15] w-full overflow-hidden bg-[#FAF9F5] dark:bg-zinc-900">
                                     {category.image ? (
                                         <ResilientImage
                                             src={category.image}
                                             alt={displayName}
                                             sizes="(max-width: 640px) 218px, (max-width: 1024px) 25vw, 240px"
-                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            className="h-full w-full object-contain p-2.5 transition-transform duration-300 group-hover:scale-[1.03]"
                                             loading="lazy"
                                         />
                                     ) : (
