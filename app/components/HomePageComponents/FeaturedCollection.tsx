@@ -171,8 +171,8 @@ const FeaturedCollection = ({ newArrivals, bestSellers, settings }: FeaturedColl
                     </div>
                 </div>
                 
-                {/* Bottom Navigation and Progress Bar */}
-                <div className="mt-8 flex items-center gap-4 px-2 w-full">
+                {/* Only show rail controls when there are enough products to scroll through. */}
+                {activeProducts.length > 4 && <div className="mt-8 flex items-center gap-4 px-2 w-full">
                     {/* Previous Button (White -> Dark Hover) */}
                     <button
                         onClick={scrollBackward}
@@ -209,7 +209,7 @@ const FeaturedCollection = ({ newArrivals, bestSellers, settings }: FeaturedColl
                             <path d="M7.5 3.75L13.75 10L7.5 16.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
                         </svg>
                     </button>
-                </div>
+                </div>}
             </div>
         </section>
     );
