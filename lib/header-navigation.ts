@@ -10,6 +10,7 @@ export type HeaderNavItem = HeaderNavItemRef & {
     nameEn?: string | null;
     slug: string;
     href: string;
+    catalogHref: string;
     image: string | null;
     categories: Array<{
         id: string;
@@ -88,6 +89,7 @@ export function resolveHeaderNavItems(
             name: brand.name,
             slug: brand.slug,
             href: `/brands/${brand.slug}`,
+            catalogHref: `/products?brandIds=${encodeURIComponent(brand.id)}`,
             image: brand.image,
             categories: categories
                 .filter((category) => category.brandId === brand.id)
@@ -96,7 +98,7 @@ export function resolveHeaderNavItems(
                     id: category.id,
                     name: category.name,
                     slug: category.slug,
-                    href: `/categories/${category.slug}`,
+                    href: `/products?brandIds=${encodeURIComponent(brand.id)}&categoryIds=${encodeURIComponent(category.id)}`,
                 })),
         }] : [];
     });

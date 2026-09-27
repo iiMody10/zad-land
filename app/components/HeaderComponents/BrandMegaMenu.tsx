@@ -43,7 +43,7 @@ export default function BrandMegaMenu({ data, onClose }: BrandMegaMenuProps) {
                         </p>
                     </div>
                     <Link
-                        href={data.href}
+                        href={data.catalogHref}
                         onClick={onClose}
                         className="inline-flex w-fit items-center gap-2 border-b border-[var(--color-accent-light)] pb-1 text-[13px] font-bold text-[var(--color-accent-light)] transition-colors hover:text-white"
                     >
