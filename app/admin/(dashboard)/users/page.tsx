@@ -10,7 +10,13 @@ export default async function AdminUsersPage() {
         redirect('/admin/dashboard');
     }
 
-    const users = await getUsers();
+    let users: Record<string, unknown>[] = [];
+    let loadError = false;
+    try {
+        users = await getUsers();
+    } catch {
+        loadError = true;
+    }
 
-    return <UsersClient users={users as any[]} />;
+    return <UsersClient users={users as any[]} loadError={loadError} />;
 }

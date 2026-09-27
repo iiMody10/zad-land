@@ -29,9 +29,9 @@ interface User {
     createdAt: Date | string;
 }
 
-export default function UsersClient({ users }: { users: User[] }) {
+export default function UsersClient({ users, loadError = false }: { users: User[]; loadError?: boolean }) {
     const { openSidebar } = useAdminSidebar();
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
@@ -124,7 +124,11 @@ export default function UsersClient({ users }: { users: User[] }) {
                         user={selectedUser}
                     />
 
-                    <div className="bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 rounded-2xl shadow-xs overflow-hidden">
+                    {loadError ? (
+                        <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-6 text-sm font-medium text-red-800 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-200">
+                            {language === 'ar' ? "تعذر تحميل المستخدمين من الخادم. حدّث الصفحة أو حاول مرة أخرى لاحقاً." : "Could not load system users from the server. Refresh the page or try again later."}
+                        </div>
+                    ) : <div className="bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 rounded-2xl shadow-xs overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className={`w-full border-collapse min-w-[800px] ${dir === 'rtl' ? 'text-end' : 'text-start'}`}>
                                 <thead>
@@ -222,7 +226,7 @@ export default function UsersClient({ users }: { users: User[] }) {
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </div>}
                 </div>
             </div>
         </div>

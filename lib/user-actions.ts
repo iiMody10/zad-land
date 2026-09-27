@@ -25,7 +25,7 @@ async function send(path: string, method: string, body?: UserInput) {
 }
 
 export async function getUsers() {
-    return laravelJson<Record<string, unknown>[]>("/api/admin/users", []);
+    return laravelJson<Record<string, unknown>[]>("/api/admin/users");
 }
 
 export async function createUser(data: UserInput) {
