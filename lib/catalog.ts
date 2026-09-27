@@ -66,12 +66,22 @@ type CatalogMainCategory = {
 };
 
 const cachedBrands = unstable_cache(
-    async () => laravelJson<CatalogBrand[]>("/api/brands", []),
-    ["laravel-catalog-brands"],
+    // Let failed API requests reject so Next does not cache the fallback `[]`.
+    // Bump the cache key to invalidate any empty result cached by older builds.
+    async () => laravelJson<CatalogBrand[]>("/api/brands"),
+    ["laravel-catalog-brands-v2"],
     { tags: ["catalog", "brands"], revalidate: 3600 },
 );
 
-export const getCatalogBrands = cache(async () => (await cachedBrands()).map((brand) => ({ ...brand, isFeatured: Boolean(brand.isFeatured) })));
+export const getCatalogBrands = cache(async () => {
+    try {
+        return (await cachedBrands()).map((brand) => ({ ...brand, isFeatured: Boolean(brand.isFeatured) }));
+    } catch {
+        // Keep storefront pages available during a temporary backend outage.
+        // Because the failure is outside unstable_cache, the empty result is not cached.
+        return [];
+    }
+});
 
 export const getBrandBySlug = cache(async (slug: string) => {
     const brands = await getCatalogBrands();
