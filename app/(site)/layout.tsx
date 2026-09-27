@@ -4,7 +4,7 @@ import FooterInfoBar from "../components/FooterInfoBar";
 import AnnouncementBar from "../components/AnnouncementBar";
 import BottomNav from "../components/BottomNav";
 import { getI18n } from "@/lib/i18n";
-import { getCatalogBrands } from "@/lib/catalog";
+import { getCatalogBrands, getCatalogCategories } from "@/lib/catalog";
 import { getNavigationData } from "@/lib/navigation";
 import { getSiteSettings } from "@/lib/admin-actions";
 import { getConfiguredHeaderNavItems, resolveHeaderNavItems } from "@/lib/header-navigation";
@@ -17,8 +17,9 @@ export default async function SiteLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const [brands, navData, siteSettings, { t, dir, language }] = await Promise.all([
+    const [brands, categories, navData, siteSettings, { t, dir, language }] = await Promise.all([
         getCatalogBrands(),
+        getCatalogCategories(),
         getNavigationData(),
         getSiteSettings(),
         getI18n(),
@@ -27,6 +28,7 @@ export default async function SiteLayout({
     const headerNavItems = resolveHeaderNavItems(
         configuredItems,
         brands,
+        categories,
     );
 
     return (

@@ -1,4 +1,4 @@
-import type { CatalogBrand } from "@/lib/catalog";
+import type { CatalogBrand, CatalogCategory } from "@/lib/catalog";
 
 export type HeaderNavItemRef = {
     type: "brand";
@@ -10,6 +10,12 @@ export type HeaderNavItem = HeaderNavItemRef & {
     nameEn?: string | null;
     slug: string;
     href: string;
+    categories: Array<{
+        id: string;
+        name: string;
+        slug: string;
+        href: string;
+    }>;
 };
 
 export function getDefaultHeaderNavItems(
@@ -72,6 +78,7 @@ export function getConfiguredHeaderNavItems(
 export function resolveHeaderNavItems(
     refs: HeaderNavItemRef[],
     brands: CatalogBrand[],
+    categories: CatalogCategory[],
 ): HeaderNavItem[] {
     return refs.flatMap((ref) => {
         const brand = brands.find((candidate) => candidate.id === ref.id);
@@ -80,6 +87,15 @@ export function resolveHeaderNavItems(
             name: brand.name,
             slug: brand.slug,
             href: `/brands/${brand.slug}`,
+            categories: categories
+                .filter((category) => category.brandId === brand.id)
+                .sort((left, right) => left.name.localeCompare(right.name))
+                .map((category) => ({
+                    id: category.id,
+                    name: category.name,
+                    slug: category.slug,
+                    href: `/categories/${category.slug}`,
+                })),
         }] : [];
     });
 }

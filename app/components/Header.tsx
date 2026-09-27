@@ -41,6 +41,7 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
+    const [activeBrandMenu, setActiveBrandMenu] = useState<string | null>(null);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
     const [visibleCount, setVisibleCount] = useState(4);
@@ -86,6 +87,7 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
             setIsHeaderCompact(compact);
             if (compact) {
                 setActiveMegaMenu(null);
+                setActiveBrandMenu(null);
                 setIsMoreOpen(false);
             }
         };
@@ -142,6 +144,7 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
         const closeOnEscape = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 setActiveMegaMenu(null);
+                setActiveBrandMenu(null);
                 setIsMoreOpen(false);
                 setIsMobileMenuOpen(false);
                 setIsMobileSearchOpen(false);
@@ -165,6 +168,7 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
     const overflowQuickNavItems = initialQuickNavItems.slice(visibleCategoryCount);
     const closeDesktopMenus = () => {
         setActiveMegaMenu(null);
+        setActiveBrandMenu(null);
         setIsMoreOpen(false);
     };
 
@@ -306,28 +310,87 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                             const name = item.nameEn || nameParts.find((part) => isArabic
                                 ? /[\u0600-\u06FF]/.test(part)
                                 : !/[\u0600-\u06FF]/.test(part)) || item.name;
-                            const isActive = pathname === item.href;
+                            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                            const isBrandMenuOpen = activeBrandMenu === item.id;
                             return (
-                                <Link
+                                <div
                                     key={`quick-${item.type}-${item.id}`}
-                                    href={item.href}
-                                    onMouseEnter={closeDesktopMenus}
-                                    aria-current={isActive ? 'page' : undefined}
-                                    title={name}
-                                    className={`flex h-10 max-w-[132px] shrink-0 items-center truncate rounded-[7px] px-3 text-[13px] font-semibold transition-colors xl:text-sm ${isActive ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10'}`}
+                                    className="relative flex shrink-0 items-center"
+                                    onMouseEnter={() => {
+                                        setActiveMegaMenu(null);
+                                        setIsMoreOpen(false);
+                                        setActiveBrandMenu(item.categories.length ? item.id : null);
+                                    }}
+                                    onMouseLeave={() => setActiveBrandMenu((active) => active === item.id ? null : active)}
+                                    onFocusCapture={() => {
+                                        if (item.categories.length) setActiveBrandMenu(item.id);
+                                    }}
+                                    onBlur={(event) => {
+                                        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                                            setActiveBrandMenu((active) => active === item.id ? null : active);
+                                        }
+                                    }}
                                 >
-                                    {name}
-                                </Link>
+                                    <Link
+                                        href={item.href}
+                                        onClick={closeDesktopMenus}
+                                        aria-current={isActive ? 'page' : undefined}
+                                        title={name}
+                                        className={`flex h-10 max-w-[132px] items-center truncate rounded-s-[7px] px-3 text-[13px] font-semibold transition-colors xl:text-sm ${item.categories.length ? '' : 'rounded-e-[7px]'} ${isActive ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10'}`}
+                                    >
+                                        {name}
+                                    </Link>
+                                    {item.categories.length > 0 && (
+                                        <button
+                                            type="button"
+                                            aria-label={isArabic ? `عرض أقسام ${name}` : `Show ${name} categories`}
+                                            aria-expanded={isBrandMenuOpen}
+                                            aria-controls={`brand-nav-${item.id}`}
+                                            onClick={() => {
+                                                setActiveMegaMenu(null);
+                                                setIsMoreOpen(false);
+                                                setActiveBrandMenu((active) => active === item.id ? null : item.id);
+                                            }}
+                                            className={`flex h-10 w-7 items-center justify-center rounded-e-[7px] transition-colors ${isActive || isBrandMenuOpen ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[#5b6c60] hover:bg-[var(--color-brand-soft)] dark:text-gray-300 dark:hover:bg-white/10'}`}
+                                        >
+                                            <MdKeyboardArrowDown className={`text-lg transition-transform ${isBrandMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                                        </button>
+                                    )}
+                                    {isBrandMenuOpen && item.categories.length > 0 && (
+                                        <div
+                                            id={`brand-nav-${item.id}`}
+                                            className="absolute top-full start-0 z-50 mt-1 min-w-56 rounded-[10px] border border-[var(--color-line)] bg-white p-2 shadow-[0_16px_35px_rgba(17,43,31,0.13)] dark:border-white/10 dark:bg-[var(--color-surface-dark)]"
+                                        >
+                                            <Link
+                                                href={item.href}
+                                                onClick={closeDesktopMenus}
+                                                className="mb-1 block rounded-[6px] px-3 py-2.5 text-sm font-bold text-[var(--color-brand)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10"
+                                            >
+                                                {isArabic ? `كل منتجات ${name}` : `All ${name} products`}
+                                            </Link>
+                                            {item.categories.map((category) => (
+                                                <Link
+                                                    key={category.id}
+                                                    href={category.href}
+                                                    onClick={closeDesktopMenus}
+                                                    className="block rounded-[6px] px-3 py-2.5 text-sm text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10"
+                                                >
+                                                    {category.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             );
                         })}
                         {visibleNavItems.map((item) => {
                             const name = isArabic ? item.name : item.nameEn || item.name;
                             const isOpen = activeMegaMenu === item.slug;
                             return (
-                                <div key={item.id} className="flex shrink-0 items-center" onMouseEnter={() => { setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}>
+                                <div key={item.id} className="flex shrink-0 items-center" onMouseEnter={() => { setActiveBrandMenu(null); setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}>
                                     <Link
                                         href={`/department/${item.slug}`}
-                                        onFocus={() => setActiveMegaMenu(item.slug)}
+                                        onFocus={() => { setActiveBrandMenu(null); setActiveMegaMenu(item.slug); }}
                                         onClick={closeDesktopMenus}
                                         className={`flex h-10 items-center rounded-s-[7px] ps-3 pe-1 text-[13px] font-semibold transition-colors xl:text-sm ${isOpen ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10'}`}
                                     >
@@ -338,7 +401,7 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                                         aria-label={isArabic ? `عرض أقسام ${name}` : `Explore ${name}`}
                                         aria-expanded={isOpen}
                                         aria-controls="desktop-category-panel"
-                                        onClick={() => { setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}
+                                        onClick={() => { setActiveBrandMenu(null); setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}
                                         className={`flex h-10 w-7 items-center justify-center rounded-e-[7px] transition-colors ${isOpen ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[#5b6c60] hover:bg-[var(--color-brand-soft)] dark:text-gray-300 dark:hover:bg-white/10'}`}
                                     >
                                         <MdKeyboardArrowDown className={`text-lg transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -347,11 +410,11 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                             );
                         })}
                         {(overflowNavItems.length > 0 || overflowQuickNavItems.length > 0) && (
-                            <div className="relative shrink-0" onMouseEnter={() => { setActiveMegaMenu(null); setIsMoreOpen(true); }}>
+                            <div className="relative shrink-0" onMouseEnter={() => { setActiveBrandMenu(null); setActiveMegaMenu(null); setIsMoreOpen(true); }}>
                                 <button
                                     type="button"
                                     aria-expanded={isMoreOpen}
-                                    onClick={() => { setActiveMegaMenu(null); setIsMoreOpen((open) => !open); }}
+                                    onClick={() => { setActiveBrandMenu(null); setActiveMegaMenu(null); setIsMoreOpen((open) => !open); }}
                                     className="flex h-10 items-center gap-1 rounded-[7px] px-3 text-[13px] font-semibold text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10"
                                 >
                                     {isArabic ? 'المزيد' : 'More'}
