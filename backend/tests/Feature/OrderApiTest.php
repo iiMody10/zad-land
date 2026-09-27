@@ -214,6 +214,38 @@ class OrderApiTest extends TestCase
         $this->assertTrue($merchant->fresh()->is_active);
     }
 
+    public function test_super_admin_can_create_edit_reset_and_delete_merchant_accounts(): void
+    {
+        $admin = User::create(['username' => 'merchant-manage-admin', 'password' => Hash::make('secret123'), 'role' => 'SUPER_ADMIN']);
+        $this->actingAs($admin, 'web');
+
+        $created = $this->postJson('/api/admin/customers', [
+            'shopName' => 'Managed Shop', 'ownerName' => 'Shop Owner', 'phone' => '0912345678',
+            'city' => 'حمص', 'address' => 'Market road 12', 'notes' => null,
+            'password' => 'merchant123', 'isActive' => true,
+        ])->assertCreated()->assertJsonPath('shopName', 'Managed Shop')->assertJsonPath('phone', '96312345678');
+        $merchantId = $created->json('id');
+        $merchant = Customer::findOrFail($merchantId);
+        $this->assertTrue(Hash::check('merchant123', $merchant->password));
+
+        $this->patchJson('/api/admin/customers/'.$merchantId, [
+            'shopName' => 'Updated Shop', 'ownerName' => 'New Owner', 'phone' => '96312345678',
+            'city' => 'حلب', 'address' => 'New address 4', 'notes' => 'Verified by admin',
+            'password' => 'resetpass123', 'isActive' => false,
+        ])->assertOk()->assertJsonPath('shopName', 'Updated Shop')->assertJsonPath('isActive', false);
+        $this->assertTrue(Hash::check('resetpass123', $merchant->fresh()->password));
+
+        $order = Order::create([
+            'customer_id' => $merchantId, 'shop_name' => 'Updated Shop', 'total_amount' => '10.00',
+            'status' => 'PENDING', 'city' => 'حلب', 'street_address' => 'New address 4',
+            'Name' => 'New Owner', 'phone' => '96312345678',
+        ]);
+
+        $this->deleteJson('/api/admin/customers/'.$merchantId)->assertOk()->assertJsonPath('success', true);
+        $this->assertDatabaseMissing('customers', ['id' => $merchantId]);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'customer_id' => null]);
+    }
+
     public function test_super_admin_can_import_workbook_product_rows_into_mysql(): void
     {
         $admin = User::create(['username' => 'catalog-admin', 'password' => Hash::make('secret123'), 'role' => 'SUPER_ADMIN']);

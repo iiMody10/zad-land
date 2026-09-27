@@ -1,25 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, Store, Clock3, CircleCheck, MapPin, Phone } from "lucide-react";
+import { Search, Store, Clock3, CircleCheck, MapPin, Phone, Pencil, Trash2, UserRoundPlus } from "lucide-react";
 import toast from "react-hot-toast";
 import { laravelClientFetch } from "@/lib/laravel-client";
 import { useLanguage } from "@/app/context/LanguageContext";
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
+import MerchantAccountModal, { type MerchantAccount } from "./MerchantAccountModal";
 
-type Merchant = {
-    id: string;
-    shopName: string;
-    ownerName: string;
-    phone: string;
-    city: string;
-    address: string;
-    notes: string | null;
-    isActive: boolean;
-    createdAt: string;
-    _count?: { orders?: number; wishlistItems?: number };
-};
+type Merchant = MerchantAccount;
 
 export default function CustomersClient({ initialCustomers }: { initialCustomers: Merchant[] }) {
     const { t, dir, language } = useLanguage();
@@ -27,6 +17,8 @@ export default function CustomersClient({ initialCustomers }: { initialCustomers
     const [customers, setCustomers] = useState(initialCustomers);
     const [busyId, setBusyId] = useState<string | null>(null);
     const [search, setSearch] = useState("");
+    const [editorOpen, setEditorOpen] = useState(false);
+    const [selectedMerchant, setSelectedMerchant] = useState<Merchant | null>(null);
     const isArabic = language === "ar";
     const numberLocale = isArabic ? "ar" : "en";
 
@@ -55,6 +47,31 @@ export default function CustomersClient({ initialCustomers }: { initialCustomers
         }
     };
 
+    const deleteMerchant = async (merchant: Merchant) => {
+        if (!window.confirm(t("admin.merchantDeleteConfirm").replace("{name}", merchant.shopName))) return;
+        setBusyId(merchant.id);
+        try {
+            const response = await laravelClientFetch(`/api/admin/customers/${encodeURIComponent(merchant.id)}`, { method: "DELETE" });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(payload?.message || payload?.error || t("admin.merchantDeleteFailed"));
+            setCustomers((current) => current.filter((item) => item.id !== merchant.id));
+            toast.success(t("admin.merchantDeleted"));
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : t("admin.merchantDeleteFailed"));
+        } finally {
+            setBusyId(null);
+        }
+    };
+
+    const saveMerchant = (merchant: Merchant) => {
+        setCustomers((current) => {
+            const exists = current.some((item) => item.id === merchant.id);
+            return exists
+                ? current.map((item) => item.id === merchant.id ? { ...item, ...merchant } : item)
+                : [{ ...merchant, _count: { orders: 0, wishlistItems: 0 } }, ...current];
+        });
+    };
+
     const renderList = (items: Merchant[], isPending: boolean) => items.length ? (
         <div className="grid gap-3">
             {items.map((customer) => (
@@ -76,15 +93,23 @@ export default function CustomersClient({ initialCustomers }: { initialCustomers
                             {customer._count?.orders ?? 0} {t("admin.merchantOrders")} <span aria-hidden="true">·</span> {customer._count?.wishlistItems ?? 0} {t("admin.merchantSavedProducts")}
                         </p>
                     </div>
-                    <button
-                        type="button"
-                        disabled={busyId === customer.id}
-                        onClick={() => updateStatus(customer.id, !customer.isActive)}
-                        className={`inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white shadow-sm transition-colors disabled:cursor-wait disabled:opacity-50 sm:min-w-36 ${isPending ? "bg-emerald-700 hover:bg-emerald-800" : "bg-slate-600 hover:bg-slate-700"}`}
-                    >
-                        {isPending ? <CircleCheck className="size-4" aria-hidden="true" /> : null}
-                        {t(isPending ? "admin.approveMerchant" : "admin.suspendMerchant")}
-                    </button>
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+                        <button
+                            type="button"
+                            disabled={busyId === customer.id}
+                            onClick={() => updateStatus(customer.id, !customer.isActive)}
+                            className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white shadow-sm transition-colors disabled:cursor-wait disabled:opacity-50 ${isPending ? "bg-emerald-700 hover:bg-emerald-800" : "bg-slate-600 hover:bg-slate-700"}`}
+                        >
+                            {isPending ? <CircleCheck className="size-4" aria-hidden="true" /> : null}
+                            {t(isPending ? "admin.approveMerchant" : "admin.suspendMerchant")}
+                        </button>
+                        <button type="button" onClick={() => { setSelectedMerchant(customer); setEditorOpen(true); }} aria-label={`${t("admin.editMerchant")}: ${customer.shopName}`} title={t("admin.editMerchant")} className="grid size-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-brand)] dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+                            <Pencil className="size-4" aria-hidden="true" />
+                        </button>
+                        <button type="button" disabled={busyId === customer.id} onClick={() => void deleteMerchant(customer)} aria-label={`${t("admin.deleteMerchant")}: ${customer.shopName}`} title={t("admin.deleteMerchant")} className="grid size-10 place-items-center rounded-xl border border-red-200 bg-white text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-900/50 dark:bg-white/5 dark:text-red-300 dark:hover:bg-red-950/30">
+                            <Trash2 className="size-4" aria-hidden="true" />
+                        </button>
+                    </div>
                 </article>
             ))}
         </div>
@@ -115,7 +140,8 @@ export default function CustomersClient({ initialCustomers }: { initialCustomers
                             <h1 className="text-2xl font-extrabold tracking-tight text-[var(--color-brand)] dark:text-white sm:text-3xl">{t("admin.merchantAccounts")}</h1>
                             <p className="mt-1 max-w-2xl text-sm text-slate-500 dark:text-slate-400">{t("admin.merchantAccountsDescription")}</p>
                         </div>
-                        <label className="relative block w-full sm:max-w-sm">
+                        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+                        <label className="relative block w-full sm:w-72">
                             <span className="sr-only">{t("admin.searchMerchants")}</span>
                             <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
                             <input
@@ -126,7 +152,18 @@ export default function CustomersClient({ initialCustomers }: { initialCustomers
                                 className="h-11 w-full rounded-xl border border-slate-200 bg-white ps-10 pe-4 text-sm text-slate-900 shadow-sm outline-none transition focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 dark:border-white/10 dark:bg-[var(--color-surface-dark)] dark:text-white"
                             />
                         </label>
+                        <button type="button" onClick={() => { setSelectedMerchant(null); setEditorOpen(true); }} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--color-brand)] px-4 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[var(--color-brand-hover)]">
+                            <UserRoundPlus className="size-4" aria-hidden="true" />{t("admin.addMerchant")}
+                        </button>
+                        </div>
                     </header>
+
+                    <MerchantAccountModal
+                        open={editorOpen}
+                        merchant={selectedMerchant}
+                        onClose={() => setEditorOpen(false)}
+                        onSaved={saveMerchant}
+                    />
 
                     <section aria-label={t("admin.merchantSummary")} className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                         {statCards.map(({ label, value, icon: Icon, tone }) => (

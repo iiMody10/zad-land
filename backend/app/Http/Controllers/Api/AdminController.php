@@ -15,6 +15,7 @@ use App\Models\Review;
 use App\Models\Settings;
 use App\Models\User;
 use App\Support\ApiJson;
+use App\Support\MerchantPhone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -256,6 +257,86 @@ class AdminController extends Controller
         $customer->update(['is_active' => $data['isActive']]);
 
         return response()->json(['customer' => ApiJson::camel($customer->only(['id', 'shop_name', 'is_active']))])->header('Cache-Control', 'no-store');
+    }
+
+    public function storeCustomer(Request $request)
+    {
+        $data = $request->validate([
+            'shopName' => ['required', 'string', 'min:2', 'max:100'],
+            'ownerName' => ['required', 'string', 'min:2', 'max:100'],
+            'phone' => ['required', 'string', 'max:32'],
+            'city' => ['required', 'string', 'min:2', 'max:100'],
+            'address' => ['required', 'string', 'min:5', 'max:250'],
+            'notes' => ['nullable', 'string', 'max:500'],
+            'password' => ['required', 'string', 'min:6', 'max:128'],
+            'isActive' => ['required', 'boolean'],
+        ]);
+        $phone = MerchantPhone::normalize($data['phone']);
+        if (! $phone) {
+            return response()->json(['error' => 'Enter a valid mobile number.'], 422);
+        }
+        if (Customer::whereIn('phone', MerchantPhone::variants($phone))->exists()) {
+            return response()->json(['error' => 'This phone number already has a merchant account.'], 409);
+        }
+
+        $customer = Customer::create([
+            'shop_name' => $data['shopName'],
+            'owner_name' => $data['ownerName'],
+            'phone' => $phone,
+            'city' => $data['city'],
+            'address' => $data['address'],
+            'notes' => $data['notes'] ?? null,
+            'password' => Hash::make($data['password']),
+            'is_active' => $data['isActive'],
+        ]);
+
+        return response()->json(ApiJson::camel($customer), 201)->header('Cache-Control', 'no-store');
+    }
+
+    public function updateCustomer(Request $request, string $id)
+    {
+        $customer = Customer::findOrFail($id);
+        $data = $request->validate([
+            'shopName' => ['required', 'string', 'min:2', 'max:100'],
+            'ownerName' => ['required', 'string', 'min:2', 'max:100'],
+            'phone' => ['required', 'string', 'max:32'],
+            'city' => ['required', 'string', 'min:2', 'max:100'],
+            'address' => ['required', 'string', 'min:5', 'max:250'],
+            'notes' => ['nullable', 'string', 'max:500'],
+            'password' => ['nullable', 'string', 'min:6', 'max:128'],
+            'isActive' => ['required', 'boolean'],
+        ]);
+        $phone = MerchantPhone::normalize($data['phone']);
+        if (! $phone) {
+            return response()->json(['error' => 'Enter a valid mobile number.'], 422);
+        }
+        if (Customer::whereIn('phone', MerchantPhone::variants($phone))->where('id', '!=', $customer->id)->exists()) {
+            return response()->json(['error' => 'This phone number already has a merchant account.'], 409);
+        }
+
+        $customer->fill([
+            'shop_name' => $data['shopName'],
+            'owner_name' => $data['ownerName'],
+            'phone' => $phone,
+            'city' => $data['city'],
+            'address' => $data['address'],
+            'notes' => $data['notes'] ?? null,
+            'is_active' => $data['isActive'],
+        ]);
+        if (! empty($data['password'])) {
+            $customer->password = Hash::make($data['password']);
+        }
+        $customer->save();
+
+        return response()->json(ApiJson::camel($customer->fresh()), 200)->header('Cache-Control', 'no-store');
+    }
+
+    public function deleteCustomer(string $id)
+    {
+        $customer = Customer::findOrFail($id);
+        $customer->delete();
+
+        return response()->json(['success' => true])->header('Cache-Control', 'no-store');
     }
 
     public function updateReview(Request $request, string $id)

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\User;
 use App\Support\ApiJson;
+use App\Support\MerchantPhone;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +26,7 @@ class AuthController extends Controller
             'notes' => ['nullable', 'string', 'max:500'],
             'password' => ['required', 'string', 'min:6', 'max:128'],
         ]);
-        $phone = $this->normalizePhone($data['phone']);
+        $phone = MerchantPhone::normalize($data['phone']);
         if (! $phone) {
             return response()->json(['error' => 'Enter a valid mobile number.'], 400);
         }
@@ -37,7 +38,7 @@ class AuthController extends Controller
             return response()->json(['error' => 'Too many registration attempts.'], 429)->header('Retry-After', RateLimiter::availableIn($limiterKey));
         }
         RateLimiter::hit($limiterKey, 3600);
-        if (Customer::whereIn('phone', $this->phoneVariants($phone))->exists()) {
+        if (Customer::whereIn('phone', MerchantPhone::variants($phone))->exists()) {
             return response()->json(['error' => 'This phone number already has a merchant account.'], 409);
         }
 
@@ -53,7 +54,7 @@ class AuthController extends Controller
     public function merchantLogin(Request $request)
     {
         $data = $request->validate(['phone' => ['required', 'string', 'max:32'], 'password' => ['required', 'string', 'max:128']]);
-        $phone = $this->normalizePhone($data['phone']);
+        $phone = MerchantPhone::normalize($data['phone']);
         if (! $phone || strlen(trim($data['password'])) < 6) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
@@ -66,7 +67,7 @@ class AuthController extends Controller
         }
         RateLimiter::hit($ipKey, 600);
         RateLimiter::hit($key, 600);
-        $customer = Customer::whereIn('phone', $this->phoneVariants($phone))->first();
+        $customer = Customer::whereIn('phone', MerchantPhone::variants($phone))->first();
         if (! $customer || ! Hash::check($data['password'], $customer->password)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
@@ -170,36 +171,6 @@ class AuthController extends Controller
         }
 
         return ApiJson::camel($customer->only($keys));
-    }
-
-    private function normalizePhone(string $value): string
-    {
-        $value = strtr(trim($value), array_combine(preg_split('//u', '٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹', -1, PREG_SPLIT_NO_EMPTY), str_split('01234567890123456789')));
-        if (! preg_match('/^[0-9+().\s-]+$/', $value)) {
-            return '';
-        }
-        $digits = preg_replace('/\D/', '', $value) ?? '';
-        if (str_starts_with($digits, '00963')) {
-            $digits = substr($digits, 5);
-        } elseif (str_starts_with($digits, '963')) {
-            $digits = substr($digits, 3);
-        }
-        if (preg_match('/^09\d{8}$/', $digits)) {
-            return '963'.substr($digits, 2);
-        }
-        if (preg_match('/^9\d{8}$/', $digits)) {
-            return '963'.substr($digits, 1);
-        }
-        if (preg_match('/^\d{8}$/', $digits)) {
-            return '9639'.$digits;
-        }
-
-        return '';
-    }
-
-    private function phoneVariants(string $canonical): array
-    {
-        return [$canonical, '09'.substr($canonical, 3)];
     }
 
     private function clean(?string $value, int $max): string

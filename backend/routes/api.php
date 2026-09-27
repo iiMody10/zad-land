@@ -48,7 +48,10 @@ Route::prefix('admin')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'adminMe'])->middleware(['auth:sanctum', 'admin']);
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::get('/customers', [AdminController::class, 'index'])->defaults('resource', 'customers')->middleware('permission:customers');
+        Route::post('/customers', [AdminController::class, 'storeCustomer'])->middleware('permission:customers');
         Route::patch('/customers', [AdminController::class, 'approveCustomer'])->middleware('permission:customers');
+        Route::patch('/customers/{id}', [AdminController::class, 'updateCustomer'])->middleware('permission:customers');
+        Route::delete('/customers/{id}', [AdminController::class, 'deleteCustomer'])->middleware('permission:customers');
         Route::get('/reviews', [AdminController::class, 'index'])->defaults('resource', 'reviews')->middleware('permission:manage_reviews');
         Route::patch('/reviews/{id}', [AdminController::class, 'updateReview'])->middleware('permission:manage_reviews');
         Route::delete('/reviews/{id}', [AdminController::class, 'deleteReview'])->middleware('permission:manage_reviews');
