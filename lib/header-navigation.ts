@@ -10,6 +10,7 @@ export type HeaderNavItem = HeaderNavItemRef & {
     nameEn?: string | null;
     slug: string;
     href: string;
+    image: string | null;
     categories: Array<{
         id: string;
         name: string;
@@ -87,6 +88,7 @@ export function resolveHeaderNavItems(
             name: brand.name,
             slug: brand.slug,
             href: `/brands/${brand.slug}`,
+            image: brand.image,
             categories: categories
                 .filter((category) => category.brandId === brand.id)
                 .sort((left, right) => left.name.localeCompare(right.name))

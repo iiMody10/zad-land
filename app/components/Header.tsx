@@ -11,6 +11,7 @@ import HeaderSearch from './HeaderSearch';
 import LanguageToggle from './LanguageToggle';
 import MobileMenu from './MobileMenu';
 import MegaMenu, { type NavMainCategory } from './HeaderComponents/MegaMenu';
+import BrandMegaMenu from './HeaderComponents/BrandMegaMenu';
 import TopBar from './HeaderComponents/TopBar';
 import type { HeaderNavItem } from '@/lib/header-navigation';
 
@@ -162,6 +163,7 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
     }, [isMobileSearchOpen]);
 
     const activeNavData = initialNavData.find((item) => item.slug === activeMegaMenu);
+    const activeBrandData = initialQuickNavItems.find((item) => item.id === activeBrandMenu);
     const visibleNavItems = initialNavData.slice(0, visibleCount);
     const overflowNavItems = initialNavData.slice(visibleCount);
     const visibleQuickNavItems = initialQuickNavItems.slice(0, visibleCategoryCount);
@@ -293,6 +295,9 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                 className="relative hidden border-t border-[var(--color-line)] bg-[var(--color-canvas)] transition-[height,opacity,transform] duration-300 ease-out motion-reduce:transition-none dark:border-white/10 dark:bg-[var(--color-surface-dark)] lg:block"
                 style={{ height: isHeaderCompact ? 0 : 50, overflow: isHeaderCompact ? 'hidden' : 'visible', opacity: isHeaderCompact ? 0 : 1, transform: isHeaderCompact ? 'translateY(-8px)' : 'translateY(0)', borderColor: isHeaderCompact ? 'transparent' : undefined }}
                 onMouseLeave={closeDesktopMenus}
+                onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeDesktopMenus();
+                }}
             >
                 <div className="container-custom flex h-[50px] items-center gap-1">
                     <Link
@@ -321,14 +326,8 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                                         setIsMoreOpen(false);
                                         setActiveBrandMenu(item.categories.length ? item.id : null);
                                     }}
-                                    onMouseLeave={() => setActiveBrandMenu((active) => active === item.id ? null : active)}
                                     onFocusCapture={() => {
                                         if (item.categories.length) setActiveBrandMenu(item.id);
-                                    }}
-                                    onBlur={(event) => {
-                                        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-                                            setActiveBrandMenu((active) => active === item.id ? null : active);
-                                        }
                                     }}
                                 >
                                     <Link
@@ -355,30 +354,6 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                                         >
                                             <MdKeyboardArrowDown className={`text-lg transition-transform ${isBrandMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
                                         </button>
-                                    )}
-                                    {isBrandMenuOpen && item.categories.length > 0 && (
-                                        <div
-                                            id={`brand-nav-${item.id}`}
-                                            className="absolute top-full start-0 z-50 mt-1 min-w-56 rounded-[10px] border border-[var(--color-line)] bg-white p-2 shadow-[0_16px_35px_rgba(17,43,31,0.13)] dark:border-white/10 dark:bg-[var(--color-surface-dark)]"
-                                        >
-                                            <Link
-                                                href={item.href}
-                                                onClick={closeDesktopMenus}
-                                                className="mb-1 block rounded-[6px] px-3 py-2.5 text-sm font-bold text-[var(--color-brand)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10"
-                                            >
-                                                {isArabic ? `كل منتجات ${name}` : `All ${name} products`}
-                                            </Link>
-                                            {item.categories.map((category) => (
-                                                <Link
-                                                    key={category.id}
-                                                    href={category.href}
-                                                    onClick={closeDesktopMenus}
-                                                    className="block rounded-[6px] px-3 py-2.5 text-sm text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10"
-                                                >
-                                                    {category.name}
-                                                </Link>
-                                            ))}
-                                        </div>
                                     )}
                                 </div>
                             );
@@ -459,6 +434,14 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                         <Link href="/contact" onMouseEnter={closeDesktopMenus} className="rounded-[7px] px-3 py-2 text-[13px] font-semibold text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10">{isArabic ? 'تواصل' : 'Contact'}</Link>
                     </div>
                 </div>
+
+                {activeBrandData && activeBrandData.categories.length > 0 && (
+                    <BrandMegaMenu
+                        key={activeBrandData.id}
+                        data={activeBrandData}
+                        onClose={closeDesktopMenus}
+                    />
+                )}
 
                 {activeNavData && (
                     <MegaMenu
