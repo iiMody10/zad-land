@@ -12,7 +12,7 @@ import { useLanguage } from "@/app/context/LanguageContext";
 import { getSafeImageUrl } from '@/lib/image-utils';
 import { formatItemsPerPackage, formatPackaging } from '@/lib/packaging';
 import { ChevronRight as MdChevronRight, ChevronLeft as MdChevronLeft, Upload as MdFileUpload, Download as MdFileDownload, Plus as MdAdd, Search as MdSearch, ChevronDown as MdExpandMore, Flame as MdLocalFireDepartment, BadgePercent as MdSell, TrendingDown as MdTrendingDown, BadgeMinus as MdMoneyOff, Trash2 as MdDelete, Pencil as MdEdit, RefreshCw as MdSync, ArrowUp as MdArrowUpward, ArrowDown as MdArrowDownward, Share2 as MdShare, Copy as MdContentCopy } from 'lucide-react';
-import { ThumbsUp as FaFacebook, MessageCircle as FaWhatsapp } from 'lucide-react';
+import PlatformIcon from '@/app/components/PlatformIcon';
 
 interface Product {
     id: string;
@@ -1035,14 +1035,14 @@ export default function ProductsClient({
                                                                             onClick={() => handleSocialShare('facebook', product)}
                                                                             className="w-full text-start px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/5 text-xs font-medium text-text-main dark:text-white transition-colors flex items-center gap-3 border-b border-gray-50 dark:border-white/5"
                                                                         >
-                                                                            <FaFacebook className="text-[#1877F2]" />
+                                                                            <PlatformIcon platform="facebook" className="size-4 text-[#1877F2]" />
                                                                             <span>{t('admin.shareOnFacebook')}</span>
                                                                         </button>
                                                                         <button
                                                                             onClick={() => handleSocialShare('whatsapp', product)}
                                                                             className="w-full text-start px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-white/5 text-xs font-medium text-text-main dark:text-white transition-colors flex items-center gap-3"
                                                                         >
-                                                                            <FaWhatsapp className="text-[#25D366]" />
+                                                                            <PlatformIcon platform="whatsapp" className="size-4 text-[#25D366]" />
                                                                             <span>{t('admin.shareOnWhatsApp')}</span>
                                                                         </button>
                                                                     </div>

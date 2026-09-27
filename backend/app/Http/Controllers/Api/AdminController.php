@@ -265,9 +265,48 @@ class AdminController extends Controller
         foreach (array_keys($request->all()) as $key) {
             $column = Str::snake($key);
             if (in_array($column, $columns, true)) {
-                $rules[$key] = $column === 'exchange_rate'
-                    ? ['nullable', 'numeric', 'gt:0', 'max:99999999.99']
-                    : ['nullable', 'string', 'max:20000'];
+                if ($column === 'exchange_rate') {
+                    $rules[$key] = ['nullable', 'numeric', 'gt:0', 'max:99999999.99'];
+                } elseif ($column === 'header_nav_items') {
+                    $rules[$key] = ['nullable', 'string', 'max:20000', function ($attribute, $value, $fail) {
+                        if ($value === null || $value === '') {
+                            return;
+                        }
+
+                        try {
+                            $items = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+                        } catch (\JsonException) {
+                            $fail('The header navigation links must be valid JSON.');
+                            return;
+                        }
+
+                        if (! is_array($items) || ! array_is_list($items) || count($items) > 12) {
+                            $fail('The header navigation supports up to 12 ordered links.');
+                            return;
+                        }
+
+                        $seen = [];
+                        foreach ($items as $item) {
+                            if (! is_array($item)
+                                || ! in_array($item['type'] ?? null, ['category', 'brand'], true)
+                                || ! is_string($item['id'] ?? null)
+                                || $item['id'] === ''
+                                || strlen($item['id']) > 191) {
+                                $fail('Each header navigation link must select a valid category or brand.');
+                                return;
+                            }
+
+                            $key = $item['type'].':'.$item['id'];
+                            if (isset($seen[$key])) {
+                                $fail('A category or brand can only appear once in the header navigation.');
+                                return;
+                            }
+                            $seen[$key] = true;
+                        }
+                    }];
+                } else {
+                    $rules[$key] = ['nullable', 'string', 'max:20000'];
+                }
             }
         }
         $data = $request->validate($rules);

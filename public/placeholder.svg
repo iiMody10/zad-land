@@ -1,4 +1,12 @@
-<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-  <rect width="200" height="200" fill="#f3f4f6"/>
-  <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="14" fill="#9ca3af" text-anchor="middle" dominant-baseline="middle">No Image</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <rect width="200" height="200" rx="16" fill="#F3F5F3"/>
+  <g stroke="#8A9890" stroke-linecap="round" stroke-linejoin="round" stroke-width="5">
+    <rect x="52" y="57" width="96" height="78" rx="9"/>
+    <circle cx="119" cy="81" r="8"/>
+    <path d="m60 121 23-25 18 18 11-12 28 29"/>
+    <path d="m82 57 16 21-10 12 15 15-12 13 15 17" stroke="#F3F5F3" stroke-width="9"/>
+    <path d="m84 62 13 17-10 12 15 15-12 13 14 16" stroke="#8A9890" stroke-width="3.5"/>
+  </g>
+  <circle cx="145" cy="137" r="17" fill="#F3F5F3" stroke="#F3F5F3" stroke-width="5"/>
+  <path d="m139 131 12 12m0-12-12 12" stroke="#8A9890" stroke-linecap="round" stroke-width="4"/>
 </svg>

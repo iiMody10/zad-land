@@ -13,7 +13,7 @@ interface MainBrandsProps {
     brands: HomeBrand[];
 }
 
-const fallbackImage = "/logo.png";
+const fallbackImage = "/placeholder.svg";
 
 export default function MainBrands({ brands }: MainBrandsProps) {
     const { t, dir } = useLanguage();

@@ -4,7 +4,7 @@ import { laravelClientFetch } from "@/lib/laravel-client";
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { MessageCircle as FaWhatsapp } from 'lucide-react';
+import PlatformIcon from '@/app/components/PlatformIcon';
 import { RefreshCw as MdRefresh } from 'lucide-react';
 import { useLanguage } from "@/app/context/LanguageContext";
 import { useCurrency } from "@/app/context/CurrencyContext";
@@ -59,10 +59,10 @@ function CompleteOrderContent() {
 
         <div className="mb-8 flex w-full flex-col items-center justify-between gap-5 rounded-2xl border border-[#25D366]/30 bg-[#25D366]/10 p-5 shadow-sm dark:bg-[#25D366]/15 sm:flex-row sm:p-6">
             <div className="flex items-center gap-4 text-center sm:text-start">
-                <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-2xl text-white"><FaWhatsapp /></span>
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white"><PlatformIcon platform="whatsapp" className="size-6" /></span>
                 <div><h2 className="text-base font-extrabold text-[var(--color-brand)] dark:text-white">{language === "ar" ? "أرسل تفاصيل الطلب عبر واتساب" : "Send your order through WhatsApp"}</h2><p className="mt-1 text-xs text-slate-600 dark:text-slate-300">{language === "ar" ? "أرسل الطلب إلى فريق المبيعات والتوزيع لتسريع تأكيده وتجهيزه." : "Send the order to our sales team to speed up confirmation and preparation."}</p></div>
             </div>
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#1ebe5d] sm:w-auto"><FaWhatsapp />{language === "ar" ? "إرسال عبر واتساب" : "Send via WhatsApp"}</a>
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#1ebe5d] sm:w-auto"><PlatformIcon platform="whatsapp" className="size-4" />{language === "ar" ? "إرسال عبر واتساب" : "Send via WhatsApp"}</a>
         </div>
 
         <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-zinc-900">

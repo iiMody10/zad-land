@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Image as MdImage, Truck as MdLocalShipping, ArrowLeftRight as MdCurrencyExchange, GalleryHorizontalEnd as MdViewCarousel, Info as MdInfoOutline, Save as MdSave, Store as MdStorefront } from 'lucide-react';
+import { Image as MdImage, Truck as MdLocalShipping, ArrowLeftRight as MdCurrencyExchange, GalleryHorizontalEnd as MdViewCarousel, Info as MdInfoOutline, ListOrdered, Save as MdSave, Store as MdStorefront } from 'lucide-react';
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import { updateSiteSettings } from "../../../../lib/admin-actions";
 import { toast } from "react-hot-toast";
 import { useLanguage } from "@/app/context/LanguageContext";
 import FooterContentSection from "./FooterContentSection";
+import HeaderNavigationSection from "./HeaderNavigationSection";
+import type { HeaderNavItemRef } from "@/lib/header-navigation";
 
 interface FooterCategoryOption {
     id: string;
@@ -16,6 +18,7 @@ interface FooterCategoryOption {
 
 interface SiteSettings {
     id: string;
+    headerNavItems: string | null;
     categoriesCtaTitle: string | null;
     categoriesCtaDesc: string | null;
     categoriesCtaTitleAr: string | null;
@@ -126,19 +129,24 @@ interface SiteSettings {
     middleBanner2ButtonTextAr: string | null;
 }
 
-type TabType = "currency" | "footer" | "banners" | "shipping" | "about";
+type TabType = "currency" | "navigation" | "footer" | "banners" | "shipping" | "about";
 
 export default function SiteContentClient({ 
     initialSettings,
-    categories 
+    categories,
+    brands,
+    initialHeaderNavItems,
 }: { 
     initialSettings: SiteSettings | null;
     categories: FooterCategoryOption[];
+    brands: FooterCategoryOption[];
+    initialHeaderNavItems: HeaderNavItemRef[];
 }) {
     const { t, dir } = useLanguage();
     const { openSidebar } = useAdminSidebar();
     const [activeTab, setActiveTab] = useState<TabType>("currency");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [headerNavItems, setHeaderNavItems] = useState<HeaderNavItemRef[]>(initialHeaderNavItems);
 
     // Site Settings State - Categories CTA
     const [ctaTitle, setCtaTitle] = useState(initialSettings?.categoriesCtaTitle || "");
@@ -268,6 +276,7 @@ export default function SiteContentClient({
         try {
             const result = await updateSiteSettings({
                 exchangeRate: Number(exchangeRate) || 135,
+                headerNavItems: JSON.stringify(headerNavItems),
                 categoriesCtaTitle: ctaTitle,
                 categoriesCtaDesc: ctaDesc,
                 categoriesCtaTitleAr: ctaTitleAr,
@@ -344,6 +353,7 @@ export default function SiteContentClient({
 
     const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
         { id: "currency", label: t('admin.tabCurrency') || "Currency & Rates", icon: <MdCurrencyExchange className="text-lg" /> },
+        { id: "navigation", label: t('admin.tabNavigation') || "Header Navigation", icon: <ListOrdered className="text-lg" /> },
         { id: "footer", label: t('admin.tabFooter') || "Footer & Social", icon: <MdStorefront className="text-lg" /> },
         { id: "banners", label: t('admin.tabBanners') || "Promo Banners", icon: <MdViewCarousel className="text-lg" /> },
         { id: "shipping", label: t('admin.tabShipping') || "Shipping & Policy", icon: <MdLocalShipping className="text-lg" /> },
@@ -451,6 +461,15 @@ export default function SiteContentClient({
                                 </p>
                             </div>
                         </div>
+                    )}
+
+                    {activeTab === "navigation" && (
+                        <HeaderNavigationSection
+                            items={headerNavItems}
+                            categories={categories}
+                            brands={brands}
+                            onChange={setHeaderNavItems}
+                        />
                     )}
 
                     {/* TAB 2: FOOTER & SOCIAL LINKS */}

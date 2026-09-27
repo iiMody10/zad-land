@@ -20,9 +20,6 @@ export default function BrandHeroHeader({ brand, totalProducts }: BrandHeroHeade
     const { language, dir } = useLanguage();
     const isArabic = language === 'ar';
 
-    const fallbackImage = "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800";
-    const brandImage = brand.image || fallbackImage;
-
     // Parse bilingual name formatted as "Alicafe - علي كافيه"
     const nameParts = brand.name.split("-");
     const primaryName = isArabic && nameParts.length > 1
@@ -41,7 +38,7 @@ export default function BrandHeroHeader({ brand, totalProducts }: BrandHeroHeade
                 {/* Brand Logo Plinth */}
                 <div className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-2xl p-3 bg-white dark:bg-zinc-800/80 border border-slate-200/80 dark:border-white/10 shadow-xs flex items-center justify-center">
                     <ResilientImage
-                        src={brandImage}
+                        src={brand.image}
                         alt={brand.name}
                         showSkeleton={false}
                         className="max-w-full max-h-full object-contain"

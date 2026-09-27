@@ -4,8 +4,10 @@ import FooterInfoBar from "../components/FooterInfoBar";
 import AnnouncementBar from "../components/AnnouncementBar";
 import BottomNav from "../components/BottomNav";
 import { getI18n } from "@/lib/i18n";
-import { getCatalogCategories } from "@/lib/catalog";
+import { getCatalogBrands, getCatalogCategories } from "@/lib/catalog";
 import { getNavigationData } from "@/lib/navigation";
+import { getSiteSettings } from "@/lib/admin-actions";
+import { getDefaultHeaderNavItems, parseHeaderNavItems, resolveHeaderNavItems } from "@/lib/header-navigation";
 
 import React, { Suspense } from "react";
 import NavigationProgressBar from "../components/NavigationProgressBar";
@@ -24,11 +26,21 @@ export default async function SiteLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const [categories, navData, { t, dir, language }] = await Promise.all([
+    const [categories, brands, navData, siteSettings, { t, dir, language }] = await Promise.all([
         getCategories(),
+        getCatalogBrands(),
         getNavigationData(),
+        getSiteSettings(),
         getI18n(),
     ]);
+    const configuredItems = siteSettings?.headerNavItems == null
+        ? getDefaultHeaderNavItems(categories, brands)
+        : parseHeaderNavItems(siteSettings.headerNavItems);
+    const headerNavItems = resolveHeaderNavItems(
+        configuredItems,
+        categories,
+        brands,
+    );
 
     return (
         <div className="min-h-screen flex flex-col" dir={dir}>
@@ -39,7 +51,7 @@ export default async function SiteLayout({
 
             {/* Header with Server-Side Pre-rendered Navigation Data */}
             <Header
-                initialCategories={categories}
+                initialQuickNavItems={headerNavItems}
                 initialNavData={navData}
                 dir={dir}
                 language={language}

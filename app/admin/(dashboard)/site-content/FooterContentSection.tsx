@@ -1,6 +1,6 @@
 "use client";
 
-import { ThumbsUp as FaFacebook, Camera as FaInstagram, MessageCircle as FaWhatsapp } from 'lucide-react';
+import PlatformIcon from '@/app/components/PlatformIcon';
 
 interface FooterCategoryOption {
     id: string;
@@ -230,7 +230,7 @@ export default function FooterContentSection({
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-gray-800/40 p-4">
                         <div className="mb-2.5 flex items-center gap-2 text-slate-800 dark:text-white">
-                            <FaInstagram className="text-lg text-pink-600" />
+                            <PlatformIcon platform="instagram" className="size-5 text-pink-600" />
                             <span className="text-xs font-bold uppercase">Instagram</span>
                         </div>
                         <TextField
@@ -242,7 +242,7 @@ export default function FooterContentSection({
                     </div>
                     <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-gray-800/40 p-4">
                         <div className="mb-2.5 flex items-center gap-2 text-slate-800 dark:text-white">
-                            <FaFacebook className="text-lg text-blue-600" />
+                            <PlatformIcon platform="facebook" className="size-5 text-blue-600" />
                             <span className="text-xs font-bold uppercase">Facebook</span>
                         </div>
                         <TextField
@@ -254,7 +254,7 @@ export default function FooterContentSection({
                     </div>
                     <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-gray-800/40 p-4">
                         <div className="mb-2.5 flex items-center gap-2 text-slate-800 dark:text-white">
-                            <FaWhatsapp className="text-lg text-emerald-600" />
+                            <PlatformIcon platform="whatsapp" className="size-5 text-emerald-600" />
                             <span className="text-xs font-bold uppercase">WhatsApp</span>
                         </div>
                         <TextField

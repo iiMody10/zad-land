@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { MessageCircle as FaWhatsapp, ThumbsUp as FaFacebook, Camera as FaInstagram } from 'lucide-react';
+import PlatformIcon from '@/app/components/PlatformIcon';
 import { Phone as LuPhone, Mail as LuMail, MapPin as LuMapPin, Clock as LuClock, Send as LuSend } from 'lucide-react';
 import { CircleCheck as IoCheckmarkCircle } from 'lucide-react';
 
@@ -85,7 +85,7 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                             className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl p-6 flex items-center gap-4 transition-all duration-300 shadow-sm hover:shadow-md group block"
                         >
                             <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform">
-                                <FaWhatsapp />
+                                <PlatformIcon platform="whatsapp" className="size-7" />
                             </div>
                             <div>
                                 <h2 className="font-bold text-base md:text-lg">
@@ -164,7 +164,7 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                                         className="w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                                         aria-label="Facebook"
                                     >
-                                        <FaFacebook className="text-base" />
+                                        <PlatformIcon platform="facebook" className="size-4" />
                                     </a>
                                 )}
                                 {settings?.footerInstagramUrl && (
@@ -175,7 +175,7 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                                         className="w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                                         aria-label="Instagram"
                                     >
-                                        <FaInstagram className="text-base" />
+                                        <PlatformIcon platform="instagram" className="size-4" />
                                     </a>
                                 )}
                             </div>

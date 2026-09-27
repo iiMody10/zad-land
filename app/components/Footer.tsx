@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import Image from 'next/image';
-import { Camera as FaInstagram, ThumbsUp as FaFacebook, MessageCircle as FaWhatsapp } from 'lucide-react';
+import PlatformIcon from '@/app/components/PlatformIcon';
 import { Mail as LuMail, MapPin as LuMapPin, Phone as LuPhone } from 'lucide-react';
 import { getFooterCategories } from '@/lib/catalog';
 import { getSiteSettings } from '@/lib/admin-actions';
@@ -40,17 +40,17 @@ const Footer = async ({ t, language }: FooterProps) => {
     const socialLinks = [
         {
             href: settings?.footerInstagramUrl || "#",
-            icon: FaInstagram,
+            platform: 'instagram' as const,
             label: "Instagram",
         },
         {
             href: settings?.footerFacebookUrl || "#",
-            icon: FaFacebook,
+            platform: 'facebook' as const,
             label: "Facebook",
         },
         {
             href: settings?.footerWhatsappUrl || "#",
-            icon: FaWhatsapp,
+            platform: 'whatsapp' as const,
             label: "WhatsApp",
         },
     ].filter((link) => link.href);
@@ -126,7 +126,6 @@ const Footer = async ({ t, language }: FooterProps) => {
                             </p>
                             <div className="mt-4 flex items-center gap-2.5">
                                 {socialLinks.map((social) => {
-                                    const Icon = social.icon;
                                     return (
                                         <a
                                             key={social.label}
@@ -136,7 +135,7 @@ const Footer = async ({ t, language }: FooterProps) => {
                                             rel="noopener noreferrer"
                                             aria-label={social.label}
                                         >
-                                            <Icon />
+                                            <PlatformIcon platform={social.platform} className="size-4" />
                                         </a>
                                     );
                                 })}
@@ -191,7 +190,7 @@ const Footer = async ({ t, language }: FooterProps) => {
                                     <span>info@zadland.com</span>
                                 </a>
                                 <a className="mt-1 inline-flex items-center gap-1.5 font-bold text-[var(--color-accent-light)] transition-colors hover:text-white" href="https://wa.me/963933254796" target="_blank" rel="noopener noreferrer">
-                                    <FaWhatsapp />
+                                    <PlatformIcon platform="whatsapp" className="size-4" />
                                     <span>{isArabic ? 'تواصل معنا عبر واتساب' : 'Chat on WhatsApp'}</span>
                                 </a>
                             </div>

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import { getI18n } from '@/lib/i18n';
 import type { HomeBrand } from '@/lib/admin-actions';
-import Image from 'next/image';
+import ResilientImage from '@/app/components/ResilientImage';
 
 interface ShopByCategoryProps {
     mainBrands: HomeBrand[];
@@ -13,7 +13,7 @@ interface DisplayCategory {
     id: string;
     name: string;
     slug: string;
-    image: string;
+    image: string | null;
 }
 
 const ShopByCategory = async ({ mainBrands }: ShopByCategoryProps) => {
@@ -21,13 +21,6 @@ const ShopByCategory = async ({ mainBrands }: ShopByCategoryProps) => {
 
     // Desired order for the 4 main categories
     const categoryOrder = ['pasta-grains', 'canned-fish', 'sauces-condiments', 'frozen-foods'];
-
-    const defaultImages: Record<string, string> = {
-        'pasta-grains': 'https://images.unsplash.com/photo-1621996346565-e3d5d6281290?w=400',
-        'canned-fish': 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?w=400',
-        'sauces-condiments': 'https://images.unsplash.com/photo-1472476443507-c7a5948772fc?w=400',
-        'frozen-foods': 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400',
-    };
 
     const localizedNames: Record<string, { en: string; ar: string }> = {
         'pasta-grains': { en: 'Pasta & Grains', ar: 'المعكرونة والحبوب' },
@@ -45,15 +38,11 @@ const ShopByCategory = async ({ mainBrands }: ShopByCategoryProps) => {
     // Build display categories in the desired order
     const displayCategories: DisplayCategory[] = categoryOrder.map(slug => {
         const brand = mainBrands.find(b => b.slug === slug);
-        const image = brand?.image
-            ? brand.image
-            : defaultImages[slug] || 'https://images.unsplash.com/photo-1621996346565-e3d5d6281290?w=400';
-
         return {
             id: brand?.id || slug,
             name: getLocalizedName(slug),
             slug,
-            image,
+            image: brand?.image || null,
         };
     });
 
@@ -72,10 +61,9 @@ const ShopByCategory = async ({ mainBrands }: ShopByCategoryProps) => {
                         >
                             {/* Card Image Container - Rectangular like the design */}
                             <div className="relative w-full aspect-square overflow-hidden rounded-2xl bg-gray-50 dark:bg-white/5 shadow-sm group-hover:shadow-lg transition-shadow duration-300">
-                                <Image
+                                <ResilientImage
                                     src={category.image}
                                     alt={category.name}
-                                    fill
                                     sizes="(max-width: 768px) 50vw, 25vw"
                                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                                 />

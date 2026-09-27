@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ChevronDown as MdExpandMore } from 'lucide-react';
 import { useLanguage } from "@/app/context/LanguageContext";
-import { getSafeImageUrl } from '@/lib/image-utils';
+import ResilientImage from "@/app/components/ResilientImage";
 
 interface Category {
     id: string;
@@ -21,8 +21,6 @@ interface CategoriesGridProps {
 const CategoriesGrid = ({ categories }: CategoriesGridProps) => {
     const { t } = useLanguage();
     const [displayLimit, setDisplayLimit] = useState(6);
-    const defaultImage = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800';
-
     const visibleCategories = categories.slice(0, displayLimit);
     const hasMore = categories.length > displayLimit;
 
@@ -40,11 +38,11 @@ const CategoriesGrid = ({ categories }: CategoriesGridProps) => {
                         className="group flex flex-col gap-5 p-2 rounded-2xl bg-surface-light dark:bg-surface-dark border border-[var(--color-accent)]/15 hover:border-[var(--color-accent)] transition-all animate-in fade-in zoom-in-95 duration-500"
                     >
                         <div className="relative aspect-16/10 overflow-hidden rounded-xl bg-background-light dark:bg-background-dark">
-                            <img
-                                src={getSafeImageUrl(category.image || defaultImage)}
+                            <ResilientImage
+                                src={category.image}
                                 alt={category.name}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                loading="lazy"
+                                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                             />
                         </div>
                         <div className="px-4 pb-4">

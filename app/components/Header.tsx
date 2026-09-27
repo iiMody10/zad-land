@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { X as MdClose, ChevronDown as MdKeyboardArrowDown, Menu as MdMenu, ShoppingBag as MdOutlineShoppingBag, UserRound as MdPersonOutline, Search as MdSearch } from 'lucide-react';
 import { useCart } from '@/app/context/CartContext';
@@ -11,10 +12,13 @@ import LanguageToggle from './LanguageToggle';
 import MobileMenu from './MobileMenu';
 import MegaMenu, { type NavMainCategory } from './HeaderComponents/MegaMenu';
 import TopBar from './HeaderComponents/TopBar';
+import type { HeaderNavItem } from '@/lib/header-navigation';
 
 interface HeaderCategory {
     id: string;
     name: string;
+    nameEn?: string | null;
+    isFeatured?: boolean;
     slug: string;
     description: string | null;
     image: string | null;
@@ -22,13 +26,15 @@ interface HeaderCategory {
 
 interface HeaderProps {
     initialCategories?: HeaderCategory[];
+    initialQuickNavItems?: HeaderNavItem[];
     initialNavData?: NavMainCategory[];
     dir: 'ltr' | 'rtl';
     language: 'en' | 'ar';
 }
 
-const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) => {
+const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavData = [] }: HeaderProps) => {
     const { language, dir } = useLanguage();
+    const pathname = usePathname();
     const { totalItems, openDrawer } = useCart();
     const headerRef = useRef<HTMLElement>(null);
     const [headerHeight, setHeaderHeight] = useState(64);
@@ -38,11 +44,14 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
     const [visibleCount, setVisibleCount] = useState(4);
+    const [visibleCategoryCount, setVisibleCategoryCount] = useState(2);
     const isArabic = language === 'ar';
 
     useEffect(() => {
         const updateVisibleCount = () => {
-            setVisibleCount(window.innerWidth >= 1440 ? 7 : window.innerWidth >= 1200 ? 5 : 4);
+            const width = window.innerWidth;
+            setVisibleCount(width >= 1440 ? 4 : width >= 1200 ? 3 : 2);
+            setVisibleCategoryCount(width >= 1440 ? 3 : width >= 1200 ? 2 : 1);
         };
         updateVisibleCount();
         window.addEventListener('resize', updateVisibleCount);
@@ -152,6 +161,8 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
     const activeNavData = initialNavData.find((item) => item.slug === activeMegaMenu);
     const visibleNavItems = initialNavData.slice(0, visibleCount);
     const overflowNavItems = initialNavData.slice(visibleCount);
+    const visibleQuickNavItems = initialQuickNavItems.slice(0, visibleCategoryCount);
+    const overflowQuickNavItems = initialQuickNavItems.slice(visibleCategoryCount);
     const closeDesktopMenus = () => {
         setActiveMegaMenu(null);
         setIsMoreOpen(false);
@@ -290,6 +301,25 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
                     </Link>
 
                     <div className="flex min-w-0 flex-1 items-center gap-0.5">
+                        {visibleQuickNavItems.map((item) => {
+                            const nameParts = item.name.split('-').map((part) => part.trim());
+                            const name = item.nameEn || nameParts.find((part) => isArabic
+                                ? /[\u0600-\u06FF]/.test(part)
+                                : !/[\u0600-\u06FF]/.test(part)) || item.name;
+                            const isActive = pathname === item.href;
+                            return (
+                                <Link
+                                    key={`quick-${item.type}-${item.id}`}
+                                    href={item.href}
+                                    onMouseEnter={closeDesktopMenus}
+                                    aria-current={isActive ? 'page' : undefined}
+                                    title={name}
+                                    className={`flex h-10 max-w-[132px] shrink-0 items-center truncate rounded-[7px] px-3 text-[13px] font-semibold transition-colors xl:text-sm ${isActive ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10'}`}
+                                >
+                                    {name}
+                                </Link>
+                            );
+                        })}
                         {visibleNavItems.map((item) => {
                             const name = isArabic ? item.name : item.nameEn || item.name;
                             const isOpen = activeMegaMenu === item.slug;
@@ -316,7 +346,7 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
                                 </div>
                             );
                         })}
-                        {overflowNavItems.length > 0 && (
+                        {(overflowNavItems.length > 0 || overflowQuickNavItems.length > 0) && (
                             <div className="relative shrink-0" onMouseEnter={() => { setActiveMegaMenu(null); setIsMoreOpen(true); }}>
                                 <button
                                     type="button"
@@ -329,6 +359,21 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
                                 </button>
                                 {isMoreOpen && (
                                     <div className="absolute top-full start-0 z-50 mt-1 w-60 rounded-[10px] border border-[var(--color-line)] bg-white p-2 shadow-[0_16px_35px_rgba(17,43,31,0.13)] dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                                        {overflowQuickNavItems.map((item) => {
+                                            const nameParts = item.name.split('-').map((part) => part.trim());
+                                            const name = item.nameEn || nameParts.find((part) => isArabic
+                                                ? /[\u0600-\u06FF]/.test(part)
+                                                : !/[\u0600-\u06FF]/.test(part)) || item.name;
+                                            return (
+                                            <Link
+                                                key={`overflow-quick-${item.type}-${item.id}`}
+                                                href={item.href}
+                                                onClick={closeDesktopMenus}
+                                                className="block rounded-[6px] px-3 py-2.5 text-sm text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10"
+                                            >
+                                                {name}
+                                            </Link>
+                                        )})}
                                         {overflowNavItems.map((item) => (
                                             <Link
                                                 key={item.id}

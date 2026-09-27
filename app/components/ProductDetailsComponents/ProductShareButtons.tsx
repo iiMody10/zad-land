@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { MessageCircle as FaWhatsapp, ThumbsUp as FaFacebook, Send as FaTelegram, Link as FaLink, Check as FaCheck } from 'lucide-react';
+import { Link as FaLink, Check as FaCheck } from 'lucide-react';
+import PlatformIcon from '@/app/components/PlatformIcon';
 import { useLanguage } from '@/app/context/LanguageContext';
 import toast from 'react-hot-toast';
 
@@ -62,7 +63,7 @@ export default function ProductShareButtons({
                 title={isArabic ? 'مشاركة عبر واتساب' : 'Share via WhatsApp'}
                 aria-label="Share on WhatsApp"
             >
-                <FaWhatsapp className="text-base" />
+                <PlatformIcon platform="whatsapp" className="size-4" />
             </a>
 
             {/* Telegram */}
@@ -74,7 +75,7 @@ export default function ProductShareButtons({
                 title={isArabic ? 'مشاركة عبر تيلغرام' : 'Share via Telegram'}
                 aria-label="Share on Telegram"
             >
-                <FaTelegram className="text-base" />
+                <PlatformIcon platform="telegram" className="size-4" />
             </a>
 
             {/* Facebook */}
@@ -86,7 +87,7 @@ export default function ProductShareButtons({
                 title={isArabic ? 'مشاركة عبر فيسبوك' : 'Share via Facebook'}
                 aria-label="Share on Facebook"
             >
-                <FaFacebook className="text-base" />
+                <PlatformIcon platform="facebook" className="size-4" />
             </a>
 
             {/* Copy Link Button */}

@@ -11,6 +11,7 @@ export interface CatalogCategory {
     image: string | null;
     brandId: string;
     mainCategoryId: string | null;
+    isFeatured?: boolean;
     brand?: CatalogBrand | null;
 }
 

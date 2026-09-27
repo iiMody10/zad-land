@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 import { ChevronRight as MdChevronRight } from 'lucide-react';
-import Image from 'next/image';
+import ResilientImage from '@/app/components/ResilientImage';
 
 interface Category {
     id: string;
@@ -18,8 +18,6 @@ interface CategoriesProps {
 }
 
 const Categories = ({ categories, t, dir }: CategoriesProps) => {
-    const defaultImage = 'https://images.unsplash.com/photo-1621996346565-e3d5d6281290?w=800';
-
     if (!categories || categories.length === 0) {
         return null;
     }
@@ -41,10 +39,9 @@ const Categories = ({ categories, t, dir }: CategoriesProps) => {
                             className="group flex flex-col gap-3 p-2 rounded-2xl transition-all duration-300 hover:bg-white dark:hover:bg-white/5 premium-shadow-hover"
                         >
                             <div className="relative aspect-4/4 w-full overflow-hidden rounded-xl bg-gray-100 dark:bg-white/5">
-                                <Image
-                                    src={category.image || defaultImage}
+                                <ResilientImage
+                                    src={category.image}
                                     alt={category.name}
-                                    fill
                                     sizes="(max-width: 768px) 50vw, 25vw"
                                     className="object-contain transition-transform duration-500 group-hover:scale-110"
                                 />

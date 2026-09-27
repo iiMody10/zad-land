@@ -1,5 +1,6 @@
 import React from 'react';
-import { Mail as MdEmail, Camera as MdCameraAlt, Tag as MdLocalOffer, Star as MdStar } from 'lucide-react';
+import { Mail as MdEmail, Tag as MdLocalOffer, Star as MdStar } from 'lucide-react';
+import PlatformIcon from '@/app/components/PlatformIcon';
 import { getI18n } from '@/lib/i18n';
 
 const FooterInfoBar = async () => {
@@ -7,22 +8,22 @@ const FooterInfoBar = async () => {
 
     const items = [
         {
-            icon: MdStar,
+            icon: <MdStar />,
             title: t('home.footerInfoExclusive'),
             subtitle: t('home.footerInfoExclusiveDesc'),
         },
         {
-            icon: MdLocalOffer,
+            icon: <MdLocalOffer />,
             title: t('home.footerInfoDiscount'),
             subtitle: t('home.footerInfoDiscountDesc'),
         },
         {
-            icon: MdCameraAlt,
+            icon: <PlatformIcon platform="instagram" className="size-5" />,
             title: t('home.footerInfoInstagram'),
             subtitle: t('home.footerInfoInstagramDesc'),
         },
         {
-            icon: MdEmail,
+            icon: <MdEmail />,
             title: t('home.footerInfoNewsletter'),
             subtitle: t('home.footerInfoNewsletterDesc'),
         },
@@ -33,14 +34,13 @@ const FooterInfoBar = async () => {
             <div className="container-custom py-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                     {items.map((item, index) => {
-                        const Icon = item.icon;
                         return (
                             <div
                                 key={index}
                                 className="flex items-center gap-3 md:gap-4 p-2 rounded-xl"
                             >
                                 <div className="flex-shrink-0 w-10 h-10 md:w-11 md:h-11 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black flex items-center justify-center">
-                                    <Icon className="text-base md:text-lg" />
+                                    {item.icon}
                                 </div>
                                 <div className="flex flex-col min-w-0">
                                     <span className="text-xs md:text-sm font-extrabold text-zinc-900 dark:text-white leading-tight truncate">
