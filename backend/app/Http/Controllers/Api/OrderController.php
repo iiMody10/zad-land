@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\PromoCode;
 use App\Support\ApiJson;
+use App\Support\MerchantPhone;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +43,7 @@ class OrderController extends Controller
             'promoCodeId' => ['nullable', 'string', 'max:191'], 'idempotencyKey' => ['nullable', 'string', 'max:128'],
         ]);
         $merchant = Auth::guard('merchant')->user();
-        $phone = $this->normalizePhone($body['phone'] ?? $merchant?->phone ?? '');
+        $phone = MerchantPhone::normalize($body['phone'] ?? $merchant?->phone ?? '') ?? '';
         $city = $this->normalizeGovernorate($body['city'] ?? $merchant?->city ?? '');
         $clean = [
             'shopName' => $this->clean($body['shopName'] ?? $merchant?->shop_name ?? '', 100),
@@ -57,7 +58,7 @@ class OrderController extends Controller
         if (mb_strlen($clean['ownerName']) < 2) {
             $errors['ownerName'] = 'Enter the contact person name';
         }
-        if (! preg_match('/^963\d{8}$/', $phone)) {
+        if (! $phone) {
             $errors['phone'] = 'Enter a valid mobile number';
         }
         if (! $city) {
@@ -196,7 +197,7 @@ class OrderController extends Controller
             return response()->json(['error' => 'Reference is ambiguous; use the full order ID'], 409);
         }
         $order = $matches->first();
-        if (! $order || $this->normalizePhone($order->phone) !== $merchant->phone) {
+        if (! $order || MerchantPhone::normalize($order->phone) !== MerchantPhone::normalize($merchant->phone)) {
             return response()->json(['error' => 'No matching order was found for your account phone'], 404);
         }
         if ($order->customer_id === $merchant->id) {
@@ -361,31 +362,6 @@ class OrderController extends Controller
         }
 
         return ((int) $match[1] * 100) + (int) str_pad($match[2] ?? '', 2, '0');
-    }
-
-    private function normalizePhone(string $value): string
-    {
-        $value = strtr($value, array_combine(preg_split('//u', '٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹', -1, PREG_SPLIT_NO_EMPTY), str_split('01234567890123456789')));
-        if (! preg_match('/^[0-9+().\s-]+$/', $value)) {
-            return '';
-        }
-        $digits = preg_replace('/\D/', '', $value) ?? '';
-        if (str_starts_with($digits, '00963')) {
-            $digits = substr($digits, 5);
-        } elseif (str_starts_with($digits, '963')) {
-            $digits = substr($digits, 3);
-        }
-        if (preg_match('/^09\d{8}$/', $digits)) {
-            return '963'.substr($digits, 2);
-        }
-        if (preg_match('/^9\d{8}$/', $digits)) {
-            return '963'.substr($digits, 1);
-        }
-        if (preg_match('/^\d{8}$/', $digits)) {
-            return '9639'.$digits;
-        }
-
-        return '';
     }
 
     private function normalizeGovernorate(string $value): string

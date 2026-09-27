@@ -96,7 +96,29 @@ class OrderApiTest extends TestCase
         $created->assertCookie('zad_order_'.$orderId);
 
         $this->getJson('/api/orders/'.$orderId.'?token='.urlencode($token))
-            ->assertOk()->assertJsonPath('id', $orderId)->assertJsonPath('items.0.product.id', $product->id);
+            ->assertOk()->assertJsonPath('id', $orderId)->assertJsonPath('items.0.product.id', $product->id)
+            ->assertJsonPath('phone', '963912345678');
+    }
+
+    public function test_merchant_can_claim_guest_order_using_receipt_reference_when_phone_matches(): void
+    {
+        $product = $this->product();
+        $merchant = Customer::create([
+            'shop_name' => 'Approved shop', 'owner_name' => 'Owner', 'phone' => '963912345678', 'city' => 'حمص',
+            'address' => 'Main street', 'password' => Hash::make('secret123'), 'is_active' => true,
+        ]);
+        $created = $this->postJson('/api/orders', [
+            'shopName' => 'Approved shop', 'ownerName' => 'Owner', 'phone' => '0912345678',
+            'city' => 'حمص', 'streetAddress' => 'Main street 12', 'idempotencyKey' => 'claim-guest-order-0001',
+            'items' => [['productId' => $product->id, 'quantity' => 2]],
+        ])->assertCreated();
+        $orderId = $created->json('id');
+
+        $this->actingAs($merchant, 'merchant')->postJson('/api/customer/orders/claim', [
+            'orderId' => strtoupper(substr($orderId, -8)),
+        ])->assertOk()->assertJsonPath('success', true);
+
+        $this->getJson('/api/customer/orders')->assertOk()->assertJsonPath('orders.0.id', $orderId);
     }
 
     public function test_promotion_discount_is_calculated_from_database_prices(): void
