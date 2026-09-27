@@ -46,12 +46,12 @@ class AdminController extends Controller
         if ($resource === 'customers') {
             $customers = Customer::withCount(['orders', 'wishlistProducts'])->orderByDesc('created_at')->get();
 
-            return response()->json(ApiJson::camel($customers->map(function (Customer $customer): array {
+            return response()->json($customers->map(function (Customer $customer): array {
                 $data = ApiJson::camel($customer);
                 $data['_count'] = ['orders' => $customer->orders_count, 'wishlistItems' => $customer->wishlist_products_count];
 
                 return $data;
-            })));
+            })->values());
         }
         if ($resource === 'users') {
             return response()->json(ApiJson::camel(User::orderByDesc('created_at')->get()));
