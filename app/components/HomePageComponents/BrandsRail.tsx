@@ -184,9 +184,6 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                             <MdChevronRight className={`text-base transition-transform ${isArabic ? 'rotate-180' : ''}`} />
                         </Link>
                     </div>
-                    <p className="mt-2 text-center text-[10px] font-medium text-slate-500 dark:text-gray-400">
-                        {isArabic ? 'شركاؤنا في الوصول إلى أسواق أكثر جودة' : 'Our partners in reaching better markets'}
-                    </p>
                 </div>
 
                 {/* Legacy desktop ornament retained for mobile-only layout compatibility */}
