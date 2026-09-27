@@ -1,5 +1,4 @@
-import { getAdminCategories, getSiteSettings } from "../../../../lib/admin-actions";
-import { getCatalogBrands } from "@/lib/catalog";
+import { getAdminBrands, getAdminCategories, getAdminSiteSettings } from "../../../../lib/admin-actions";
 import { getConfiguredHeaderNavItems } from "@/lib/header-navigation";
 import SiteContentClient from "./SiteContentClient";
 import { getLaravelAdmin } from "@/lib/laravel-server";
@@ -13,9 +12,9 @@ export default async function SiteContentPage() {
     }
 
     const [siteSettings, categoriesData, catalogBrands] = await Promise.all([
-        getSiteSettings(),
+        getAdminSiteSettings(),
         getAdminCategories(1, 500),
-        getCatalogBrands(),
+        getAdminBrands(),
     ]);
     const headerNavItems = getConfiguredHeaderNavItems(siteSettings?.headerNavItems, catalogBrands);
     

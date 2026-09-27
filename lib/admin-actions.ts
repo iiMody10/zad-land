@@ -67,7 +67,12 @@ async function request<T = any>(path: string, method = "GET", body?: unknown): P
 }
 
 function invalidateAdminData() {
-    for (const path of ["/", "/products", "/brands", "/categories", "/admin"]) {
+    for (const path of [
+        "/", "/products", "/brands", "/categories", "/admin",
+        "/admin/banners", "/admin/site-content", "/admin/settings", "/admin/users",
+        "/admin/customers", "/admin/brands", "/admin/categories", "/admin/main-categories",
+        "/admin/products", "/admin/orders", "/admin/promocodes", "/admin/reviews",
+    ]) {
         revalidatePath(path);
     }
 }
@@ -109,6 +114,10 @@ const imageOf = (images: unknown) => {
 
 export async function getSiteSettings(): Promise<any> {
     return laravelJson<any>("/api/settings", null, { forwardSession: false });
+}
+
+export async function getAdminSiteSettings(): Promise<any> {
+    return request<any>("/admin/settings");
 }
 
 export async function getActiveBanners() {
