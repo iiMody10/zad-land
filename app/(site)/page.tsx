@@ -3,7 +3,7 @@ import {
     getActiveBanners,
     getMainCategoryBrands,
     getHomeRailBrands,
-    getCategoryHighlightCardsData,
+    getHomeRailCategories,
     getBestSellerProducts,
     getOnSaleProducts,
     getNewArrivalProducts,
@@ -29,7 +29,7 @@ export default async function Home() {
         banners,
         mainBrands,
         railBrands,
-        highlightCards,
+        mainCategories,
         featuredBestSellers,
         featuredNewArrivals,
         featuredBundles,
@@ -40,7 +40,7 @@ export default async function Home() {
         loadHomeSection("banners", getActiveBanners, []),
         loadHomeSection("main brands", getMainCategoryBrands, []),
         loadHomeSection("brand rail", getHomeRailBrands, []),
-        loadHomeSection("category highlights", getCategoryHighlightCardsData, []),
+        loadHomeSection("main categories", getHomeRailCategories, []),
         loadHomeSection("best sellers", getBestSellerProducts, []),
         loadHomeSection("new arrivals", getNewArrivalProducts, []),
         loadHomeSection("sale products", getOnSaleProducts, []),
@@ -61,7 +61,7 @@ export default async function Home() {
                     banners={banners}
                     mainBrands={mainBrands}
                     railBrands={railBrands}
-                    highlightCards={highlightCards}
+                    mainCategories={mainCategories}
                     featuredNewArrivals={featuredNewArrivals}
                     featuredBundles={featuredBundles}
                     featuredBestSellers={featuredBestSellers}

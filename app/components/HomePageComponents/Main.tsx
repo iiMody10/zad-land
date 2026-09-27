@@ -54,7 +54,7 @@ interface Product {
     } | null;
 }
 
-import type { HighlightCard } from './CategoryHighlightCards';
+import type { HomeMainCategory } from '@/lib/admin-actions';
 
 interface FeaturedCategory {
     id: string;
@@ -70,7 +70,7 @@ interface MainProps {
     banners: Banner[];
     mainBrands: HomeBrand[];
     railBrands: RailBrand[];
-    highlightCards: HighlightCard[];
+    mainCategories: HomeMainCategory[];
     featuredNewArrivals: Product[];
     featuredBundles: Product[];
     featuredBestSellers: Product[];
@@ -83,7 +83,7 @@ const Main = async ({
     banners,
     mainBrands,
     railBrands,
-    highlightCards,
+    mainCategories,
     featuredNewArrivals,
     featuredBundles,
     featuredBestSellers,
@@ -107,7 +107,7 @@ const Main = async ({
                 <PromoBanner settings={settings} dir={dir} language={language} />
 
                 {/* 4. Category Highlight Cards */}
-                <CategoryHighlightCards cards={highlightCards} language={language} />
+                <CategoryHighlightCards categories={mainCategories} language={language} />
             </div>
 
             {/* 5. الجديد والمحبوب (New Arrivals & Best Sellers) */}

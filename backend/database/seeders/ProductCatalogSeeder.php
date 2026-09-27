@@ -47,7 +47,12 @@ class ProductCatalogSeeder extends Seeder
             $mainKey = mb_strtolower($mainName);
             $mainCategories[$mainKey] ??= MainCategory::firstOrCreate(
                 ['slug' => $mainSlug],
-                ['name' => $mainName, 'show_in_nav' => true, 'is_active' => true],
+                [
+                    'name' => $mainName,
+                    'image' => $this->mainCategoryImage($mainName),
+                    'show_in_nav' => true,
+                    'is_active' => true,
+                ],
             );
 
             $brandName = trim($row['brand']);
@@ -110,5 +115,18 @@ class ProductCatalogSeeder extends Seeder
         $suffix = substr(hash('sha256', mb_strtolower($stableKey ?? $value)), 0, 12);
 
         return ($base !== '' ? $base : $prefix).'-'.$suffix;
+    }
+
+    private function mainCategoryImage(string $name): ?string
+    {
+        return match ($name) {
+            'غذائيات' => '/images/categories/canned-goods.webp',
+            'مشروبات' => '/images/categories/beverages-coffee.webp',
+            'منظفات' => '/images/categories/cleaning-supplies.webp',
+            'نقرشات' => '/images/categories/snacks-nuts.webp',
+            // Frozen foods intentionally use an actual product image until an
+            // appropriate cover is uploaded from the main-category editor.
+            default => null,
+        };
     }
 }

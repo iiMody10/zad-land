@@ -38,6 +38,14 @@ export interface HomeBrand {
     id: string; name: string; slug: string; description: string | null; image: string | null; group: BrandGroup;
     _count: { products: number; categories: number };
 }
+export interface HomeMainCategory {
+    id: string;
+    name: string;
+    nameAr: string;
+    nameEn: string;
+    slug: string;
+    image: string;
+}
 export interface RailBrand { id: string; name: string; nameAr: string; fullName: string; slug: string; image: string; productCount?: number }
 
 export interface DashboardStats {
@@ -140,27 +148,24 @@ export async function getHomeRailBrands(): Promise<RailBrand[]> {
     }));
 }
 
-export async function getHomeRailCategories() {
+export async function getHomeRailCategories(): Promise<HomeMainCategory[]> {
     const departments = await laravelJson<Record<string, any>[]>("/api/main-categories", [], { forwardSession: false });
     const results = await Promise.all(departments.map(async (department) => {
-        const result = await publicProducts(`page=1&limit=1&mainCategoryId=${encodeURIComponent(department.id)}`);
-        const product = result[0];
+        let image = typeof department.image === "string" ? department.image : "";
+        if (!image) {
+            const result = await publicProducts(`page=1&limit=1&mainCategoryId=${encodeURIComponent(department.id)}`);
+            image = imageOf(result[0]?.images);
+        }
         return {
-            id: department.id, name: department.nameEn || department.name, nameAr: department.name,
-            slug: department.slug, image: department.image || imageOf(product?.images),
+            id: String(department.id),
+            name: String(department.name || ""),
+            nameAr: String(department.name || ""),
+            nameEn: String(department.nameEn || department.name || ""),
+            slug: String(department.slug || ""),
+            image,
         };
     }));
-    return results.filter((category) => category.image);
-}
-
-export async function getCategoryHighlightCardsData() {
-    const departments = await getHomeRailCategories();
-    return departments.slice(0, 4).map((department) => ({
-        id: department.id, slug: department.slug, subheadingAr: department.nameAr, subheadingEn: department.name,
-        headingAr: department.nameAr, headingEn: department.name,
-        productNameAr: department.nameAr, productNameEn: department.name,
-        priceText: "", heroImage: department.image, productThumb: department.image, productSlug: "",
-    }));
+    return results.filter((category) => category.id && category.slug && category.image);
 }
 
 export async function getOnSaleProducts() { return publicProducts("page=1&limit=12&onSale=true"); }
