@@ -14,14 +14,18 @@ final class MerchantPhone
             return null;
         }
         $digits = preg_replace('/\D/', '', $normalized) ?? '';
-        // Existing merchant records use this canonical form. Keep it stable
-        // when an admin edits a profile and saves the phone unchanged.
-        if (preg_match('/^963\d{8}$/', $digits)) {
+        // Canonical Syrian mobile numbers are country code + nine digits,
+        // including the mobile prefix 9 (for example 963933254796).
+        if (preg_match('/^9639\d{8}$/', $digits)) {
             return $digits;
         }
         if (str_starts_with($digits, '00963')) $digits = substr($digits, 5);
-        elseif (str_starts_with($digits, '963')) $digits = substr($digits, 3);
-        if (preg_match('/^09\d{8}$/', $digits)) return '963'.substr($digits, 2);
+        elseif (preg_match('/^963\d{8}$/', $digits)) {
+            // Older code accidentally dropped the leading mobile 9 when
+            // saving a local number. Accept that stored/input form and repair it.
+            return '9639'.substr($digits, 3);
+        } elseif (str_starts_with($digits, '963')) $digits = substr($digits, 3);
+        if (preg_match('/^09\d{8}$/', $digits)) return '963'.substr($digits, 1);
         if (preg_match('/^9\d{8}$/', $digits)) return '963'.substr($digits, 1);
         if (preg_match('/^\d{8}$/', $digits)) return '9639'.$digits;
 
@@ -30,6 +34,14 @@ final class MerchantPhone
 
     public static function variants(string $canonical): array
     {
-        return [$canonical, '09'.substr($canonical, 3)];
+        $subscriber = substr($canonical, 3);
+
+        return array_values(array_unique([
+            $canonical,
+            '0'.$subscriber,
+            // Include values saved by the previous normalizer, which omitted
+            // the subscriber's leading 9 from international-form numbers.
+            preg_match('/^9639\d{8}$/', $canonical) ? '963'.substr($canonical, 4) : $canonical,
+        ]));
     }
 }

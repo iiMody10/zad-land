@@ -239,7 +239,7 @@ class OrderApiTest extends TestCase
             'shopName' => 'Managed Shop', 'ownerName' => 'Shop Owner', 'phone' => '0912345678',
             'city' => 'حمص', 'address' => 'Market road 12', 'notes' => null,
             'password' => 'merchant123', 'isActive' => true,
-        ])->assertCreated()->assertJsonPath('shopName', 'Managed Shop')->assertJsonPath('phone', '96312345678');
+        ])->assertCreated()->assertJsonPath('shopName', 'Managed Shop')->assertJsonPath('phone', '963912345678');
         $merchantId = $created->json('id');
         $merchant = Customer::findOrFail($merchantId);
         $this->assertTrue(Hash::check('merchant123', $merchant->password));
@@ -294,18 +294,28 @@ class OrderApiTest extends TestCase
             'city' => 'حمص', 'address' => 'Main street 12', 'password' => 'secret123',
         ])->assertCreated()->assertJsonPath('pendingApproval', true);
 
-        $this->assertDatabaseHas('customers', ['phone' => '96312345678', 'is_active' => false]);
+        $this->assertDatabaseHas('customers', ['phone' => '963912345678', 'is_active' => false]);
     }
 
     public function test_merchant_login_uses_sanctum_session_authentication(): void
     {
-        Customer::create(['shop_name' => 'Approved shop', 'owner_name' => 'Owner', 'phone' => '96312345678', 'city' => 'حمص', 'address' => 'Main street', 'password' => Hash::make('secret123'), 'is_active' => true]);
+        Customer::create(['shop_name' => 'Approved shop', 'owner_name' => 'Owner', 'phone' => '963912345678', 'city' => 'حمص', 'address' => 'Main street', 'password' => Hash::make('secret123'), 'is_active' => true]);
 
         $this->withHeaders(['Origin' => 'http://localhost:3000', 'Referer' => 'http://localhost:3000/'])
             ->postJson('/api/customer/auth/login', ['phone' => '0912345678', 'password' => 'secret123'])
-            ->assertOk()->assertJsonPath('customer.phone', '96312345678');
+            ->assertOk()->assertJsonPath('customer.phone', '963912345678');
 
         $this->getJson('/api/customer/auth/me')->assertOk()->assertJsonPath('customer.shopName', 'Approved shop');
         $this->getJson('/api/customer/wishlist?idsOnly=true')->assertOk()->assertJsonPath('wishlistIds', []);
+    }
+
+    public function test_merchant_login_repairs_legacy_phone_values(): void
+    {
+        Customer::create(['shop_name' => 'Legacy shop', 'owner_name' => 'Owner', 'phone' => '96312345678', 'city' => 'حمص', 'address' => 'Main street', 'password' => Hash::make('secret123'), 'is_active' => true]);
+
+        $this->withHeaders(['Origin' => 'http://localhost:3000', 'Referer' => 'http://localhost:3000/'])
+            ->postJson('/api/customer/auth/login', ['phone' => '0912345678', 'password' => 'secret123'])
+            ->assertOk()->assertJsonPath('customer.phone', '963912345678');
+        $this->assertDatabaseHas('customers', ['phone' => '963912345678']);
     }
 }
