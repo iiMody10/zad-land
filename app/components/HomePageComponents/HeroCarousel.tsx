@@ -36,21 +36,6 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
     const isArabic = dir === 'rtl';
     const wrapperRef = React.useRef<HTMLElement>(null);
     
-    const DEFAULT_BANNER: Banner = {
-        id: 'default',
-        title: 'Connecting Global Brands to Every Market',
-        subtitle: 'Zad Land leading wholesale distribution\nOfficial partner for global products in Syria - Homs',
-        titleAr: 'نصل بالعلامات العالمية إلى كل سوق',
-        subtitleAr: 'زاد لاند شركة توزيع رائدة\nالوكيل الرسمي لمنتجات عالمية\nوطنية في سوريا - حمص',
-        image: "/images/redesign/hero-bg.png",
-        buttonText: 'Discover More',
-        buttonTextAr: 'اكتشف المزيد',
-        link: "/products",
-        badge: 'Certified Wholesale',
-        badgeAr: 'توزيع جملة معتمد',
-        isActive: true
-    };
-
     const getBannerTitle = (banner: Banner): string => {
         return isArabic ? (banner.titleAr || banner.title || 'نصل بالعلامات العالمية إلى كل سوق') : (banner.title || banner.titleAr || 'Connecting Global Brands to Every Market');
     };
@@ -74,7 +59,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
     };
 
     const sortedBanners = React.useMemo(() => {
-        if (!banners || banners.length === 0) return [DEFAULT_BANNER];
+        if (!banners || banners.length === 0) return [];
         const hero = banners.find(b => b.image === '/images/redesign/hero-bg.png');
         if (hero) {
             return [hero, ...banners.filter(b => b.id !== hero.id)];
@@ -83,6 +68,8 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
     }, [banners]);
 
     const displayBanners = sortedBanners;
+
+    if (displayBanners.length === 0) return null;
 
     return (
         <section ref={wrapperRef} className="w-full pt-0 pb-0 md:pb-6 group hero-carousel">

@@ -94,7 +94,7 @@ export default function BannersClient({ banners }: { banners: Banner[] }) {
                                 {t('admin.heroBanners')}
                             </h3>
                             <p className="text-sm text-slate-500 dark:text-gray-400 mt-1">
-                                {t('admin.manageHeroBanners')}
+                                {t('admin.controlHero')}
                             </p>
                         </div>
                         {canManage && (
@@ -114,6 +114,16 @@ export default function BannersClient({ banners }: { banners: Banner[] }) {
                         banner={selectedBanner}
                     />
 
+                    {banners.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                {t('admin.noBanners')}
+                            </h3>
+                            <p className="mt-2 text-sm text-slate-500 dark:text-gray-400">
+                                {t('admin.addFirstBanner')}
+                            </p>
+                        </div>
+                    ) : (
                     <div className="grid grid-cols-1 gap-6">
                         {banners.map((banner) => (
                             <div key={banner.id} className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col lg:flex-row">
@@ -225,6 +235,7 @@ export default function BannersClient({ banners }: { banners: Banner[] }) {
                             </div>
                         ))}
                     </div>
+                    )}
                 </div>
             </div>
         </div>
