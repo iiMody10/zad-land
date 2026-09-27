@@ -5,8 +5,10 @@ export type HeaderNavItemRef = {
     id: string;
 };
 
-export function getDefaultHeaderNavItems(mainCategories: Array<Pick<NavMainCategory, 'id'>>): HeaderNavItemRef[] {
-    return mainCategories.slice(0, 6).map(({ id }) => ({ type: 'mainCategory', id }));
+export function getDefaultHeaderNavItems(mainCategories: Array<Pick<NavMainCategory, 'id' | 'showInNav'>>): HeaderNavItemRef[] {
+    const categoriesWithLegacyVisibility = mainCategories.filter((category) => 'showInNav' in category && category.showInNav);
+    const defaults = categoriesWithLegacyVisibility.length > 0 ? categoriesWithLegacyVisibility : mainCategories;
+    return defaults.slice(0, 6).map(({ id }) => ({ type: 'mainCategory', id }));
 }
 
 export function parseHeaderNavItems(value: unknown): HeaderNavItemRef[] {
@@ -34,7 +36,7 @@ export function parseHeaderNavItems(value: unknown): HeaderNavItemRef[] {
  */
 export function getConfiguredHeaderNavItems(
     value: unknown,
-    mainCategories: Array<Pick<NavMainCategory, 'id'>>,
+    mainCategories: Array<Pick<NavMainCategory, 'id' | 'showInNav'>>,
 ): HeaderNavItemRef[] {
     if (value == null) return getDefaultHeaderNavItems(mainCategories);
 

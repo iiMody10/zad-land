@@ -136,7 +136,10 @@ class CatalogController extends Controller
 
     public function navigation()
     {
-        $mainCategories = MainCategory::where('is_active', true)->where('show_in_nav', true)->orderBy('nav_order')
+        // The header navigation settings choose which active departments are
+        // rendered. Return all active departments here so admins can add one
+        // even before its legacy show_in_nav flag has been enabled.
+        $mainCategories = MainCategory::where('is_active', true)->orderBy('nav_order')
             ->with(['brands' => fn ($q) => $q->where('is_active', true)->orderBy('name'), 'categories' => fn ($q) => $q->with('brand')->orderBy('name')->take(30), 'products' => fn ($q) => $q->with('brand')->orderByDesc('created_at')->take(40)])
             ->get();
         $data = $mainCategories->map(function (MainCategory $main): array {
@@ -162,7 +165,7 @@ class CatalogController extends Controller
             }
             $top = $products->reject(fn ($p) => $trending->contains('id', $p->id))->take(8)->map(fn ($p) => ['id' => $p->id, 'name' => $p->name, 'nameAr' => $p->name_ar, 'nameEn' => $p->name_en, 'slug' => $p->slug])->values();
 
-            return ['id' => $main->id, 'name' => $main->name, 'nameEn' => $main->description ?: $main->name, 'slug' => $main->slug, 'image' => $main->image, 'brands' => ApiJson::camel($brands->sortBy('name')->values()->map->only(['id', 'name', 'slug', 'image'])), 'categories' => ApiJson::camel($main->categories->map->only(['id', 'name', 'slug'])->values()), 'topProducts' => $top, 'trendingProducts' => $trending->take(3)->map($format)->values()];
+            return ['id' => $main->id, 'name' => $main->name, 'nameEn' => $main->description ?: $main->name, 'slug' => $main->slug, 'image' => $main->image, 'showInNav' => (bool) $main->show_in_nav, 'brands' => ApiJson::camel($brands->sortBy('name')->values()->map->only(['id', 'name', 'slug', 'image'])), 'categories' => ApiJson::camel($main->categories->map->only(['id', 'name', 'slug'])->values()), 'topProducts' => $top, 'trendingProducts' => $trending->take(3)->map($format)->values()];
         });
 
         return response()->json($data)->header('Cache-Control', 'private, no-store');

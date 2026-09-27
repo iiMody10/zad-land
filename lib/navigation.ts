@@ -11,13 +11,13 @@ export interface NavTrendingProduct {
     packaging: string | null; itemsPerPackage: string | null; brand?: { name: string } | null;
 }
 export interface NavMainCategory {
-    id: string; name: string; nameEn?: string; slug: string; image?: string | null;
+    id: string; name: string; nameEn?: string; slug: string; image?: string | null; showInNav?: boolean;
     brands: NavBrand[]; categories: NavCategory[]; topProducts: NavTopProduct[]; trendingProducts: NavTrendingProduct[];
 }
 
 const cachedNavigation = unstable_cache(
     async () => laravelJson<NavMainCategory[]>("/api/navigation", []),
-    ["laravel-navigation-data"],
+    ["laravel-navigation-data-v2"],
     { tags: ["navigation"], revalidate: 3600 },
 );
 

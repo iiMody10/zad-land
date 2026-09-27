@@ -1,6 +1,5 @@
-import { getAdminCategories, getAdminSiteSettings } from "../../../../lib/admin-actions";
+import { getAdminMainCategories, getAdminCategories, getAdminSiteSettings } from "../../../../lib/admin-actions";
 import { getConfiguredHeaderNavItems } from "@/lib/header-navigation";
-import { getNavigationData } from "@/lib/navigation";
 import SiteContentClient from "./SiteContentClient";
 import { getLaravelAdmin } from "@/lib/laravel-server";
 import { redirect } from "next/navigation";
@@ -15,9 +14,10 @@ export default async function SiteContentPage() {
     const [siteSettings, categoriesData, mainCategories] = await Promise.all([
         getAdminSiteSettings(),
         getAdminCategories(1, 500),
-        getNavigationData(),
+        getAdminMainCategories(),
     ]);
-    const headerNavItems = getConfiguredHeaderNavItems(siteSettings?.headerNavItems, mainCategories);
+    const activeMainCategories = mainCategories.filter((category: { isActive?: boolean }) => category.isActive !== false);
+    const headerNavItems = getConfiguredHeaderNavItems(siteSettings?.headerNavItems, activeMainCategories);
     
     return (
         <SiteContentClient
@@ -26,7 +26,7 @@ export default async function SiteContentPage() {
                 id: category.id,
                 name: category.name,
             }))}
-            mainCategories={mainCategories.map((category) => ({ id: category.id, name: category.name, nameEn: category.nameEn }))}
+            mainCategories={activeMainCategories.map((category: { id: string; name: string; description?: string | null }) => ({ id: category.id, name: category.name, nameEn: category.description || undefined }))}
             initialHeaderNavItems={headerNavItems}
         />
     );
