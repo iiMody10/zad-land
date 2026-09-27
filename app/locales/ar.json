@@ -215,7 +215,7 @@
     },
     "orderComplete": {
         "thankYou": "شكراً لك!",
-        "orderConfirmed": "تم تأكيد طلبك",
+        "orderConfirmed": "تم تسجيل طلبك، وسيتواصل معك فريقنا لتأكيده",
         "orderNumber": "رقم الطلب",
         "orderDetails": "تفاصيل الطلب",
         "items": "العناصر",

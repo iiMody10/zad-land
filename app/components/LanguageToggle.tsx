@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useLanguage } from '@/app/context/LanguageContext';
-import { MdKeyboardArrowDown } from 'react-icons/md';
+import { ChevronDown as MdKeyboardArrowDown } from 'lucide-react';
 
 const LanguageToggle = () => {
     const { language, setLanguage } = useLanguage();

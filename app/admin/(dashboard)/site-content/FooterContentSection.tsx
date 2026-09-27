@@ -1,6 +1,6 @@
 "use client";
 
-import { FaFacebook, FaInstagram, FaWhatsapp } from "react-icons/fa";
+import { ThumbsUp as FaFacebook, Camera as FaInstagram, MessageCircle as FaWhatsapp } from 'lucide-react';
 
 interface FooterCategoryOption {
     id: string;
@@ -50,7 +50,7 @@ function TextField({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="w-full rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-slate-900 dark:text-white outline-none transition-all focus:border-[#072835] focus:ring-2 focus:ring-[#072835]/15"
+                className="w-full rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-slate-900 dark:text-white outline-none transition-all focus:border-[var(--color-brand)] focus:ring-2 focus:ring-[var(--color-brand)]/15"
             />
         </div>
     );
@@ -74,7 +74,7 @@ function TextAreaField({
                 rows={rows}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full resize-none rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-slate-900 dark:text-white outline-none transition-all focus:border-[#072835] focus:ring-2 focus:ring-[#072835]/15"
+                className="w-full resize-none rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-slate-900 dark:text-white outline-none transition-all focus:border-[var(--color-brand)] focus:ring-2 focus:ring-[var(--color-brand)]/15"
             />
         </div>
     );
@@ -97,7 +97,7 @@ function SelectField({
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-slate-900 dark:text-white outline-none transition-all focus:border-[#072835] focus:ring-2 focus:ring-[#072835]/15 cursor-pointer"
+                className="w-full rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 px-4 py-2.5 text-sm text-slate-900 dark:text-white outline-none transition-all focus:border-[var(--color-brand)] focus:ring-2 focus:ring-[var(--color-brand)]/15 cursor-pointer"
             >
                 <option value="">{label}</option>
                 {options.map((option) => (
@@ -167,7 +167,7 @@ export default function FooterContentSection({
     return (
         <div className="space-y-8">
             {/* Branding Section */}
-            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0f172a] p-6 md:p-8 shadow-xs">
+            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[var(--color-surface-dark)] p-6 md:p-8 shadow-xs">
                 <SectionTitle
                     title={t('admin.footerBranding') || 'Footer Branding'}
                     description={t('admin.footerBrandingDescription') || 'Edit brand title, company description, and copyright note in the footer.'}
@@ -221,7 +221,7 @@ export default function FooterContentSection({
             </div>
 
             {/* Social Links Section */}
-            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0f172a] p-6 md:p-8 shadow-xs">
+            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[var(--color-surface-dark)] p-6 md:p-8 shadow-xs">
                 <SectionTitle
                     title={t('admin.socialLinks') || 'Social Media Links'}
                     description={t('admin.socialLinksDescription') || 'Configure links to your official social profiles.'}
@@ -268,7 +268,7 @@ export default function FooterContentSection({
             </div>
 
             {/* Shop Categories Section */}
-            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0f172a] p-6 md:p-8 shadow-xs">
+            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[var(--color-surface-dark)] p-6 md:p-8 shadow-xs">
                 <SectionTitle
                     title={t('admin.footerShopSection') || 'Shop Categories Column'}
                     description={t('admin.footerShopSectionDescription') || 'Rename the shop column and select up to 4 quick shortcut categories.'}
@@ -318,7 +318,7 @@ export default function FooterContentSection({
             </div>
 
             {/* Support Links Section */}
-            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0f172a] p-6 md:p-8 shadow-xs">
+            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[var(--color-surface-dark)] p-6 md:p-8 shadow-xs">
                 <SectionTitle
                     title={t('admin.footerSupportSection') || 'Customer Support Column'}
                     description={t('admin.footerSupportSectionDescription') || 'Edit heading and quick links for customer support and policies.'}
@@ -377,7 +377,7 @@ export default function FooterContentSection({
             </div>
 
             {/* Company Links Section */}
-            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0f172a] p-6 md:p-8 shadow-xs">
+            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[var(--color-surface-dark)] p-6 md:p-8 shadow-xs">
                 <SectionTitle
                     title={t('admin.footerCompanySection') || 'Company Information Column'}
                     description={t('admin.footerCompanySectionDescription') || 'Edit company column heading and up to three footer links.'}

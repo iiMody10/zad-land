@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useLanguage } from "@/app/context/LanguageContext";
 import ResilientImage from "@/app/components/ResilientImage";
-import { MdStar } from "react-icons/md";
+import { Star as MdStar } from 'lucide-react';
 
 interface Brand {
     id: string;
@@ -44,8 +44,8 @@ export default function BrandsClient({ brands }: BrandsClientProps) {
                 href={`/brands/${brand.slug}`}
                 className={`group flex min-h-[160px] flex-col justify-between rounded-2xl border transition-all duration-300 hover:-translate-y-1 p-3 sm:p-4 ${
                     isHighlight
-                        ? "border-[#B8860B]/30 bg-gradient-to-b from-[#FAF6EC]/60 to-white shadow-xs hover:border-[#B8860B] hover:shadow-md dark:border-[#B8860B]/20 dark:from-[#B8860B]/5 dark:to-white/5"
-                        : "border-slate-200/80 bg-white hover:border-[#072835] hover:shadow-md dark:border-white/10 dark:bg-white/5"
+                        ? "border-[var(--color-accent)]/30 bg-gradient-to-b from-[var(--color-canvas)]/60 to-white shadow-xs hover:border-[var(--color-accent)] hover:shadow-md dark:border-[var(--color-accent)]/20 dark:from-[var(--color-accent)]/5 dark:to-white/5"
+                        : "border-slate-200/80 bg-white hover:border-[var(--color-brand)] hover:shadow-md dark:border-white/10 dark:bg-white/5"
                 }`}
             >
                 <div className="relative aspect-square overflow-hidden rounded-xl bg-white dark:bg-white/5 p-3 flex items-center justify-center border border-slate-100 dark:border-white/5">
@@ -62,7 +62,7 @@ export default function BrandsClient({ brands }: BrandsClientProps) {
                     )}
                 </div>
                 <div className="pt-3 text-center">
-                    <p className="line-clamp-1 text-xs sm:text-sm font-bold text-slate-900 transition-colors group-hover:text-[#B8860B] dark:text-white dark:group-hover:text-[#E5B54A]">
+                    <p className="line-clamp-1 text-xs sm:text-sm font-bold text-slate-900 transition-colors group-hover:text-[var(--color-accent)] dark:text-white dark:group-hover:text-[var(--color-accent-light)]">
                         {displayName}
                     </p>
                     {subName && (
@@ -81,12 +81,12 @@ export default function BrandsClient({ brands }: BrandsClientProps) {
             <nav className="relative z-20 flex items-center flex-wrap gap-y-2 text-[11px] md:text-[12px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-6" aria-label="Breadcrumb">
                 <Link 
                     href="/" 
-                    className="inline-flex items-center py-1.5 px-1 -my-1.5 text-[#072835] dark:text-white/80 hover:text-[#B8860B] dark:hover:text-[#E5B54A] cursor-pointer touch-manipulation transition-colors"
+                    className="inline-flex items-center py-1.5 px-1 -my-1.5 text-[var(--color-brand)] dark:text-white/80 hover:text-[var(--color-accent)] dark:hover:text-[var(--color-accent-light)] cursor-pointer touch-manipulation transition-colors"
                 >
                     {isArabic ? 'الرئيسية' : 'HOME'}
                 </Link>
                 <span className="mx-2 md:mx-3 text-gray-300 dark:text-white/20 select-none">/</span>
-                <span className="text-[#B8860B] dark:text-[#E5B54A]">
+                <span className="text-[var(--color-accent)] dark:text-[var(--color-accent-light)]">
                     {isArabic ? 'العلامات التجارية' : 'BRANDS'}
                 </span>
             </nav>
@@ -94,10 +94,10 @@ export default function BrandsClient({ brands }: BrandsClientProps) {
             {/* Header Area */}
             <div className="mb-8 md:mb-10 border-b border-slate-200/80 pb-6 dark:border-white/10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                 <div>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#B8860B] dark:text-[#E5B54A] block mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.24em] text-[var(--color-accent)] dark:text-[var(--color-accent-light)] block mb-1">
                         {isArabic ? 'كتالوج العلامات التجارية والشركاء المعتمدين' : 'AUTHORIZED GLOBAL BRANDS'}
                     </span>
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#072835] dark:text-white tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-brand)] dark:text-white tracking-tight">
                         {isArabic ? 'العلامات التجارية' : 'Brands'}
                     </h1>
                 </div>
@@ -110,8 +110,8 @@ export default function BrandsClient({ brands }: BrandsClientProps) {
             {featuredBrands.length > 0 && (
                 <section className="mb-10 md:mb-12">
                     <div className="mb-4 flex items-center gap-2">
-                        <div className="size-2.5 rounded-full bg-[#B8860B]" />
-                        <h2 className="text-lg sm:text-xl font-bold text-[#072835] dark:text-white">
+                        <div className="size-2.5 rounded-full bg-[var(--color-accent)]" />
+                        <h2 className="text-lg sm:text-xl font-bold text-[var(--color-brand)] dark:text-white">
                             {isArabic ? 'العلامات المميزة' : 'Featured Brands'}
                         </h2>
                     </div>
@@ -124,8 +124,8 @@ export default function BrandsClient({ brands }: BrandsClientProps) {
             {/* All Brands Directory */}
             <section>
                 <div className="mb-4 flex items-center gap-2">
-                    <div className="size-2.5 rounded-full bg-[#072835] dark:bg-white/40" />
-                    <h2 className="text-lg sm:text-xl font-bold text-[#072835] dark:text-white">
+                    <div className="size-2.5 rounded-full bg-[var(--color-brand)] dark:bg-white/40" />
+                    <h2 className="text-lg sm:text-xl font-bold text-[var(--color-brand)] dark:text-white">
                         {isArabic ? 'كافة العلامات التجارية' : 'All Brands'}
                     </h2>
                 </div>

@@ -1,10 +1,13 @@
 "use client";
 
+import { laravelClientFetch } from "@/lib/laravel-client";
+
 import { useState, useEffect, useRef } from "react";
-import { MdClose, MdExpandMore, MdSync, MdCheckCircle, MdCloudUpload } from "react-icons/md";
+import { X as MdClose, ChevronDown as MdExpandMore, RefreshCw as MdSync, CircleCheck as MdCheckCircle, CloudUpload as MdCloudUpload } from 'lucide-react';
 import { createProduct, updateProduct } from "../../../../lib/admin-actions";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { toast } from "react-hot-toast";
+import { formatPackaging } from "@/lib/packaging";
 
 interface Category {
     id: string;
@@ -42,6 +45,9 @@ interface Product {
     discountType: string | null;
     discountValue: number | null;
     stock: number;
+    minOrder?: number;
+    packaging?: string | null;
+    itemsPerPackage?: string | null;
     options?: string | null;
     sku: string | null;
     images: string;
@@ -74,6 +80,9 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
         discountType: "NONE", // NONE, PERCENTAGE, FIXED
         discountValue: "",
         stock: "",
+        minOrder: "1",
+        packaging: "طرد",
+        itemsPerPackage: "",
         options: "",
         sku: "",
         images: "", // Comma separated links
@@ -94,7 +103,7 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                 const fd = new FormData();
                 fd.append("file", file);
                 fd.append("folder", "products");
-                const res = await fetch("/api/upload", { method: "POST", body: fd });
+                const res = await laravelClientFetch("/api/upload", { method: "POST", body: fd });
                 const data = await res.json();
                 if (res.ok && data.url) {
                     uploadedUrls.push(data.url);
@@ -132,6 +141,9 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                 discountType: product.discountType || "NONE",
                 discountValue: product.discountValue?.toString() || "",
                 stock: product.stock.toString(),
+                minOrder: String(product.minOrder || 1),
+                packaging: product.packaging || "طرد",
+                itemsPerPackage: product.itemsPerPackage || "",
                 options: product.options || "",
                 sku: product.sku || "",
                 images: product.images,
@@ -151,6 +163,9 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                 discountType: "NONE",
                 discountValue: "",
                 stock: "",
+                minOrder: "1",
+                packaging: "طرد",
+                itemsPerPackage: "",
                 options: "",
                 sku: "",
                 images: "",
@@ -191,6 +206,9 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                 discountPrice: calculatedDiscountPrice,
                 discountValue: formData.discountType === "NONE" ? null : parseFloat(formData.discountValue),
                 stock: parseInt(formData.stock) || 0,
+                minOrder: Math.max(1, parseInt(formData.minOrder, 10) || 1),
+                packaging: formData.packaging.trim() || "طرد",
+                itemsPerPackage: formData.itemsPerPackage.trim() || null,
                 options: formData.options || null,
                 mainCategoryId: formData.mainCategoryId || null,
             };
@@ -297,16 +315,16 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
                                     disabled={isUploadingImage}
-                                    className="px-4 h-12 rounded-xl bg-[#072835] hover:bg-[#0c4054] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                                    className="px-4 h-12 rounded-xl bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shrink-0"
                                 >
                                     {isUploadingImage ? (
                                         <>
-                                            <MdSync className="text-lg animate-spin text-[#E5B54A]" />
+                                            <MdSync className="text-lg animate-spin text-[var(--color-accent-light)]" />
                                             <span>{language === 'ar' ? 'جاري الرفع...' : 'Uploading...'}</span>
                                         </>
                                     ) : (
                                         <>
-                                            <MdCloudUpload className="text-lg text-[#E5B54A]" />
+                                            <MdCloudUpload className="text-lg text-[var(--color-accent-light)]" />
                                             <span>{language === 'ar' ? 'رفع صور من الجهاز' : 'Upload from PC'}</span>
                                         </>
                                     )}
@@ -496,7 +514,7 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                         {/* Quantity (Stock) */}
                         <div className="space-y-2">
                             <label className="text-[11px] font-bold uppercase tracking-widest text-text-sub dark:text-gray-400">
-                                {language === 'ar' ? 'الكمية والمخزون (Quantity / Stock)' : 'Quantity / Stock'}
+                                {language === 'ar' ? `المخزون المتاح (${formatPackaging(formData.packaging, 'ar')})` : `Available stock (${formatPackaging(formData.packaging, 'en')})`}
                             </label>
                             <input
                                 className="w-full h-12 rounded-xl border border-black/[0.04] dark:border-white/[0.04] bg-gray-50/50 dark:bg-black/20 focus:bg-white dark:focus:bg-surface-dark focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all px-4 text-sm font-medium dark:text-white outline-none"
@@ -504,6 +522,49 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                                 type="number"
                                 value={formData.stock}
                                 onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold uppercase tracking-widest text-text-sub dark:text-gray-400">
+                                {language === 'ar' ? 'وحدة البيع بالجملة' : 'Wholesale package unit'}
+                            </label>
+                            <input
+                                className="w-full h-12 rounded-xl border border-black/[0.04] dark:border-white/[0.04] bg-gray-50/50 dark:bg-black/20 focus:bg-white dark:focus:bg-surface-dark focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all px-4 text-sm font-medium dark:text-white outline-none"
+                                type="text"
+                                maxLength={50}
+                                placeholder={language === 'ar' ? 'طرد، كرتونة، صندوق...' : 'Carton, box, bag...'}
+                                value={formData.packaging}
+                                onChange={(e) => setFormData({ ...formData, packaging: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold uppercase tracking-widest text-text-sub dark:text-gray-400">
+                                {language === 'ar' ? 'محتويات وحدة البيع' : 'Items per package'}
+                            </label>
+                            <input
+                                className="w-full h-12 rounded-xl border border-black/[0.04] dark:border-white/[0.04] bg-gray-50/50 dark:bg-black/20 focus:bg-white dark:focus:bg-surface-dark focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all px-4 text-sm font-medium dark:text-white outline-none"
+                                type="text"
+                                maxLength={100}
+                                placeholder={language === 'ar' ? 'مثال: 12 أو 12 × 250 مل' : 'e.g. 12 or 12 × 250 ml'}
+                                value={formData.itemsPerPackage}
+                                onChange={(e) => setFormData({ ...formData, itemsPerPackage: e.target.value })}
+                            />
+                        </div>
+
+                        {/* Minimum order */}
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold uppercase tracking-widest text-text-sub dark:text-gray-400">
+                                {language === 'ar' ? `الحد الأدنى للطلب (${formatPackaging(formData.packaging, 'ar')})` : `Minimum order (${formatPackaging(formData.packaging, 'en')})`}
+                            </label>
+                            <input
+                                className="w-full h-12 rounded-xl border border-black/[0.04] dark:border-white/[0.04] bg-gray-50/50 dark:bg-black/20 focus:bg-white dark:focus:bg-surface-dark focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all px-4 text-sm font-medium dark:text-white outline-none"
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={formData.minOrder}
+                                onChange={(e) => setFormData({ ...formData, minOrder: e.target.value })}
                             />
                         </div>
 
@@ -582,7 +643,7 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                     <button
                         onClick={handleSubmit}
                         disabled={isLoading}
-                        className="bg-[#072835] hover:bg-[#0c4054] dark:bg-[#B8860B] dark:hover:bg-[#9a7009] disabled:opacity-50 text-white h-12 px-8 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-sm transform active:scale-[0.98] cursor-pointer"
+                        className="bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] dark:bg-[var(--color-accent)] dark:hover:bg-[var(--color-accent-hover)] disabled:opacity-50 text-white h-12 px-8 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-sm transform active:scale-[0.98] cursor-pointer"
                     >
                         {isLoading ? (
                             <MdSync className="animate-spin text-[20px]" />

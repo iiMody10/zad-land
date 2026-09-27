@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getLaravelAdmin } from "@/lib/laravel-server";
 import { redirect } from "next/navigation";
 import ReviewsClient from "./ReviewsClient";
 
@@ -8,13 +7,13 @@ export const metadata = {
 };
 
 export default async function ReviewsPage() {
-    const session = await getServerSession(authOptions);
+    const session = await getLaravelAdmin();
 
     if (!session) {
         redirect("/admin/login");
     }
 
-    if (!session.user.canManageReviews && session.user.role !== "SUPER_ADMIN") {
+    if (!session.canManageReviews && session.role !== "SUPER_ADMIN") {
         redirect("/admin/dashboard");
     }
 

@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   experimental: {
-    optimizePackageImports: ['react-icons', 'framer-motion', 'swiper'],
+    optimizePackageImports: ['lucide-react', 'framer-motion', 'swiper'],
   },
   images: {
     unoptimized: true,
@@ -42,6 +42,17 @@ const nextConfig: NextConfig = {
       },
     ],
     dangerouslyAllowSVG: true,
+  },
+  async rewrites() {
+    const laravelUrl = (process.env.LARAVEL_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+
+    return {
+      beforeFiles: [
+        { source: "/api/:path*", destination: `${laravelUrl}/api/:path*` },
+        { source: "/sanctum/csrf-cookie", destination: `${laravelUrl}/sanctum/csrf-cookie` },
+        { source: "/uploads/:path*", destination: `${laravelUrl}/uploads/:path*` },
+      ],
+    };
   },
 };
 

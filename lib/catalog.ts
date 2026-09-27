@@ -1,6 +1,7 @@
-import { prisma } from "./prisma";
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
+import { laravelJson } from "@/lib/laravel-server";
+import { canViewWholesalePrices, projectProductsPrices } from "./price-visibility";
 
 export interface CatalogCategory {
     id: string;
@@ -9,6 +10,7 @@ export interface CatalogCategory {
     description: string | null;
     image: string | null;
     brandId: string;
+    mainCategoryId: string | null;
     brand?: CatalogBrand | null;
 }
 
@@ -16,14 +18,25 @@ export interface CatalogProduct {
     id: string;
     slug: string;
     name: string;
+    nameAr?: string | null;
+    nameEn?: string | null;
     description: string | null;
+    descriptionAr?: string | null;
+    descriptionEn?: string | null;
     price: string;
     discountPrice: string | null;
+    discountType?: string | null;
+    discountValue?: string | null;
     images: string;
     brandId: string;
     categoryId: string;
+    mainCategoryId: string | null;
     stock: number;
+    minOrder?: number;
+    packaging?: string | null;
+    itemsPerPackage?: string | null;
     isTrending: boolean;
+    category?: { id: string; name: string; slug: string } | null;
     brand?: CatalogBrand | null;
 }
 
@@ -34,7 +47,7 @@ export interface CatalogBrand {
     description: string | null;
     image: string | null;
     group: "MAIN" | "DIFFERENT";
-    isFeatured?: boolean;
+    isFeatured: boolean;
     mainCategory?: {
         id: string;
         name: string;
@@ -43,298 +56,83 @@ export interface CatalogBrand {
     } | null;
 }
 
-const catalogCategorySelect = {
-    id: true,
-    name: true,
-    slug: true,
-    description: true,
-    image: true,
-    brandId: true,
-    brand: {
-        select: {
-            id: true,
-            name: true,
-            slug: true,
-            description: true,
-            image: true,
-            group: true,
-        },
-    },
+type CatalogMainCategory = {
+    id: string;
+    name: string;
+    nameEn?: string;
+    slug: string;
+    description: string | null;
+    image: string | null;
 };
 
-const catalogBrandSelect = {
-    id: true,
-    name: true,
-    slug: true,
-    description: true,
-    image: true,
-    group: true,
-    isFeatured: true,
-    mainCategory: {
-        select: {
-            id: true,
-            name: true,
-            slug: true,
-            description: true,
-        },
-    },
-};
-
-export const getCatalogBrands = cache(
-    unstable_cache(
-        async () => {
-            return prisma.brand.findMany({
-                where: { isActive: true },
-                orderBy: [
-                    { isFeatured: "desc" },
-                    { name: "asc" },
-                ],
-                select: catalogBrandSelect,
-            });
-        },
-        ["catalog-brands"],
-        { tags: ["catalog", "brands"], revalidate: 3600 }
-    )
+const cachedBrands = unstable_cache(
+    async () => laravelJson<CatalogBrand[]>("/api/brands", []),
+    ["laravel-catalog-brands"],
+    { tags: ["catalog", "brands"], revalidate: 3600 },
 );
 
+export const getCatalogBrands = cache(async () => (await cachedBrands()).map((brand) => ({ ...brand, isFeatured: Boolean(brand.isFeatured) })));
+
 export const getBrandBySlug = cache(async (slug: string) => {
-    return unstable_cache(
-        async () => {
-            return prisma.brand.findFirst({
-                where: {
-                    slug,
-                    isActive: true,
-                },
-                select: catalogBrandSelect,
-            });
-        },
-        [`catalog-brand-${slug}`],
-        { tags: ["catalog", "brands"], revalidate: 3600 }
-    )();
+    const brands = await getCatalogBrands();
+    return brands.find((brand) => brand.slug === slug) || null;
 });
 
 export const getCatalogCategories = cache(async (brandId?: string) => {
-    return unstable_cache(
-        async () => {
-            return prisma.category.findMany({
-                where: {
-                    brand: { isActive: true },
-                    ...(brandId ? { brandId } : {}),
-                },
-                orderBy: [
-                    { isFeatured: "desc" },
-                    { name: "asc" },
-                ],
-                select: catalogCategorySelect,
-            });
-        },
-        [`catalog-categories-${brandId || "all"}`],
-        { tags: ["catalog", "categories"], revalidate: 3600 }
-    )();
+    const query = new URLSearchParams({ limit: "1000" });
+    if (brandId) query.set("brandId", brandId);
+    return laravelJson<Array<Omit<CatalogCategory, "mainCategoryId"> & { mainCategoryId?: string | null }>>(`/api/categories?${query.toString()}`, []).then((items) => items.map((item) => ({ ...item, mainCategoryId: item.mainCategoryId ?? null })));
 });
 
 export const getFooterCategories = cache(async (preferredIds: string[] = []) => {
-    const sanitizedIds = [...new Set(preferredIds.filter(Boolean))];
+    const categories = await getCatalogCategories();
+    const selected = [...new Set(preferredIds.filter(Boolean))]
+        .map((id) => categories.find((category) => category.id === id))
+        .filter((category): category is CatalogCategory => Boolean(category));
 
-    if (sanitizedIds.length > 0) {
-        const selectedCategories = await prisma.category.findMany({
-            where: {
-                id: {
-                    in: sanitizedIds,
-                },
-                brand: { isActive: true },
-            },
-            select: {
-                id: true,
-                name: true,
-                slug: true,
-            },
-        });
-
-        const orderedSelectedCategories = sanitizedIds
-            .map((id) => selectedCategories.find((category) => category.id === id))
-            .filter((category): category is NonNullable<typeof category> => Boolean(category));
-
-        if (orderedSelectedCategories.length > 0) {
-            return orderedSelectedCategories;
-        }
-    }
-
-    return prisma.category.findMany({
-        where: {
-            brand: { isActive: true },
-        },
-        take: 4,
-        orderBy: [
-            { isFeatured: "desc" },
-            { name: "asc" },
-        ],
-        select: {
-            id: true,
-            name: true,
-            slug: true,
-        },
-    });
+    return (selected.length ? selected : categories).slice(0, 4).map(({ id, name, slug }) => ({ id, name, slug }));
 });
 
 export const getCategoryBySlug = cache(async (slug: string) => {
-    return unstable_cache(
-        async () => {
-            return prisma.category.findFirst({
-                where: {
-                    slug,
-                    brand: { isActive: true },
-                },
-                select: catalogCategorySelect,
-            });
-        },
-        [`catalog-category-${slug}`],
-        { tags: ["catalog", "categories"], revalidate: 3600 }
-    )();
+    const categories = await getCatalogCategories();
+    return categories.find((category) => category.slug === slug) || null;
 });
 
-export const getCatalogMainCategories = cache(
-    unstable_cache(
-        async () => {
-            const mainCategories = await prisma.mainCategory.findMany({
-                where: {
-                    isActive: true,
-                    products: {
-                        some: {
-                            brand: { isActive: true },
-                        },
-                    },
-                },
-                orderBy: [
-                    { navOrder: "asc" },
-                    { name: "asc" },
-                ],
-                select: {
-                    id: true,
-                    name: true,
-                    slug: true,
-                    description: true,
-                    image: true,
-                },
-            });
-
-            return mainCategories.map((mc) => ({
-                id: mc.id,
-                name: mc.name,
-                nameEn: mc.description || mc.name,
-                slug: mc.slug,
-                description: mc.description,
-                image: mc.image,
-            }));
-        },
-        ["catalog-main-categories"],
-        { tags: ["catalog", "main-categories"], revalidate: 3600 }
-    )
+const cachedMainCategories = unstable_cache(
+    async () => laravelJson<CatalogMainCategory[]>("/api/main-categories", []),
+    ["laravel-catalog-main-categories"],
+    { tags: ["catalog", "main-categories"], revalidate: 3600 },
 );
 
-export const getCatalogInitialData = cache(
-    async (categoryId?: string, brandId?: string, mainCategoryId?: string) => {
-        const cacheKey = `catalog-initial-${categoryId || 'none'}-${brandId || 'none'}-${mainCategoryId || 'none'}`;
-        return unstable_cache(
-            async () => {
-                const whereClause: {
-                    categoryId?: string;
-                    brandId?: string;
-                    mainCategoryId?: string;
-                    brand: { isActive: boolean };
-                } = {
-                    brand: { isActive: true },
-                };
+export const getCatalogMainCategories = cache(async () => (await cachedMainCategories()).map((category) => ({
+    id: category.id,
+    name: category.name,
+    nameEn: category.nameEn || category.description || category.name,
+    slug: category.slug,
+    description: category.description,
+    image: category.image,
+})));
 
-                if (categoryId) {
-                    whereClause.categoryId = categoryId;
-                }
+export const getCatalogInitialData = cache(async (
+    categoryId?: string,
+    brandId?: string,
+    mainCategoryId?: string,
+    pageSize = 12,
+) => {
+    const query = new URLSearchParams({ page: "1", limit: String(Math.min(32, Math.max(1, pageSize))) });
+    if (categoryId) query.set("categoryIds", categoryId);
+    if (brandId) query.set("brandIds", brandId);
+    if (mainCategoryId) query.set("mainCategoryId", mainCategoryId);
 
-                if (brandId) {
-                    whereClause.brandId = brandId;
-                }
+    const [catalog, categories] = await Promise.all([
+        laravelJson<{ products: CatalogProduct[]; pagination: { total: number } }>(`/api/products?${query.toString()}`, { products: [], pagination: { total: 0 } }),
+        brandId ? getCatalogCategories(brandId) : getCatalogMainCategories(),
+    ]);
+    const allowed = await canViewWholesalePrices();
 
-                if (mainCategoryId) {
-                    whereClause.mainCategoryId = mainCategoryId;
-                }
-
-                const categoriesPromise = brandId 
-                    ? getCatalogCategories(brandId) 
-                    : getCatalogMainCategories();
-
-                const [categories, products, totalProducts] = await Promise.all([
-                    categoriesPromise,
-                    prisma.product.findMany({
-                        where: whereClause,
-                        take: 12,
-                        orderBy: {
-                            createdAt: "desc",
-                        },
-                        include: {
-                            brand: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    slug: true,
-                                    description: true,
-                                    image: true,
-                                    group: true,
-                                },
-                            },
-                            category: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    slug: true,
-                                },
-                            },
-                        },
-                    }),
-                    prisma.product.count({
-                        where: whereClause,
-                    }),
-                ]);
-
-                return {
-                    categories,
-                    products: products.map((product) => ({
-                        id: product.id,
-                        slug: product.slug,
-                        name: product.name,
-                        nameAr: product.nameAr,
-                        nameEn: product.nameEn,
-                        description: product.description,
-                        descriptionAr: product.descriptionAr,
-                        descriptionEn: product.descriptionEn,
-                        price: product.price.toString(),
-                        discountPrice: product.discountPrice ? product.discountPrice.toString() : null,
-                        discountType: product.discountType,
-                        discountValue: product.discountValue ? product.discountValue.toString() : null,
-                        images: product.images,
-                        brandId: product.brandId,
-                        categoryId: product.categoryId,
-                        mainCategoryId: product.mainCategoryId,
-                        stock: product.stock,
-                        isTrending: product.isTrending,
-                        category: product.category ? {
-                            id: product.category.id,
-                            name: product.category.name,
-                            slug: product.category.slug,
-                        } : null,
-                        brand: product.brand ? {
-                            id: product.brand.id,
-                            name: product.brand.name,
-                            slug: product.brand.slug,
-                            description: product.brand.description,
-                            image: product.brand.image,
-                            group: product.brand.group,
-                        } : null,
-                    })),
-                    totalProducts,
-                };
-            },
-            [cacheKey],
-            { tags: ["catalog", "products"], revalidate: 60 }
-        )();
-    }
-);
+    return {
+        categories,
+        products: projectProductsPrices(catalog.products, allowed),
+        totalProducts: catalog.pagination.total,
+    };
+});

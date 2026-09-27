@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import ResilientImage from "@/app/components/ResilientImage";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdChevronRight, MdChevronLeft } from "react-icons/md";
+import { ChevronRight as MdChevronRight, ChevronLeft as MdChevronLeft } from 'lucide-react';
 
 interface BrandMastheadProps {
     brand: {
@@ -64,7 +64,7 @@ export default function BrandMasthead({ brand }: BrandMastheadProps) {
             >
                 <Link 
                     href="/" 
-                    className="hover:text-[#072835] dark:hover:text-white transition-colors py-1"
+                    className="hover:text-[var(--color-brand)] dark:hover:text-white transition-colors py-1"
                 >
                     {isArabic ? "الرئيسية" : "Home"}
                 </Link>
@@ -75,7 +75,7 @@ export default function BrandMasthead({ brand }: BrandMastheadProps) {
                 )}
                 <Link 
                     href="/brands" 
-                    className="hover:text-[#072835] dark:hover:text-white transition-colors py-1"
+                    className="hover:text-[var(--color-brand)] dark:hover:text-white transition-colors py-1"
                 >
                     {isArabic ? "العلامات التجارية" : "Brands"}
                 </Link>
@@ -84,15 +84,15 @@ export default function BrandMasthead({ brand }: BrandMastheadProps) {
                 ) : (
                     <MdChevronRight className="text-slate-400 dark:text-slate-600 text-sm shrink-0" />
                 )}
-                <span className="text-[#072835] dark:text-white font-bold truncate max-w-[200px] sm:max-w-none">
+                <span className="text-[var(--color-brand)] dark:text-white font-bold truncate max-w-[200px] sm:max-w-none">
                     {primaryName}
                 </span>
             </nav>
 
             {/* Architectural Masthead Card */}
-            <div className="relative rounded-2xl md:rounded-3xl bg-white dark:bg-[#0C1821] border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden">
+            <div className="relative rounded-2xl md:rounded-3xl bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden">
                 {/* Refined Top Accent Bar */}
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#072835] via-[#B8860B] to-[#072835]" />
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[var(--color-brand)] via-[var(--color-accent)] to-[var(--color-brand)]" />
 
                 <div className="p-5 sm:p-7 md:p-8">
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-7">
@@ -113,14 +113,14 @@ export default function BrandMasthead({ brand }: BrandMastheadProps) {
                         <div className={`flex-1 min-w-0 ${isRtl ? "text-right" : "text-left"} text-center sm:text-start`}>
                             {/* Sector / Department */}
                             {sectorName && (
-                                <p className="text-xs font-bold text-[#B8860B] dark:text-[#E5B54A] mb-1.5 uppercase tracking-wider">
+                                <p className="text-xs font-bold text-[var(--color-accent)] dark:text-[var(--color-accent-light)] mb-1.5 uppercase tracking-wider">
                                     {sectorName}
                                 </p>
                             )}
 
                             {/* Dual-Language Title Treatment */}
                             <div className="flex flex-wrap items-baseline justify-center sm:justify-start gap-x-3 gap-y-1 mb-2">
-                                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#072835] dark:text-white tracking-tight">
+                                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-brand)] dark:text-white tracking-tight">
                                     {primaryName}
                                 </h1>
                                 {secondaryName && (

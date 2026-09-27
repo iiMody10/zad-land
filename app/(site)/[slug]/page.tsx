@@ -1,5 +1,5 @@
 import React from 'react';
-import { prisma } from "@/lib/prisma";
+import { laravelJson } from "@/lib/laravel-server";
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ProductGallery from '@/app/components/ProductDetailsComponents/ProductGallery';
@@ -8,35 +8,34 @@ import ProductPrice from '@/app/components/ProductDetailsComponents/ProductPrice
 import ProductActions from '@/app/components/ProductDetailsComponents/ProductActions';
 import ProductAccordions from '@/app/components/ProductDetailsComponents/ProductAccordions';
 import RelatedProducts from '@/app/components/ProductDetailsComponents/RelatedProducts';
+import { canViewWholesalePrices } from '@/lib/price-visibility';
+
+export const dynamic = 'force-dynamic';
 
 // ProductPageProps removed as it was unused and replaced by inline props
 
 const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
     const params = await props.params;
-    const product = await prisma.product.findFirst({
-        where: {
-            slug: params.slug,
-            brand: { isActive: true },
-        },
-        include: {
-            brand: true,
-        },
-    });
+    const [product, canViewPrices] = await Promise.all([
+        laravelJson<Record<string, any> | null>(`/api/products/${encodeURIComponent(params.slug)}`, null, { forwardSession: false }),
+        canViewWholesalePrices(),
+    ]);
 
     if (!product) {
         notFound();
     }
 
     // Fetch related products (same category, exclude current)
-    const relatedProducts = await prisma.product.findMany({
-        where: {
-            categoryId: product.categoryId,
-            brandId: product.brandId,
-            id: { not: product.id },
-            brand: { isActive: true },
-        },
-        take: 4,
-    });
+    const relatedResult = await laravelJson<{ products: Record<string, any>[] }>(
+        `/api/products?categoryIds=${encodeURIComponent(product.categoryId)}&brandIds=${encodeURIComponent(product.brandId)}&limit=5`,
+        { products: [] }, { forwardSession: false },
+    );
+    const relatedProducts = relatedResult.products.filter((item) => item.id !== product.id).slice(0, 4);
+
+    const images = Array.isArray(product.images) ? product.images : (() => {
+        try { const parsed = JSON.parse(product.images || "[]"); return Array.isArray(parsed) ? parsed : String(product.images || "").split(","); }
+        catch { return String(product.images || "").split(","); }
+    })();
 
     return (
         <div className="grow w-full mx-auto px-6 py-8 md:px-20 lg:px-32 xl:px-48 2xl:px-64 lg:py-12">
@@ -70,8 +69,8 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
                     </div>
                     
                     <ProductPrice
-                        price={product.price.toString()}
-                        discountPrice={product.discountPrice?.toString()}
+                        price={canViewPrices ? product.price.toString() : null}
+                        discountPrice={canViewPrices ? product.discountPrice?.toString() : null}
                     />
 
                     <ProductActions product={{
@@ -79,10 +78,13 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
                         name: product.name,
                         nameAr: product.nameAr,
                         nameEn: product.nameEn,
-                        price: Number(product.discountPrice || product.price),
-                        image: product.images.split(',')[0],
+                        price: canViewPrices ? Number(product.discountPrice || product.price) : null,
+                        image: images[0] || "",
                         slug: product.slug,
                         options: product.options,
+                        minOrder: product.minOrder,
+                        packaging: product.packaging,
+                        itemsPerPackage: product.itemsPerPackage,
                         description: product.description,
                         descriptionAr: product.descriptionAr,
                         descriptionEn: product.descriptionEn,
@@ -99,12 +101,12 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
 
             <RelatedProducts products={relatedProducts.map(p => ({
                 ...p,
-                price: Number(p.price),
-                discountPrice: p.discountPrice ? Number(p.discountPrice) : null,
-                discountType: p.discountType,
-                discountValue: p.discountValue ? Number(p.discountValue) : null,
-                createdAt: p.createdAt.toISOString(),
-                updatedAt: p.updatedAt.toISOString(),
+                price: canViewPrices ? Number(p.price) : null,
+                discountPrice: canViewPrices && p.discountPrice ? Number(p.discountPrice) : null,
+                discountType: canViewPrices ? p.discountType : null,
+                discountValue: canViewPrices && p.discountValue ? Number(p.discountValue) : null,
+                createdAt: p.createdAt,
+                updatedAt: p.updatedAt,
             }))} />
         </div>
     );

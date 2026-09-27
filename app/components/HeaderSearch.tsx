@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/app/context/LanguageContext';
-import { useCurrency } from '@/app/context/CurrencyContext';
+import PriceText from '@/app/components/PriceText';
 import ResilientImage from './ResilientImage';
 import { getPrimaryImage } from '@/lib/image-utils';
-import { MdArrowForward, MdSearch } from 'react-icons/md';
+import { ArrowRight as MdArrowForward, X as MdClose, Search as MdSearch } from 'lucide-react';
 
 interface HeaderSearchProps {
     onSearchSelect?: () => void;
@@ -14,6 +14,23 @@ interface HeaderSearchProps {
     placeholder?: string;
     autoFocus?: boolean;
     locale?: 'en' | 'ar';
+    mobileModal?: boolean;
+}
+
+interface SearchProduct {
+    id: string;
+    slug: string;
+    name: string;
+    images: string;
+    price?: string | number | null;
+    discountPrice?: string | number | null;
+    brand?: { name: string } | null;
+}
+
+interface SearchCategory {
+    id: string;
+    name: string;
+    slug: string;
 }
 
 const foodSuggestionsAr = ['معكرونة دي سيكو', 'صوصات أميركان غاردن', 'تونة ريو ماري', 'حليب وبدائل ألبان', 'مفرزات كابتن فيشر', 'قهوة علي كافيه'];
@@ -51,14 +68,14 @@ const dynamicItemsEn = [
     "Coffee, Tea & Beverages..."
 ];
 
-const HeaderSearch = ({ onSearchSelect, onClose, placeholder, autoFocus = false, locale }: HeaderSearchProps) => {
-    const { t, dir, language } = useLanguage();
-    const { formatPrice } = useCurrency();
+const HeaderSearch = ({ onSearchSelect, onClose, placeholder, autoFocus = false, locale, mobileModal = false }: HeaderSearchProps) => {
+    const inputId = React.useId();
+    const { dir, language } = useLanguage();
     const currentLocale = locale ?? language;
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState<any[]>([]);
+    const [results, setResults] = useState<SearchProduct[]>([]);
     const [suggestions, setSuggestions] = useState<string[]>([]);
-    const [categories, setCategories] = useState<any[]>([]);
+    const [categories, setCategories] = useState<SearchCategory[]>([]);
     const [loading, setLoading] = useState(false);
     const [showResults, setShowResults] = useState(false);
     const [totalCount, setTotalCount] = useState(0);
@@ -188,28 +205,28 @@ const HeaderSearch = ({ onSearchSelect, onClose, placeholder, autoFocus = false,
     };
 
     return (
-        <div className="header-search-wrapper w-full relative" ref={searchRef}>
+        <div className={`header-search-wrapper relative w-full ${mobileModal ? 'flex min-h-0 flex-1 flex-col' : ''}`} ref={searchRef}>
             {/* Search Form */}
             <form
                 action="/products"
                 method="get"
                 role="search"
                 onSubmit={handleSubmit}
-                className="w-full"
+                className={`w-full ${mobileModal ? 'shrink-0' : ''}`}
             >
                 <input type="hidden" name="options[prefix]" value="last" />
                 <div className="search__field relative flex items-center w-full">
                     {/* Search Input */}
                     <input
                         ref={inputRef}
-                        id="HeaderSearchInput"
+                        id={inputId}
                         autoFocus={autoFocus}
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         onFocus={() => {
                             if (query.trim().length > 0) setShowResults(true);
                         }}
-                        className="w-full bg-[#EDEDED] dark:bg-white/5 border border-transparent rounded-full text-[15px] font-medium text-[#1a1a1a] dark:text-white placeholder-[#888] dark:placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-white/10 focus:border-[#B8860B] focus:ring-2 focus:ring-[#B8860B]/15 focus:placeholder-gray-400 transition-all h-12 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-webkit-search-results-button]:hidden [&::-webkit-search-results-decoration]:hidden"
+                        className="h-11 w-full rounded-[9px] border border-[var(--color-line)] bg-[var(--color-brand-soft)] text-[14px] font-medium text-[#1a1a1a] placeholder-[#78867c] transition-colors focus:border-[var(--color-brand-hover)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-hover)]/15 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder-gray-400 dark:focus:bg-white/10 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-webkit-search-results-button]:hidden [&::-webkit-search-results-decoration]:hidden"
                         style={{
                             padding: isArabic ? '0 16px 0 80px' : '0 80px 0 16px',
                             direction: dir,
@@ -218,47 +235,45 @@ const HeaderSearch = ({ onSearchSelect, onClose, placeholder, autoFocus = false,
                         type="search"
                         name="q"
                         role="combobox"
+                        aria-controls={`${inputId}-results`}
                         aria-expanded={showResults ? "true" : "false"}
                         autoComplete="off"
                         spellCheck="false"
                     />
 
-                    {/* Clear Button */}
-                    {query && (
+                    {/* Keep a single trailing action visible: clear the query or show search. */}
+                    {query ? (
                         <button
                             type="button"
                             onClick={handleReset}
-                            className="absolute flex items-center justify-center text-xs font-bold text-[#555] dark:text-gray-300 hover:text-[#B8860B] dark:hover:text-[#E5B54A] transition-colors"
-                            style={{
-                                [isArabic ? 'left' : 'right']: '48px',
-                            }}
-                            aria-label={isArabic ? "مسح" : "Clear"}
+                            className="absolute flex min-h-9 min-w-9 items-center justify-center rounded-full text-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-[var(--color-brand)] dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white"
+                            style={{ [isArabic ? 'left' : 'right']: '12px' }}
+                            aria-label={isArabic ? 'مسح البحث' : 'Clear search'}
                         >
-                            {isArabic ? "مسح" : "Clear"}
+                            <MdClose aria-hidden="true" />
+                        </button>
+                    ) : (
+                        <button
+                            type="submit"
+                            className="absolute flex min-h-9 min-w-9 items-center justify-center text-[22px] text-[#555] transition-colors hover:text-[var(--color-accent)] dark:text-gray-300 dark:hover:text-[var(--color-accent-light)]"
+                            style={{ [isArabic ? 'left' : 'right']: '12px' }}
+                            aria-label={isArabic ? 'بحث' : 'Search'}
+                        >
+                            <MdSearch aria-hidden="true" />
                         </button>
                     )}
-
-                    {/* Search Icon */}
-                    <button 
-                        type="submit"
-                        className="absolute flex items-center justify-center text-[22px] text-[#555] dark:text-gray-300 hover:text-[#B8860B] dark:hover:text-[#E5B54A] transition-colors min-w-[36px] min-h-[36px]"
-                        style={{
-                            [isArabic ? 'left' : 'right']: '12px',
-                        }}
-                        aria-label={isArabic ? "بحث" : "Search"}
-                    >
-                        <MdSearch />
-                    </button>
                 </div>
             </form>
 
             {/* ========== Predictive Search Results Dropdown ========== */}
             {showResults && (
                 <div
-                    className="absolute top-full mt-1 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-100 dark:border-white/10 z-50 overflow-y-auto max-h-[70vh] md:max-h-[unset] md:overflow-visible"
+                    id={`${inputId}-results`}
+                    className={`z-50 overflow-y-auto border border-gray-100 bg-white shadow-xl dark:border-white/10 dark:bg-zinc-900 ${mobileModal ? 'relative mt-3 min-h-0 flex-1 rounded-2xl overscroll-contain' : 'absolute top-full mt-1 max-h-[70vh] rounded-2xl md:max-h-[unset] md:overflow-visible'}`}
                     style={{
                         width: '100%',
                         direction: dir,
+                        ...(mobileModal ? { maxHeight: 'none' } : {}),
                     }}
                 >
                     {loading && results.length === 0 ? (
@@ -269,10 +284,10 @@ const HeaderSearch = ({ onSearchSelect, onClose, placeholder, autoFocus = false,
                             </svg>
                         </div>
                     ) : (
-                        <div className="flex flex-col md:flex-row p-6 gap-6 md:gap-0">
+                        <div className={`flex flex-col md:flex-row ${mobileModal ? 'gap-0 p-0 md:flex-col' : 'gap-6 p-6 md:gap-0'}`}>
                             
                             {/* Suggestions & Categories Section */}
-                            <div className="w-full md:w-[260px] shrink-0 md:border-e border-gray-100 dark:border-white/5 md:pe-6 pb-6 md:pb-0 mb-6 md:mb-0 border-b md:border-b-0">
+                            <div className={mobileModal ? 'hidden' : 'mb-6 w-full shrink-0 border-b border-gray-100 pb-6 dark:border-white/5 md:mb-0 md:w-[260px] md:border-b-0 md:border-e md:pb-0 md:pe-6'}>
                                 
                                 {/* Suggestions */}
                                 {suggestions.length > 0 && (
@@ -336,50 +351,51 @@ const HeaderSearch = ({ onSearchSelect, onClose, placeholder, autoFocus = false,
                             </div>
 
                             {/* Products Section */}
-                            <div className="flex-1 md:ps-6">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <span className="text-[11px] font-bold text-[#888] dark:text-gray-400 uppercase tracking-wide">
-                                        {isArabic ? "منتجات" : "Products"}
+                            <div className={`min-w-0 flex-1 ${mobileModal ? 'p-4 md:p-4' : 'md:ps-6'}`}>
+                                <div className="mb-3 flex items-center justify-between gap-3">
+                                    <span className="text-xs font-bold text-[var(--color-brand)] dark:text-gray-200">
+                                        {isArabic ? "المنتجات" : "Products"}
                                     </span>
-                                    <div className="h-px bg-gray-100 dark:bg-white/5 flex-1"></div>
+                                    <span className="text-[11px] text-slate-500 dark:text-gray-400">
+                                        {totalCount > 0 ? (isArabic ? `${totalCount} نتيجة` : `${totalCount} results`) : ''}
+                                    </span>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-8">
+                                {results.length > 0 ? <div className={mobileModal ? 'divide-y divide-slate-100 dark:divide-white/10' : 'grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-3'}>
                                     {results.map((product) => (
                                         <Link
                                             key={product.id}
                                             href={`/products/${product.slug}`}
                                             onClick={handleProductClick}
-                                            className="flex flex-col items-center group text-center"
+                                            className={mobileModal ? 'group flex items-center gap-3 py-3 text-start first:pt-0 last:pb-0' : 'group flex flex-col items-center text-center'}
                                         >
-                                            <div className="w-24 h-24 mb-4 relative flex items-center justify-center">
+                                            <div className={mobileModal ? 'size-[72px] shrink-0 rounded-xl bg-slate-50 p-1 dark:bg-white/5' : 'relative mb-4 flex h-24 w-24 items-center justify-center'}>
                                                 <ResilientImage
                                                     src={getPrimaryImage(product.images)}
                                                     alt={product.name}
-                                                    className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-300 group-hover:scale-105"
+                                                    className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                                                 />
                                             </div>
-                                            
-                                            <span className="text-[10px] text-[#888] dark:text-gray-400 uppercase tracking-[0.1em] mb-1.5 font-medium line-clamp-1">
-                                                {product.brand?.name || 'ZAD LAND'}
-                                            </span>
-                                            
-                                            <h4 dir="ltr" className="text-[13px] font-medium text-[#333] dark:text-gray-200 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors leading-tight mb-1.5 line-clamp-2 px-2 font-sans tracking-normal">
-                                                {product.name}
-                                            </h4>
-                                            
-                                            <div className="text-[13px] font-extrabold text-zinc-900 dark:text-white" dir="ltr">
-                                                {formatPrice(Number(product.discountPrice || product.price))}
+                                            <div className={mobileModal ? 'min-w-0 flex-1' : 'flex flex-col items-center'}>
+                                                <span className="mb-1 block line-clamp-1 text-[11px] font-medium text-slate-500 dark:text-gray-400">
+                                                    {product.brand?.name || 'ZAD LAND'}
+                                                </span>
+                                                <h4 dir="auto" className={`line-clamp-2 font-medium text-[#25332d] transition-colors group-hover:text-[var(--color-brand-hover)] dark:text-gray-100 ${mobileModal ? 'text-[13px] leading-5' : 'mb-1.5 px-2 font-sans text-[13px] leading-tight tracking-normal'}`}>
+                                                    {product.name}
+                                                </h4>
+                                                <div className={`mt-1 text-[13px] font-extrabold text-[var(--color-brand)] dark:text-white ${mobileModal ? 'text-start' : ''}`} dir="ltr">
+                                                    <PriceText amount={product.discountPrice ?? product.price} />
+                                                </div>
                                             </div>
                                         </Link>
                                     ))}
-                                </div>
+                                </div> : <p className="py-8 text-center text-sm text-slate-500 dark:text-gray-400">{isArabic ? 'لا توجد منتجات مطابقة لبحثك.' : 'No matching products found.'}</p>}
 
                                 {totalCount > 0 && (
-                                    <div className="mt-8 flex justify-center">
+                                    <div className={`flex justify-center ${mobileModal ? 'border-t border-slate-100 py-4 dark:border-white/10' : 'mt-8'}`}>
                                         <button
                                             onClick={handleViewAll}
-                                            className="flex items-center gap-2 text-sm font-bold text-[#444] dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
+                                            className="flex min-h-10 items-center gap-2 text-sm font-bold text-[var(--color-brand)] transition-colors hover:text-[var(--color-brand-hover)] dark:text-gray-300 dark:hover:text-white"
                                         >
                                             <span>
                                                 {isArabic

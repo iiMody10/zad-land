@@ -112,7 +112,7 @@ export default function NavigationProgressBar() {
             aria-hidden="true"
         >
             <div
-                className="h-full bg-gradient-to-r from-[#B8860B] via-[#E5B54A] to-[#B8860B] shadow-[0_0_8px_rgba(184,134,11,0.6)] ease-out"
+                className="h-full bg-gradient-to-r from-[var(--color-accent)] via-[var(--color-accent-light)] to-[var(--color-accent)] shadow-[0_0_8px_rgba(184,134,11,0.6)] ease-out"
                 style={{
                     width: `${progress}%`,
                     opacity: status === 'completing' ? 0 : 1,

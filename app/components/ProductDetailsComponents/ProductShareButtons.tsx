@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FaWhatsapp, FaFacebook, FaTelegram, FaLink, FaCheck } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { MessageCircle as FaWhatsapp, ThumbsUp as FaFacebook, Send as FaTelegram, Link as FaLink, Check as FaCheck } from 'lucide-react';
 import { useLanguage } from '@/app/context/LanguageContext';
 import toast from 'react-hot-toast';
 
@@ -17,18 +17,20 @@ export default function ProductShareButtons({
     const { language } = useLanguage();
     const isArabic = language === 'ar';
     const [copied, setCopied] = useState(false);
+    const configuredOrigin = (process.env.NEXT_PUBLIC_SITE_URL || 'https://zadland.com').replace(/\/+$/, '');
+    const [shareOrigin, setShareOrigin] = useState(configuredOrigin);
 
-    const getProductUrl = () => {
-        if (typeof window !== 'undefined') {
-            return `${window.location.origin}/products/${productSlug}`;
-        }
-        return `https://zadland.com/products/${productSlug}`;
-    };
+    useEffect(() => {
+        // Keep server and first client render identical, then use the active host
+        // so links copied from local or preview environments still work there.
+        setShareOrigin(window.location.origin);
+    }, []);
+
+    const productUrl = `${shareOrigin}/products/${productSlug}`;
 
     const handleCopy = async () => {
-        const url = getProductUrl();
         try {
-            await navigator.clipboard.writeText(url);
+            await navigator.clipboard.writeText(productUrl);
             setCopied(true);
             toast.success(isArabic ? 'تم نسخ رابط المنتج!' : 'Product link copied!');
             setTimeout(() => setCopied(false), 2500);
@@ -37,7 +39,6 @@ export default function ProductShareButtons({
         }
     };
 
-    const productUrl = typeof window !== 'undefined' ? `${window.location.origin}/products/${productSlug}` : `https://zadland.com/products/${productSlug}`;
     const shareMessage = isArabic
         ? `شاهد ${productName} على زاد لاند - أسعار الجملة المعتمدة:\n${productUrl}`
         : `Check out ${productName} on Zad Land Wholesale:\n${productUrl}`;
@@ -92,7 +93,7 @@ export default function ProductShareButtons({
             <button
                 type="button"
                 onClick={handleCopy}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-300 hover:bg-[#B8860B] hover:text-white dark:hover:bg-[#B8860B] dark:hover:text-white transition-all shadow-2xs cursor-pointer"
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-300 hover:bg-[var(--color-accent)] hover:text-white dark:hover:bg-[var(--color-accent)] dark:hover:text-white transition-all shadow-2xs cursor-pointer"
                 title={isArabic ? 'نسخ الرابط' : 'Copy link'}
                 aria-label="Copy Link"
             >

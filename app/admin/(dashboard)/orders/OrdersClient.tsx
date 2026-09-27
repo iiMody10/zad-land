@@ -1,14 +1,14 @@
 "use client";
 
 import AdminHeader from "../../components/AdminHeader";
-import { MdPendingActions, MdLocalShipping, MdTaskAlt, MdPayments, MdExpandMore, MdVisibility, MdDelete, MdSync, MdChevronLeft, MdChevronRight, MdArrowUpward, MdArrowDownward } from "react-icons/md";
+import { ClipboardClock as MdPendingActions, Truck as MdLocalShipping, CircleCheck as MdTaskAlt, CreditCard as MdPayments, ChevronDown as MdExpandMore, Trash2 as MdDelete, RefreshCw as MdSync, ChevronLeft as MdChevronLeft, ChevronRight as MdChevronRight, ArrowUp as MdArrowUpward, ArrowDown as MdArrowDownward } from 'lucide-react';
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import Link from "next/link";
 import { updateOrderStatus, deleteOrder } from "../../../../lib/admin-actions";
 import { useState, useRef, useEffect } from "react";
 import OrderDetailsModal from "./OrderDetailsModal";
-import { OrderStatus } from "@prisma/client";
-import { useSession } from "next-auth/react";
+import type { OrderStatus } from "../../../../lib/admin-actions";
+import { useAdminSession } from "../../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
@@ -16,6 +16,8 @@ import { toast } from "react-hot-toast";
 interface Order {
     id: string;
     Name: string;
+    shopName?: string | null;
+    notes?: string | null;
     phone: string;
     streetAddress: string;
     city: string;
@@ -35,7 +37,7 @@ interface Order {
 }
 
 export default function OrdersClient({ orders }: { orders: Order[] }) {
-    const { data: session } = useSession() || {};
+    const { data: session } = useAdminSession();
     const router = useRouter();
     const canManage = session?.user?.role === 'SUPER_ADMIN' || session?.user?.canManageOrders;
     const canDelete = session?.user?.role === 'SUPER_ADMIN' || session?.user?.canDeleteOrders;
@@ -171,7 +173,7 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
 
                     {/* Stats Grid (2-cols on mobile, 4-cols on lg) */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6">
-                        <div className="bg-white dark:bg-[#0f172a] p-3.5 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all hover:shadow-md flex flex-col justify-between">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] p-3.5 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all hover:shadow-md flex flex-col justify-between">
                             <div className="flex justify-between items-center gap-1 mb-2 sm:mb-4">
                                 <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('admin.pendingOrders')}</p>
                                 <div className="p-1.5 sm:p-2.5 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-lg sm:rounded-xl shrink-0">
@@ -181,7 +183,7 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                             <h3 className="text-slate-900 dark:text-white text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight mt-1">{stats.pending}</h3>
                         </div>
 
-                        <div className="bg-white dark:bg-[#0f172a] p-3.5 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all hover:shadow-md flex flex-col justify-between">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] p-3.5 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all hover:shadow-md flex flex-col justify-between">
                             <div className="flex justify-between items-center gap-1 mb-2 sm:mb-4">
                                 <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('admin.shippedToday')}</p>
                                 <div className="p-1.5 sm:p-2.5 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-lg sm:rounded-xl shrink-0">
@@ -191,20 +193,20 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                             <h3 className="text-slate-900 dark:text-white text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight mt-1">{stats.shippedToday}</h3>
                         </div>
 
-                        <div className="bg-white dark:bg-[#0f172a] p-3.5 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all hover:shadow-md flex flex-col justify-between">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] p-3.5 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all hover:shadow-md flex flex-col justify-between">
                             <div className="flex justify-between items-center gap-1 mb-2 sm:mb-4">
                                 <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('admin.deliveredMtd')}</p>
-                                <div className="p-1.5 sm:p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-[#2E7D32] dark:text-[#4ade80] rounded-lg sm:rounded-xl shrink-0">
+                                <div className="p-1.5 sm:p-2.5 bg-emerald-50 dark:bg-emerald-950/50 text-[var(--color-brand-hover)] dark:text-[var(--color-brand-light)] rounded-lg sm:rounded-xl shrink-0">
                                     <MdTaskAlt className="text-lg sm:text-2xl" />
                                 </div>
                             </div>
                             <h3 className="text-slate-900 dark:text-white text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight mt-1">{stats.deliveredMTD}</h3>
                         </div>
 
-                        <div className="bg-white dark:bg-[#0f172a] p-3.5 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all hover:shadow-md flex flex-col justify-between">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] p-3.5 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all hover:shadow-md flex flex-col justify-between">
                             <div className="flex justify-between items-center gap-1 mb-2 sm:mb-4">
                                 <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('admin.totalRevenue')}</p>
-                                <div className="p-1.5 sm:p-2.5 bg-[#072835]/10 dark:bg-[#E5B54A]/10 text-[#072835] dark:text-[#E5B54A] rounded-lg sm:rounded-xl shrink-0">
+                                <div className="p-1.5 sm:p-2.5 bg-[var(--color-brand)]/10 dark:bg-[var(--color-accent-light)]/10 text-[var(--color-brand)] dark:text-[var(--color-accent-light)] rounded-lg sm:rounded-xl shrink-0">
                                     <MdPayments className="text-lg sm:text-2xl" />
                                 </div>
                             </div>
@@ -220,12 +222,12 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                                 <h3 className="text-slate-900 dark:text-white text-lg font-bold">
                                     {t('admin.allOrders')} ({filteredOrders.length})
                                 </h3>
-                                <div className="flex flex-wrap bg-white dark:bg-[#0f172a] rounded-xl p-1 border border-slate-200/80 dark:border-white/10 gap-1 shadow-2xs">
+                                <div className="flex flex-wrap bg-white dark:bg-[var(--color-surface-dark)] rounded-xl p-1 border border-slate-200/80 dark:border-white/10 gap-1 shadow-2xs">
                                     <button
                                         onClick={() => setFilter("ALL")}
                                         className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                                             filter === "ALL" 
-                                                ? "bg-[#072835] text-white shadow-2xs" 
+                                                ? "bg-[var(--color-brand)] text-white shadow-2xs"
                                                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                                         }`}
                                     >
@@ -265,8 +267,8 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                                         onClick={() => setFilter("DELIVERED")}
                                         className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                                             filter === "DELIVERED" 
-                                                ? "bg-[#2E7D32] text-white shadow-2xs" 
-                                                : "text-slate-600 dark:text-slate-400 hover:text-[#2E7D32]"
+                                                ? "bg-[var(--color-brand-hover)] text-white shadow-2xs"
+                                                : "text-slate-600 dark:text-slate-400 hover:text-[var(--color-brand-hover)]"
                                         }`}
                                     >
                                         {t('admin.delivered')} ({orders.filter(o => o.status === 'DELIVERED').length})
@@ -287,7 +289,7 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                             isDeleting={selectedOrder ? deletingId === selectedOrder.id : false}
                         />
 
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className={`w-full border-collapse ${dir === 'rtl' ? 'text-end' : 'text-start'}`}>
                                     <thead>
@@ -296,8 +298,8 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                                                 <div className="flex items-center">
                                                     {t('admin.orderId')}
                                                     <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'id' && sortConfig.direction === 'asc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
-                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'id' && sortConfig.direction === 'desc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
+                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'id' && sortConfig.direction === 'asc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
+                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'id' && sortConfig.direction === 'desc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
                                                     </span>
                                                 </div>
                                             </th>
@@ -305,8 +307,8 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                                                 <div className="flex items-center">
                                                     {t('admin.customerName')}
                                                     <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'Name' && sortConfig.direction === 'asc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
-                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'Name' && sortConfig.direction === 'desc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
+                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'Name' && sortConfig.direction === 'asc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
+                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'Name' && sortConfig.direction === 'desc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
                                                     </span>
                                                 </div>
                                             </th>
@@ -314,8 +316,8 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                                                 <div className="flex items-center">
                                                     {t('admin.date')}
                                                     <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'createdAt' && sortConfig.direction === 'asc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
-                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'createdAt' && sortConfig.direction === 'desc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
+                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'createdAt' && sortConfig.direction === 'asc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
+                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'createdAt' && sortConfig.direction === 'desc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
                                                     </span>
                                                 </div>
                                             </th>
@@ -323,8 +325,8 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                                                 <div className="flex items-center">
                                                     {t('admin.totalAmount')}
                                                     <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'totalAmount' && sortConfig.direction === 'asc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
-                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'totalAmount' && sortConfig.direction === 'desc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
+                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'totalAmount' && sortConfig.direction === 'asc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
+                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'totalAmount' && sortConfig.direction === 'desc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
                                                     </span>
                                                 </div>
                                             </th>
@@ -333,8 +335,8 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                                                 <div className="flex items-center">
                                                     {t('admin.orderStatus')}
                                                     <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'status' && sortConfig.direction === 'asc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
-                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'status' && sortConfig.direction === 'desc' ? 'text-[#072835] dark:text-[#E5B54A]' : 'text-slate-300'}`} />
+                                                        <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'status' && sortConfig.direction === 'asc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
+                                                        <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'status' && sortConfig.direction === 'desc' ? 'text-[var(--color-brand)] dark:text-[var(--color-accent-light)]' : 'text-slate-300'}`} />
                                                     </span>
                                                 </div>
                                             </th>

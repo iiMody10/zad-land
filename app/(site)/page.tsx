@@ -4,7 +4,6 @@ import {
     getMainCategoryBrands,
     getHomeRailBrands,
     getCategoryHighlightCardsData,
-    getApprovedReviews,
     getBestSellerProducts,
     getOnSaleProducts,
     getNewArrivalProducts,
@@ -13,7 +12,17 @@ import {
     getFeaturedCategories,
 } from "../../lib/admin-actions";
 
-export const revalidate = 86400; // Revalidate every 24 hours
+// Keep the homepage fresh enough to recover after transient data-source failures.
+export const revalidate = 300;
+
+async function loadHomeSection<T>(name: string, load: () => Promise<T>, fallback: T): Promise<T> {
+    try {
+        return await load();
+    } catch (error) {
+        console.error(`Failed to load homepage ${name}:`, error);
+        return fallback;
+    }
+}
 
 export default async function Home() {
     const [
@@ -21,7 +30,6 @@ export default async function Home() {
         mainBrands,
         railBrands,
         highlightCards,
-        reviews,
         featuredBestSellers,
         featuredNewArrivals,
         featuredBundles,
@@ -29,17 +37,16 @@ export default async function Home() {
         trendingWeekly,
         featuredCategories,
     ] = await Promise.all([
-        getActiveBanners(),
-        getMainCategoryBrands(),
-        getHomeRailBrands(),
-        getCategoryHighlightCardsData(),
-        getApprovedReviews(),
-        getBestSellerProducts(),
-        getNewArrivalProducts(),
-        getOnSaleProducts(),
-        getSiteSettings(),
-        getTrendingWeeklyProducts(),
-        getFeaturedCategories(),
+        loadHomeSection("banners", getActiveBanners, []),
+        loadHomeSection("main brands", getMainCategoryBrands, []),
+        loadHomeSection("brand rail", getHomeRailBrands, []),
+        loadHomeSection("category highlights", getCategoryHighlightCardsData, []),
+        loadHomeSection("best sellers", getBestSellerProducts, []),
+        loadHomeSection("new arrivals", getNewArrivalProducts, []),
+        loadHomeSection("sale products", getOnSaleProducts, []),
+        loadHomeSection("site settings", getSiteSettings, null),
+        loadHomeSection("weekly trends", getTrendingWeeklyProducts, []),
+        loadHomeSection("featured categories", getFeaturedCategories, []),
     ]);
 
     const firstBannerImage = banners?.[0]?.image;
@@ -55,7 +62,6 @@ export default async function Home() {
                     mainBrands={mainBrands}
                     railBrands={railBrands}
                     highlightCards={highlightCards}
-                    reviews={reviews}
                     featuredNewArrivals={featuredNewArrivals}
                     featuredBundles={featuredBundles}
                     featuredBestSellers={featuredBestSellers}

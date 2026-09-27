@@ -5,7 +5,7 @@ import { useLanguage } from "@/app/context/LanguageContext";
 import BrandMasthead from "./BrandMasthead";
 import BrandCatalogToolbar, { CategoryItem } from "./BrandCatalogToolbar";
 import EditorialProductCard, { Product as BrandProductItem } from "@/app/components/ProductsPageComponents/EditorialProductCard";
-import { MdSearchOff, MdRefresh } from "react-icons/md";
+import { SearchX as MdSearchOff, RefreshCw as MdRefresh } from 'lucide-react';
 
 interface BrandShowcaseClientProps {
     brand: {
@@ -183,7 +183,7 @@ export default function BrandShowcaseClient({
                     <button
                         type="button"
                         onClick={handleResetFilters}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#072835] dark:bg-[#B8860B] text-white text-xs font-bold transition-all active:scale-95 shadow-xs"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[var(--color-brand)] dark:bg-[var(--color-accent)] text-white text-xs font-bold transition-all active:scale-95 shadow-xs"
                     >
                         <MdRefresh className="text-base" />
                         <span>{isArabic ? "إعادة تعيين الفلاتر" : "Reset Filters"}</span>
@@ -207,7 +207,7 @@ export default function BrandShowcaseClient({
             {hasMore && (
                 <div ref={observerRef} className="mt-10 py-6 flex items-center justify-center">
                     <div className="flex items-center gap-2.5 text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-zinc-900 px-4 py-2 rounded-full border border-slate-200/80 dark:border-white/5">
-                        <div className="w-4 h-4 border-2 border-[#072835] dark:border-[#B8860B] border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-[var(--color-brand)] dark:border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />
                         <span>{isArabic ? "جاري تحميل المزيد من المنتجات..." : "Loading more products..."}</span>
                     </div>
                 </div>

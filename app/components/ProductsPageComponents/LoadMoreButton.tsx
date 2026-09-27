@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useLanguage } from '@/app/context/LanguageContext';
-import { MdExpandMore } from 'react-icons/md';
+import { ChevronDown as MdExpandMore } from 'lucide-react';
 
 interface LoadMoreButtonProps {
     handleLoadMore: () => void;

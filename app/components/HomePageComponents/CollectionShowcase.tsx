@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import { MdChevronRight } from "react-icons/md";
+import { ChevronRight as MdChevronRight } from 'lucide-react';
 import type { HomeCollectionSection } from "@/lib/admin-actions";
 import ProductCard from "../ProductsPageComponents/ProductCard";
 import ResilientImage from "@/app/components/ResilientImage";
@@ -12,11 +12,7 @@ interface CollectionShowcaseProps {
     language: "en" | "ar";
 }
 
-const panelThemes = [
-    "border-amber-100 bg-gradient-to-br from-[#FDFCF8] via-white to-[#F5ECD7] dark:border-white/10 dark:from-[#24211a] dark:via-[#1e1c17] dark:to-[#171511]",
-    "border-stone-200 bg-gradient-to-br from-[#FAFAF8] via-white to-[#F0EBE1] dark:border-white/10 dark:from-[#21201c] dark:via-[#1c1b18] dark:to-[#181714]",
-    "border-amber-100 bg-gradient-to-br from-[#FCFBF7] via-white to-[#F3EADA] dark:border-white/10 dark:from-[#222019] dark:via-[#1d1b15] dark:to-[#161510]",
-] as const;
+const panelTheme = "border-[var(--color-line)] bg-gradient-to-br from-[var(--color-canvas)] via-white to-[var(--color-brand-soft)] dark:border-white/10 dark:from-[var(--color-background-dark)] dark:via-[var(--color-surface-dark)] dark:to-[var(--color-background-dark)]";
 
 const CollectionShowcase = ({ sections, t, dir, language }: CollectionShowcaseProps) => {
     if (!sections.length) {
@@ -27,7 +23,6 @@ const CollectionShowcase = ({ sections, t, dir, language }: CollectionShowcasePr
         <section className="container-custom py-4 md:py-8">
             <div className="flex flex-col gap-8 md:gap-12">
                 {sections.map((section, index) => {
-                    const theme = panelThemes[index % panelThemes.length];
                     const reverseOnLarge = index % 2 === 1;
                     const desktopGrid = reverseOnLarge
                         ? "lg:grid-cols-[1.28fr_0.72fr]"
@@ -42,7 +37,7 @@ const CollectionShowcase = ({ sections, t, dir, language }: CollectionShowcasePr
                     return (
                         <article
                             key={section.category.id}
-                            className={`overflow-hidden rounded-[2rem] border ${theme} premium-shadow`}
+                            className={`overflow-hidden rounded-[2rem] border ${panelTheme} premium-shadow`}
                         >
                             <div className={`grid gap-8 p-5 md:p-8 lg:items-center lg:gap-10 lg:p-10 ${desktopGrid}`}>
                                 <div className={`flex flex-col justify-center ${reverseOnLarge ? "lg:order-2" : ""} ${contentAlignment}`}>

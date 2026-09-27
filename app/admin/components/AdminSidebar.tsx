@@ -2,24 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { 
-    MdDashboard, 
-    MdShoppingBag, 
-    MdStorefront,
-    MdCategory, 
-    MdViewCarousel, 
-    MdInventory2, 
-    MdLocalOffer, 
-    MdEditNote, 
-    MdGroup, 
-    MdSettings,
-    MdClose,
-    MdLogout,
-    MdAccountTree,
-    MdStar
-} from "react-icons/md";
+import { LayoutDashboard as MdDashboard, ShoppingBag as MdShoppingBag, Store as MdStorefront, Shapes as MdCategory, GalleryHorizontalEnd as MdViewCarousel, Package as MdInventory2, Tag as MdLocalOffer, FilePenLine as MdEditNote, Users as MdGroup, Settings as MdSettings, X as MdClose, LogOut as MdLogout, GitBranch as MdAccountTree, Star as MdStar } from 'lucide-react';
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { signOutAdmin, useAdminSession } from "../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
 
 interface AdminSidebarProps {
@@ -51,7 +36,7 @@ interface NavSection {
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     const pathname = usePathname();
-    const { data: session } = useSession() || {};
+    const { data: session } = useAdminSession();
     const { t, dir, language } = useLanguage();
     const isSuperAdmin = session?.user?.role === 'SUPER_ADMIN';
 
@@ -77,6 +62,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             title: t('admin.salesAndCustomers') || "Sales & Customers",
             items: [
                 { href: "/admin/orders", icon: MdInventory2, label: t('admin.orders'), permission: "canManageOrders" },
+                { href: "/admin/customers", icon: MdGroup, label: isArabic ? "حسابات التجار" : "Merchants", superAdminOnly: true },
                 { href: "/admin/promocodes", icon: MdLocalOffer, label: t('admin.promoCodes'), permission: "canManagePromoCodes" },
                 { href: "/admin/reviews", icon: MdStar, label: t('admin.reviews'), permission: "canManageReviews" }
             ]
@@ -92,9 +78,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         }
     ];
 
-    const handleSignOut = () => {
-        signOut({ callbackUrl: "/admin/login" });
-    };
+    const handleSignOut = () => { void signOutAdmin(); };
 
     return (
         <>
@@ -111,7 +95,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             <aside
                 className={`fixed lg:static inset-y-0 ${
                     dir === 'rtl' ? 'right-0 border-s' : 'left-0 border-e'
-                } z-50 w-[270px] max-w-[85vw] shrink-0 border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0f172a] flex flex-col transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none ${
+                } z-50 w-[270px] max-w-[85vw] shrink-0 border-slate-200/80 dark:border-white/10 bg-white dark:bg-[var(--color-surface-dark)] flex flex-col transition-transform duration-300 ease-in-out shadow-2xl lg:shadow-none ${
                     isOpen
                         ? "translate-x-0 pointer-events-auto"
                         : dir === 'rtl'
@@ -133,7 +117,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                                     className="h-10 w-auto object-contain transition-transform group-hover:scale-105"
                                 />
                                 <div className="flex flex-col">
-                                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#072835] dark:text-[#E5B54A]">
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-brand)] dark:text-[var(--color-accent-light)]">
                                         {isArabic ? "لوحة الإدارة" : "Admin Portal"}
                                     </span>
                                 </div>
@@ -176,14 +160,14 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                                                         onClick={onClose}
                                                         className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 group ${
                                                             isActive
-                                                                ? "bg-[#072835] text-white shadow-xs font-semibold"
+                                                                ? "bg-[var(--color-brand)] text-white shadow-xs font-semibold"
                                                                 : "text-slate-600 dark:text-slate-300 hover:bg-slate-100/90 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white font-medium"
                                                         }`}
                                                     >
                                                         <item.icon
                                                             className={`text-[19px] shrink-0 transition-colors ${
                                                                 isActive
-                                                                    ? "text-[#E5B54A]"
+                                                                    ? "text-[var(--color-accent-light)]"
                                                                     : "text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-200"
                                                             }`}
                                                         />
@@ -203,14 +187,14 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                     {/* Bottom User & Sign Out Footer */}
                     <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-slate-200/80 dark:border-white/10">
                         <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-white/5">
-                            <div className="h-8 w-8 rounded-full bg-[#072835] dark:bg-[#E5B54A] text-white dark:text-[#072835] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                            <div className="h-8 w-8 rounded-full bg-[var(--color-brand)] dark:bg-[var(--color-accent-light)] text-white dark:text-[var(--color-brand)] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                                 {session?.user?.name?.charAt(0).toUpperCase() || "A"}
                             </div>
                             <div className="flex flex-col min-w-0 flex-1">
                                 <p className="text-slate-900 dark:text-white text-[13px] font-bold leading-tight truncate">
                                     {session?.user?.name || "Admin"}
                                 </p>
-                                <p className="text-[#2E7D32] dark:text-[#4ade80] text-[10.5px] font-bold tracking-tight uppercase truncate">
+                                <p className="text-[var(--color-brand-hover)] dark:text-[var(--color-brand-light)] text-[10.5px] font-bold tracking-tight uppercase truncate">
                                     {isSuperAdmin ? t('admin.superAdmin') : t('admin.editor')}
                                 </p>
                             </div>

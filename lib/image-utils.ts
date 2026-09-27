@@ -30,14 +30,14 @@ export const isValidImageSrc = (url: string | null | undefined): boolean => {
 
 const isRemoteImageUrl = (url: string) => /^https?:\/\//i.test(url);
 
-export const getProxyImageUrl = (url: string) => `/api/image-proxy?url=${encodeURIComponent(url)}`;
+export const getProxyImageUrl = (url: string) => `/image-proxy?url=${encodeURIComponent(url)}`;
 
 const appendRetryParam = (url: string, attempt: number) =>
     `${url}${url.includes("?") ? "&" : "?"}retry=${attempt}`;
 
 const cleanUrl = (url: string): string => {
     let cleaned = url.trim();
-    if (cleaned.includes('/api/image-proxy?url=')) {
+    if (cleaned.includes('/image-proxy?url=') || cleaned.includes('/api/image-proxy?url=')) {
         try {
             const urlParam = cleaned.split('url=')[1].split('&')[0];
             cleaned = decodeURIComponent(urlParam);

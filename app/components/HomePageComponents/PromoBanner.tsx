@@ -39,13 +39,13 @@ const PromoBanner = ({ settings, dir = 'rtl', language = 'ar' }: PromoBannerProp
                     <h3 className="text-[13px] sm:text-[17px] md:text-2xl lg:text-[28px] font-black text-white leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-tight">
                         {isArabic ? 'منتجات عالمية' : 'Global Products'}
                     </h3>
-                    <p className="text-[9.5px] sm:text-[12px] md:text-sm lg:text-base font-bold text-[#E5B54A] leading-tight mt-0.5 sm:mt-1 mb-1.5 sm:mb-3 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+                    <p className="text-[9.5px] sm:text-[12px] md:text-sm lg:text-base font-bold text-[var(--color-accent-light)] leading-tight mt-0.5 sm:mt-1 mb-1.5 sm:mb-3 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
                         {isArabic ? 'لجودة حياة أفضل' : 'For Better Quality Living'}
                     </p>
 
                     <div className="inline-flex items-center gap-1 sm:gap-2 text-[8.5px] sm:text-[11px] md:text-xs lg:text-sm font-extrabold text-white/95 group-hover:text-white transition-colors">
                         <span>{isArabic ? 'تسوق حسب الفئات' : 'Shop by Categories'}</span>
-                        <span className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 rounded-full bg-[#B8860B] group-hover:bg-[#E5B54A] text-white flex items-center justify-center text-[10px] sm:text-xs transition-colors shadow-xs">
+                        <span className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 rounded-full bg-[var(--color-accent)] group-hover:bg-[var(--color-accent-hover)] text-white flex items-center justify-center text-[10px] sm:text-xs transition-colors shadow-xs">
                             <span className="leading-none">{isArabic ? '‹' : '›'}</span>
                         </span>
                     </div>

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FaWhatsapp, FaFacebook, FaInstagram } from 'react-icons/fa';
-import { LuPhone, LuMail, LuMapPin, LuClock, LuSend } from 'react-icons/lu';
-import { IoCheckmarkCircle } from 'react-icons/io5';
+import { MessageCircle as FaWhatsapp, ThumbsUp as FaFacebook, Camera as FaInstagram } from 'lucide-react';
+import { Phone as LuPhone, Mail as LuMail, MapPin as LuMapPin, Clock as LuClock, Send as LuSend } from 'lucide-react';
+import { CircleCheck as IoCheckmarkCircle } from 'lucide-react';
 
 interface ContactSettings {
     footerWhatsappUrl?: string | null;
@@ -44,32 +44,32 @@ export default function ContactClient({ language, dir, settings }: ContactClient
             : 'https://wa.me/';
 
     return (
-        <div className="bg-[#FAF9F5] dark:bg-[#141410] min-h-screen py-8 md:py-14" dir={dir}>
+        <div className="bg-[var(--color-canvas)] dark:bg-[#141410] min-h-screen py-8 md:py-14" dir={dir}>
             <div className="container-custom max-w-5xl">
                 {/* Header */}
                 <div className="text-center max-w-2xl mx-auto mb-10 md:mb-14">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100/70 text-[#B8860B] dark:bg-amber-950/40 dark:text-[#E5B54A] text-xs font-bold mb-3">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100/70 text-[var(--color-accent)] dark:bg-amber-950/40 dark:text-[var(--color-accent-light)] text-xs font-bold mb-3">
                         <LuPhone className="text-sm" />
                         <span>{isAr ? 'خدمة عملاء وتوريد الجملة' : 'Wholesale Support & Sales'}</span>
                     </div>
 
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#072835] dark:text-[#F5F0E0] mb-3">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-[var(--color-brand)] dark:text-[#F5F0E0] mb-3">
                         {isAr ? 'تواصل معنا - شركة زاد لاند' : 'Contact Zad Land Wholesale'}
                     </h1>
 
-                    <p className="text-sm md:text-base text-[#5A5A48] dark:text-[#C4B89A] leading-relaxed">
+                    <p className="text-sm md:text-base text-[var(--color-text-muted-light)] dark:text-[var(--color-text-muted-dark)] leading-relaxed">
                         {isAr
                             ? 'فريق مبيعات الجملة والتوزيع جاهز للرد على استفساراتكم وتزويدكم بعروض الأسعار وجداول التسليم لكافة المحافظات.'
                             : 'Our wholesale sales & distribution team is ready to assist your business with customized supply quotes and scheduled deliveries.'}
                     </p>
 
                     {/* Signature Ornamental Divider */}
-                    <div className="flex items-center justify-center gap-3 mt-4 text-[#B8860B] opacity-80 select-none">
-                        <span className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[#B8860B]" />
+                    <div className="flex items-center justify-center gap-3 mt-4 text-[var(--color-accent)] opacity-80 select-none">
+                        <span className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[var(--color-accent)]" />
                         <span>🌾</span>
                         <span className="text-xs font-bold tracking-wider">ZAD LAND</span>
                         <span>🌾</span>
-                        <span className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#B8860B]" />
+                        <span className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[var(--color-accent)]" />
                     </div>
                 </div>
 
@@ -100,16 +100,16 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                         </a>
 
                         {/* Info Card */}
-                        <div className="bg-white dark:bg-[#1E1E16] rounded-2xl border border-gray-100 dark:border-white/10 p-6 space-y-6 shadow-xs">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-gray-100 dark:border-white/10 p-6 space-y-6 shadow-xs">
                             <div className="flex items-start gap-3.5">
-                                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-white/5 text-[#B8860B] dark:text-[#E5B54A] flex items-center justify-center shrink-0 text-lg">
+                                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-white/5 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] flex items-center justify-center shrink-0 text-lg">
                                     <LuMapPin />
                                 </div>
                                 <div>
                                     <h3 className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
                                         {isAr ? 'المقر الرئيسي والمستودعات' : 'Headquarters & Warehouses'}
                                     </h3>
-                                    <p className="text-sm font-semibold text-[#072835] dark:text-white mt-0.5">
+                                    <p className="text-sm font-semibold text-[var(--color-brand)] dark:text-white mt-0.5">
                                         {isAr ? 'المنطقة الصناعية - حمص، سوريا' : 'Industrial Area - Homs, Syria'}
                                     </p>
                                     <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
@@ -119,14 +119,14 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                             </div>
 
                             <div className="flex items-start gap-3.5">
-                                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-white/5 text-[#B8860B] dark:text-[#E5B54A] flex items-center justify-center shrink-0 text-lg">
+                                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-white/5 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] flex items-center justify-center shrink-0 text-lg">
                                     <LuClock />
                                 </div>
                                 <div>
                                     <h3 className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
                                         {isAr ? 'أوقات العمل والتوزيع' : 'Operating Hours'}
                                     </h3>
-                                    <p className="text-sm font-semibold text-[#072835] dark:text-white mt-0.5">
+                                    <p className="text-sm font-semibold text-[var(--color-brand)] dark:text-white mt-0.5">
                                         {isAr ? 'السبت - الخميس: ٨:٠٠ ص - ٦:٠٠ م' : 'Sat - Thu: 8:00 AM - 6:00 PM'}
                                     </p>
                                     <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
@@ -136,14 +136,14 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                             </div>
 
                             <div className="flex items-start gap-3.5">
-                                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-white/5 text-[#B8860B] dark:text-[#E5B54A] flex items-center justify-center shrink-0 text-lg">
+                                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-white/5 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] flex items-center justify-center shrink-0 text-lg">
                                     <LuMail />
                                 </div>
                                 <div>
                                     <h3 className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
                                         {isAr ? 'البريد الإلكتروني التجاري' : 'Commercial Email'}
                                     </h3>
-                                    <p className="text-sm font-semibold text-[#072835] dark:text-white mt-0.5">
+                                    <p className="text-sm font-semibold text-[var(--color-brand)] dark:text-white mt-0.5">
                                         info@zadland.com
                                     </p>
                                 </div>
@@ -151,7 +151,7 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                         </div>
 
                         {/* Social Links */}
-                        <div className="bg-white dark:bg-[#1E1E16] rounded-2xl border border-gray-100 dark:border-white/10 p-5 flex items-center justify-between shadow-xs">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-gray-100 dark:border-white/10 p-5 flex items-center justify-between shadow-xs">
                             <span className="text-xs font-bold text-slate-600 dark:text-zinc-400">
                                 {isAr ? 'تابع صفحاتنا الرسمية:' : 'Follow Official Channels:'}
                             </span>
@@ -183,8 +183,8 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                     </div>
 
                     {/* Inquiry Form Column */}
-                    <div className="lg:col-span-7 bg-white dark:bg-[#1E1E16] rounded-2xl border border-gray-100 dark:border-white/10 p-6 sm:p-8 shadow-xs">
-                        <h2 className="text-xl font-bold text-[#072835] dark:text-white mb-1">
+                    <div className="lg:col-span-7 bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-gray-100 dark:border-white/10 p-6 sm:p-8 shadow-xs">
+                        <h2 className="text-xl font-bold text-[var(--color-brand)] dark:text-white mb-1">
                             {isAr ? 'طلب تسعير أو استفسار جملة' : 'Request Wholesale Quote'}
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mb-6">
@@ -220,7 +220,7 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                                             value={form.name}
                                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                                             placeholder={isAr ? 'محمد خالد' : 'John Doe'}
-                                            className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[#FAF9F5] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[#072835] dark:text-white outline-none focus:border-[#B8860B] focus:ring-2 focus:ring-[#B8860B]/20 transition-all"
+                                            className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all"
                                         />
                                     </div>
 
@@ -234,7 +234,7 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                                             value={form.businessName}
                                             onChange={(e) => setForm({ ...form, businessName: e.target.value })}
                                             placeholder={isAr ? 'سوبرماركت الأمانة' : 'Al-Amana Supermarket'}
-                                            className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[#FAF9F5] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[#072835] dark:text-white outline-none focus:border-[#B8860B] focus:ring-2 focus:ring-[#B8860B]/20 transition-all"
+                                            className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all"
                                         />
                                     </div>
                                 </div>
@@ -249,7 +249,7 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                                         value={form.phone}
                                         onChange={(e) => setForm({ ...form, phone: e.target.value })}
                                         placeholder="+963..."
-                                        className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[#FAF9F5] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[#072835] dark:text-white outline-none focus:border-[#B8860B] focus:ring-2 focus:ring-[#B8860B]/20 transition-all"
+                                        className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all"
                                     />
                                 </div>
 
@@ -267,14 +267,14 @@ export default function ContactClient({ language, dir, settings }: ContactClient
                                                 ? 'اكتب المنتجات أو الكميات المطلوبة والمحافظة...'
                                                 : 'Specify products, quantities needed, and location...'
                                         }
-                                        className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[#FAF9F5] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[#072835] dark:text-white outline-none focus:border-[#B8860B] focus:ring-2 focus:ring-[#B8860B]/20 transition-all resize-none"
+                                        className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all resize-none"
                                     />
                                 </div>
 
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full py-3 px-6 rounded-xl bg-[#B8860B] hover:bg-[#9E7309] text-white font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 active:scale-98 shadow-sm cursor-pointer disabled:opacity-70"
+                                    className="w-full py-3 px-6 rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 active:scale-98 shadow-sm cursor-pointer disabled:opacity-70"
                                 >
                                     {loading ? (
                                         <span>{isAr ? 'جاري الإرسال...' : 'Sending...'}</span>

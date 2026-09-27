@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MdChevronRight } from "react-icons/md";
+import { ChevronRight as MdChevronRight } from 'lucide-react';
 import { useLanguage } from "@/app/context/LanguageContext";
 import CategoriesGrid from "./CategoriesGrid";
 import { getSafeImageUrl } from '@/lib/image-utils';

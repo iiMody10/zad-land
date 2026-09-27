@@ -3,19 +3,11 @@
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import { useState } from "react";
-import { 
-    MdAdd, 
-    MdSync, 
-    MdVisibility, 
-    MdVisibilityOff, 
-    MdEdit, 
-    MdDelete, 
-    MdViewCarousel 
-} from "react-icons/md";
+import { Plus as MdAdd, RefreshCw as MdSync, Eye as MdVisibility, EyeOff as MdVisibilityOff, Pencil as MdEdit, Trash2 as MdDelete } from 'lucide-react';
 import BannerModal from "./BannerModal";
 import { deleteBanner, toggleBannerStatus } from "../../../../lib/admin-actions";
 import { toast } from "react-hot-toast";
-import { useSession } from "next-auth/react";
+import { useAdminSession } from "../../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
 
 interface Banner {
@@ -36,7 +28,7 @@ interface Banner {
 }
 
 export default function BannersClient({ banners }: { banners: Banner[] }) {
-    const { data: session } = useSession() || {};
+    const { data: session } = useAdminSession();
     const { t, dir, language } = useLanguage();
     const isArabic = language === 'ar';
     const canManage = session?.user?.role === 'SUPER_ADMIN' || session?.user?.canManageBanners;
@@ -108,7 +100,7 @@ export default function BannersClient({ banners }: { banners: Banner[] }) {
                         {canManage && (
                             <button
                                 onClick={handleAdd}
-                                className="flex items-center gap-2 bg-[#072835] hover:bg-[#0c4054] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-xs cursor-pointer"
+                                className="flex items-center gap-2 bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-xs cursor-pointer"
                             >
                                 <MdAdd className="text-xl" />
                                 <span>{t('admin.addNewBanner')}</span>
@@ -124,7 +116,7 @@ export default function BannersClient({ banners }: { banners: Banner[] }) {
 
                     <div className="grid grid-cols-1 gap-6">
                         {banners.map((banner) => (
-                            <div key={banner.id} className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col lg:flex-row">
+                            <div key={banner.id} className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col lg:flex-row">
                                 <div className="lg:w-1/3 aspect-21/9 lg:aspect-auto overflow-hidden bg-slate-100 dark:bg-gray-800 relative min-h-[200px]">
                                     <img
                                         alt={banner.title || "Banner"}
@@ -136,7 +128,7 @@ export default function BannersClient({ banners }: { banners: Banner[] }) {
                                     <div className="flex flex-col gap-3">
                                         <div className="flex flex-wrap items-center gap-2">
                                             {banner.badge && (
-                                                <span className="bg-amber-50 text-[#B8860B] border border-amber-200 dark:bg-amber-950/40 dark:text-[#E5B54A] dark:border-amber-900 px-3 py-0.5 rounded-full text-[11px] font-bold">
+                                                <span className="bg-amber-50 text-[var(--color-accent)] border border-amber-200 dark:bg-amber-950/40 dark:text-[var(--color-accent-light)] dark:border-amber-900 px-3 py-0.5 rounded-full text-[11px] font-bold">
                                                     🇬🇧 {banner.badge}
                                                 </span>
                                             )}

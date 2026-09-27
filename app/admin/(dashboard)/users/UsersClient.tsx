@@ -8,7 +8,7 @@ import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import AdminHeader from "../../components/AdminHeader";
 import UserModal from "./UserModal";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdChevronRight, MdPersonAdd, MdEdit, MdDelete, MdArrowUpward, MdArrowDownward } from "react-icons/md";
+import { ChevronRight as MdChevronRight, UserRoundPlus as MdPersonAdd, Pencil as MdEdit, Trash2 as MdDelete, ArrowUp as MdArrowUpward, ArrowDown as MdArrowDownward } from 'lucide-react';
 
 interface User {
     id: string;
@@ -108,7 +108,7 @@ export default function UsersClient({ users }: { users: User[] }) {
                                 setSelectedUser(null);
                                 setIsModalOpen(true);
                             }}
-                            className="bg-[#072835] hover:bg-[#0c4054] text-white h-12 px-6 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-xs transform hover:-translate-y-0.5 active:translate-y-0"
+                            className="bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white h-12 px-6 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-xs transform hover:-translate-y-0.5 active:translate-y-0"
                         >
                             <MdPersonAdd className="text-[20px]" />
                             {t('admin.addNewUser')}
@@ -124,7 +124,7 @@ export default function UsersClient({ users }: { users: User[] }) {
                         user={selectedUser}
                     />
 
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 rounded-2xl shadow-xs overflow-hidden">
+                    <div className="bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 rounded-2xl shadow-xs overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className={`w-full border-collapse min-w-[800px] ${dir === 'rtl' ? 'text-end' : 'text-start'}`}>
                                 <thead>

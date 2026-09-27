@@ -1,11 +1,13 @@
 "use client";
 
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdClose, MdPerson, MdLocationOn, MdInventory2, MdSync, MdDelete } from "react-icons/md";
+import { X as MdClose, UserRound as MdPerson, MapPin as MdLocationOn, Package as MdInventory2, RefreshCw as MdSync, Trash2 as MdDelete } from 'lucide-react';
 
 interface Order {
     id: string;
     Name: string;
+    shopName?: string | null;
+    notes?: string | null;
     phone: string;
     streetAddress: string;
     city: string;
@@ -103,6 +105,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                                 {t('admin.customerInformation')}
                             </h4>
                             <div className={`space-y-1 ${dir === 'rtl' ? 'me-6' : 'ms-6'}`}>
+                                {order.shopName && <p className="text-sm font-bold text-text-main dark:text-white">{order.shopName}</p>}
                                 <p className="text-[11px] font-bold uppercase tracking-widest text-text-sub dark:text-gray-400">{order.Name}</p>
                                 <p className="text-sm text-text-sub dark:text-gray-400" dir="ltr">{order.phone}</p>
                             </div>
@@ -117,6 +120,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                                     {order.streetAddress}<br />
                                     {order.city}
                                 </p>
+                                {order.notes && <p className="mt-2 text-xs text-text-sub dark:text-gray-400">{order.notes}</p>}
                             </div>
                         </div>
                     </div>

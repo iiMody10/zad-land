@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/app/context/LanguageContext';
 import ResilientImage from '@/app/components/ResilientImage';
-import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import { ChevronLeft as MdChevronLeft, ChevronRight as MdChevronRight } from 'lucide-react';
 import type { RailBrand } from '@/lib/admin-actions';
 
 interface BrandsRailProps {
@@ -81,7 +81,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
             <Link
                 key={brand.id || brand.slug}
                 href={`/brands/${brand.slug}`}
-                className={`group flex flex-col items-center justify-between bg-white dark:bg-[#1A1A14] border border-[#B8860B]/20 dark:border-white/10 hover:border-[#B8860B] hover:shadow-sm rounded-lg transition-all duration-300 ${
+                className={`group flex flex-col items-center justify-between bg-white dark:bg-[var(--color-background-dark)] border border-[var(--color-accent)]/20 dark:border-white/10 hover:border-[var(--color-accent)] hover:shadow-sm rounded-lg transition-all duration-300 ${
                     isCompact ? 'min-h-[124px] w-full min-w-[145px] shrink-0 snap-start p-3 md:flex-[0_0_calc(25%_-_12px)] lg:flex-[0_0_calc(16.666%_-_14px)]' : 'p-2.5 sm:p-3 min-h-[105px] sm:min-h-[115px]'
                 }`}
             >
@@ -99,7 +99,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                 </div>
 
                 {/* Brand Subtitle / Category Label */}
-                <span className="text-[10px] lg:text-[11px] font-bold text-slate-800 dark:text-gray-200 text-center line-clamp-1 group-hover:text-[#B8860B] dark:group-hover:text-[#E5B54A] transition-colors mt-1 leading-snug">
+                <span className="text-[10px] lg:text-[11px] font-bold text-slate-800 dark:text-gray-200 text-center line-clamp-1 group-hover:text-[var(--color-accent)] dark:group-hover:text-[var(--color-accent-light)] transition-colors mt-1 leading-snug">
                     {brandLabel}
                 </span>
             </Link>
@@ -118,15 +118,15 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
     });
 
     return (
-        <section className="relative z-20 -mt-8 w-full rounded-t-[32px] border-b border-gray-100 bg-white pt-4 pb-3 dark:border-white/5 dark:bg-[#1A1A14] sm:-mt-10 sm:rounded-t-[38px] md:z-auto md:mt-0 md:rounded-t-none md:pt-6 md:pb-8">
+        <section className="relative z-20 -mt-8 w-full rounded-t-[32px] border-b border-gray-100 bg-white pt-4 pb-3 dark:border-white/5 dark:bg-[var(--color-background-dark)] sm:-mt-10 sm:rounded-t-[38px] md:z-auto md:mt-0 md:rounded-t-none md:pt-6 md:pb-8">
             <div className="container-custom">
                 {/* 1. Mobile Header (< md) */}
-                <div className="relative mb-3 flex items-center justify-center px-2 text-[#B8860B] md:hidden">
+                <div className="relative mb-3 flex items-center justify-center px-2 text-[var(--color-accent)] md:hidden">
                     {/* View All Link - Fixed on the left side */}
                     <Link
                         href="/brands"
                         dir="ltr"
-                        className="absolute left-2 top-1/2 z-10 flex -translate-y-1/2 items-center gap-0.5 text-[11px] font-bold text-gray-500 transition-colors hover:text-[#B8860B] dark:text-gray-400"
+                        className="absolute left-2 top-1/2 z-10 flex -translate-y-1/2 items-center gap-0.5 text-[11px] font-bold text-gray-500 transition-colors hover:text-[var(--color-accent)] dark:text-gray-400"
                     >
                         <span className="text-base leading-none">‹</span>
                         <span>{isArabic ? 'عرض الكل' : 'View All'}</span>
@@ -134,15 +134,15 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
 
                     {/* Center Ornamental Title */}
                     <div className="flex w-full items-center justify-center gap-3 pointer-events-none sm:gap-4 md:gap-6">
-                        <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-r from-transparent via-[#C5A059]/40 to-[#B8860B] sm:max-w-[90px] md:max-w-[200px] dark:to-[#E5B54A]" />
+                        <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-r from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
                         <svg className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                             <path d="M12 2C11.5 4 10.5 6 9 7.5C10.5 9 11.5 11 12 13C12.5 11 13.5 9 15 7.5C13.5 6 12.5 4 12 2Z" opacity="0.9" />
                             <path d="M7 6C6.5 8 5.5 10 4 11.5C5.5 13 6.5 15 7 17C7.5 15 8.5 13 10 11.5C8.5 10 7.5 8 7 6Z" />
                             <path d="M17 6C16.5 8 15.5 10 14 11.5C15.5 13 16.5 15 17 17C17.5 15 18.5 13 20 11.5C18.5 10 17.5 8 17 6Z" />
                             <path d="M12 11V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
-                        <h2 className="whitespace-nowrap px-1 text-base font-extrabold tracking-tight text-[#072835] sm:text-2xl md:text-[28px] dark:text-white">
-                            {isArabic ? 'شركاؤنا العالميون' : 'Our Global Partners'}
+                        <h2 className="whitespace-nowrap px-1 text-base font-extrabold tracking-tight text-[var(--color-brand)] sm:text-2xl md:text-[28px] dark:text-white">
+                            {isArabic ? 'شركائنا العالميون' : 'Our Global Partners'}
                         </h2>
                         <svg className="h-4 w-4 shrink-0 scale-x-[-1] sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                             <path d="M12 2C11.5 4 10.5 6 9 7.5C10.5 9 11.5 11 12 13C12.5 11 13.5 9 15 7.5C13.5 6 12.5 4 12 2Z" opacity="0.9" />
@@ -150,39 +150,41 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                             <path d="M17 6C16.5 8 15.5 10 14 11.5C15.5 13 16.5 15 17 17C17.5 15 18.5 13 20 11.5C18.5 10 17.5 8 17 6Z" />
                             <path d="M12 11V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
-                        <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-l from-transparent via-[#C5A059]/40 to-[#B8860B] sm:max-w-[90px] md:max-w-[200px] dark:to-[#E5B54A]" />
+                        <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-l from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
                     </div>
                 </div>
 
                 {/* 2. Desktop Section Header (>= md) */}
-                <div className="relative mb-4 hidden md:flex flex-col items-center justify-center">
-                    <Link
-                        href="/brands"
-                        className="absolute left-0 top-0 inline-flex items-center gap-1 rounded-full border border-[#B8860B]/25 bg-[#FAF6EC] px-3 py-1 text-[10px] font-bold text-[#072835] transition-colors hover:border-[#B8860B]/60 hover:text-[#B8860B] dark:bg-white/5 dark:text-[#E5B54A]"
-                    >
-                        <span>{isArabic ? 'عرض جميع الشركات' : 'View All Brands'}</span>
-                        <MdChevronRight className={`text-sm ${isArabic ? 'rotate-180' : ''}`} />
-                    </Link>
-                    <div className="flex w-full items-center justify-center gap-3 text-[#B8860B] md:gap-4">
-                        <div className="h-px flex-1 max-w-[36px] bg-gradient-to-r from-transparent via-[#C5A059]/40 to-[#B8860B]" />
+                <div className="mb-6 hidden px-2 md:block">
+                    <div className="mb-3 flex items-center justify-center gap-3 text-[var(--color-accent)] sm:gap-4 md:mb-5 md:gap-6">
+                        <div className="h-[1.5px] max-w-[36px] flex-1 bg-gradient-to-r from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
                         <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                             <path d="M12 2C11.5 4 10.5 6 9 7.5C10.5 9 11.5 11 12 13C12.5 11 13.5 9 15 7.5C13.5 6 12.5 4 12 2Z" opacity="0.9" />
                             <path d="M7 6C6.5 8 5.5 10 4 11.5C5.5 13 6.5 15 7 17C7.5 15 8.5 13 10 11.5C8.5 10 7.5 8 7 6Z" />
                             <path d="M17 6C16.5 8 15.5 10 14 11.5C15.5 13 16.5 15 17 17C17.5 15 18.5 13 20 11.5C18.5 10 17.5 8 17 6Z" />
                             <path d="M12 11V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
-                        <h2 className="whitespace-nowrap px-1 text-lg font-extrabold tracking-tight text-[#072835] dark:text-white lg:text-xl">
-                            {isArabic ? 'الشركات العالمية' : 'Global Partner Brands'}
+                        <h2 className="whitespace-nowrap px-1 text-base font-extrabold tracking-tight text-[var(--color-brand)] sm:text-2xl md:text-[28px] dark:text-white">
+                            {isArabic ? 'شركائنا العالميون' : 'Global Partner Brands'}
                         </h2>
-                        <svg className="h-4 w-4 shrink-0 scale-x-[-1]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <svg className="h-4 w-4 shrink-0 scale-x-[-1] sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                             <path d="M12 2C11.5 4 10.5 6 9 7.5C10.5 9 11.5 11 12 13C12.5 11 13.5 9 15 7.5C13.5 6 12.5 4 12 2Z" opacity="0.9" />
                             <path d="M7 6C6.5 8 5.5 10 4 11.5C5.5 13 6.5 15 7 17C7.5 15 8.5 13 10 11.5C8.5 10 7.5 8 7 6Z" />
                             <path d="M17 6C16.5 8 15.5 10 14 11.5C15.5 13 16.5 15 17 17C17.5 15 18.5 13 20 11.5C18.5 10 17.5 8 17 6Z" />
                             <path d="M12 11V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
-                        <div className="h-px flex-1 max-w-[36px] bg-gradient-to-l from-transparent via-[#C5A059]/40 to-[#B8860B]" />
+                        <div className="h-[1.5px] max-w-[36px] flex-1 bg-gradient-to-l from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
                     </div>
-                    <p className="mt-0.5 text-[10px] font-medium text-slate-500 dark:text-gray-400">
+                    <div className="flex items-center justify-center text-center">
+                        <Link
+                            href="/brands"
+                            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--color-accent)]/25 bg-[var(--color-canvas)] px-3 py-1 text-xs font-bold text-[var(--color-brand)] transition-colors hover:border-[var(--color-accent)]/60 hover:text-[var(--color-accent)] dark:bg-white/5 dark:text-[var(--color-accent-light)]"
+                        >
+                            <span>{isArabic ? 'عرض جميع الشركات' : 'View All Brands'}</span>
+                            <MdChevronRight className={`text-base transition-transform ${isArabic ? 'rotate-180' : ''}`} />
+                        </Link>
+                    </div>
+                    <p className="mt-2 text-center text-[10px] font-medium text-slate-500 dark:text-gray-400">
                         {isArabic ? 'شركاؤنا في الوصول إلى أسواق أكثر جودة' : 'Our partners in reaching better markets'}
                     </p>
                 </div>
@@ -190,11 +192,11 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                 {/* Legacy desktop ornament retained for mobile-only layout compatibility */}
                 <div className="hidden">
                     {/* Left Ornamental Line */}
-                    <div className="h-[1.5px] flex-1 max-w-[60px] sm:max-w-[120px] md:max-w-[200px] bg-gradient-to-r from-transparent via-[#C5A059]/40 to-[#B8860B] dark:to-[#E5B54A]" />
+                    <div className="h-[1.5px] flex-1 max-w-[60px] sm:max-w-[120px] md:max-w-[200px] bg-gradient-to-r from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] dark:to-[var(--color-accent-light)]" />
 
                     {/* Wheat / Olive Leaf Left */}
                     <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-[#B8860B] dark:text-[#E5B54A] shrink-0"
+                        className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] shrink-0"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                     >
@@ -205,13 +207,13 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                     </svg>
 
                     {/* Section Title */}
-                    <h2 className="text-base sm:text-2xl md:text-[28px] font-extrabold text-[#072835] dark:text-white tracking-tight whitespace-nowrap px-1">
-                        {isArabic ? 'الشركات العالمية' : 'Global Partner Brands'}
+                    <h2 className="text-base sm:text-2xl md:text-[28px] font-extrabold text-[var(--color-brand)] dark:text-white tracking-tight whitespace-nowrap px-1">
+                        {isArabic ? 'شركائنا العالميون' : 'Global Partner Brands'}
                     </h2>
 
                     {/* Wheat / Olive Leaf Right */}
                     <svg
-                        className="w-4 h-4 sm:w-5 sm:h-5 text-[#B8860B] dark:text-[#E5B54A] shrink-0 scale-x-[-1]"
+                        className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] shrink-0 scale-x-[-1]"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                     >
@@ -222,7 +224,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                     </svg>
 
                     {/* Right Ornamental Line */}
-                    <div className="h-[1.5px] flex-1 max-w-[60px] sm:max-w-[120px] md:max-w-[200px] bg-gradient-to-l from-transparent via-[#C5A059]/40 to-[#B8860B] dark:to-[#E5B54A]" />
+                    <div className="h-[1.5px] flex-1 max-w-[60px] sm:max-w-[120px] md:max-w-[200px] bg-gradient-to-l from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] dark:to-[var(--color-accent-light)]" />
                 </div>
 
                 {/* 1. Mobile Experience (< md): Single Row Horizontal Scroll matching Target Design */}
@@ -235,7 +237,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                                     <Link
                                         key={brand.id || brand.slug}
                                         href={`/brands/${brand.slug}`}
-                                        className="group shrink-0 w-[84px] sm:w-[92px] h-[78px] sm:h-[84px] bg-white dark:bg-zinc-800/90 rounded-2xl border border-gray-200/70 dark:border-white/10 hover:border-[#B8860B] p-2 flex flex-col items-center justify-center snap-start transition-all shadow-2xs hover:shadow-xs"
+                                        className="group shrink-0 w-[84px] sm:w-[92px] h-[78px] sm:h-[84px] bg-white dark:bg-zinc-800/90 rounded-2xl border border-gray-200/70 dark:border-white/10 hover:border-[var(--color-accent)] p-2 flex flex-col items-center justify-center snap-start transition-all shadow-2xs hover:shadow-xs"
                                     >
                                         <div className={`w-full flex items-center justify-center relative overflow-hidden ${isMersin ? 'h-[44px]' : 'h-[52px]'}`}>
                                             <ResilientImage
@@ -264,7 +266,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                         type="button"
                         onClick={() => scrollDesktopBrands('left')}
                         aria-label={isArabic ? 'الشركات السابقة' : 'Previous brands'}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#B8860B]/30 bg-white text-[#B8860B] shadow-sm transition-colors hover:border-[#B8860B] hover:bg-[#FAF6EC]"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--color-accent)]/30 bg-white text-[var(--color-accent)] shadow-sm transition-colors hover:border-[var(--color-accent)] hover:bg-[var(--color-canvas)]"
                     >
                         <MdChevronLeft className="text-xl" />
                     </button>
@@ -282,7 +284,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                         type="button"
                         onClick={() => scrollDesktopBrands('right')}
                         aria-label={isArabic ? 'الشركات التالية' : 'Next brands'}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#B8860B]/30 bg-white text-[#B8860B] shadow-sm transition-colors hover:border-[#B8860B] hover:bg-[#FAF6EC]"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--color-accent)]/30 bg-white text-[var(--color-accent)] shadow-sm transition-colors hover:border-[var(--color-accent)] hover:bg-[var(--color-canvas)]"
                     >
                         <MdChevronRight className="text-xl" />
                     </button>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createUser, updateUser } from "@/lib/user-actions";
 import { toast } from "react-hot-toast";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdClose, MdSync } from "react-icons/md";
+import { X as MdClose, RefreshCw as MdSync } from 'lucide-react';
 
 interface User {
     id: string;

@@ -8,7 +8,6 @@ import PromoBanner from './PromoBanner';
 import TrendingWeekly from './TrendingWeekly';
 import FeaturedCategoriesGrid from './FeaturedCategoriesGrid';
 import CategoryHighlightCards from './CategoryHighlightCards';
-import TestimonialsMasonry from './TestimonialsMasonry';
 import AboutSupplyBanner from './AboutSupplyBanner';
 import ScrollReveal from '../ScrollReveal';
 import { getI18n } from '@/lib/i18n';
@@ -56,7 +55,6 @@ interface Product {
 }
 
 import type { HighlightCard } from './CategoryHighlightCards';
-import type { ReviewItem } from './TestimonialsMasonry';
 
 interface FeaturedCategory {
     id: string;
@@ -73,7 +71,6 @@ interface MainProps {
     mainBrands: HomeBrand[];
     railBrands: RailBrand[];
     highlightCards: HighlightCard[];
-    reviews: ReviewItem[];
     featuredNewArrivals: Product[];
     featuredBundles: Product[];
     featuredBestSellers: Product[];
@@ -87,7 +84,6 @@ const Main = async ({
     mainBrands,
     railBrands,
     highlightCards,
-    reviews,
     featuredNewArrivals,
     featuredBundles,
     featuredBestSellers,
@@ -138,10 +134,6 @@ const Main = async ({
                 <TrendingWeekly products={trendingWeekly} />
             </ScrollReveal>
 
-            {/* 8. Testimonials Masonry (Dynamic Reviews from Database) */}
-            <ScrollReveal>
-                <TestimonialsMasonry reviews={reviews} products={featuredBestSellers} />
-            </ScrollReveal>
         </main>
     );
 };

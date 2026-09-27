@@ -1,5 +1,5 @@
 import React, { cache } from 'react';
-import { prisma } from "@/lib/prisma";
+import { laravelJson } from "@/lib/laravel-server";
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import ProductGallery from '@/app/components/ProductDetailsComponents/ProductGallery';
@@ -10,22 +10,23 @@ import ProductAccordions from '@/app/components/ProductDetailsComponents/Product
 import ProductShareButtons from '@/app/components/ProductDetailsComponents/ProductShareButtons';
 import RelatedProducts from '@/app/components/ProductDetailsComponents/RelatedProducts';
 import Breadcrumbs from '@/app/components/ProductDetailsComponents/Breadcrumbs';
-import ProductReviews from '@/app/components/ProductDetailsComponents/ProductReviews';
 import { getI18n } from '@/lib/i18n';
+import { canViewWholesalePrices } from '@/lib/price-visibility';
 
-export const revalidate = 60; // Revalidate cache every 60 seconds
+const productImages = (images: unknown): string[] => {
+    if (Array.isArray(images)) return images.filter((image): image is string => typeof image === 'string' && image.length > 0);
+    if (typeof images !== 'string' || !images) return [];
+    try {
+        const parsed: unknown = JSON.parse(images);
+        if (Array.isArray(parsed)) return parsed.filter((image): image is string => typeof image === 'string' && image.length > 0);
+    } catch { /* Older records may contain comma-separated URLs. */ }
+    return images.split(',').map((image) => image.trim()).filter(Boolean);
+}
+
+export const dynamic = 'force-dynamic';
 
 const getProduct = cache(async (slug: string) => {
-    return prisma.product.findFirst({
-        where: {
-            slug,
-            brand: { isActive: true },
-        },
-        include: {
-            brand: true,
-            category: true,
-        },
-    });
+    return laravelJson<Record<string, any> | null>(`/api/products/${encodeURIComponent(slug)}`, null, { forwardSession: false });
 });
 
 export async function generateMetadata(
@@ -46,7 +47,7 @@ export async function generateMetadata(
         ? `${product.name} من ${brandName}. متوفر للطلب والبيع بالجملة مع شحن موثوق عبر منصة زاد لاند. ${product.description.slice(0, 120)}`
         : `اشترِ ${product.name} من ${brandName} بأفضل أسعار الجملة المعتمدة من شركة زاد لاند لتجارة وتوزيع المواد الغذائية.`;
 
-    const mainImage = (product.images as string).split(',').map((img: string) => img.trim()).filter(Boolean)[0] || '/logo.jpeg';
+    const mainImage = productImages(product.images)[0] || '/logo.jpeg';
 
     return {
         title,
@@ -79,7 +80,7 @@ export async function generateMetadata(
 
 const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
     const params = await props.params;
-    const { language } = await getI18n();
+    const [{ language }, canViewPrices] = await Promise.all([getI18n(), canViewWholesalePrices()]);
 
     const product = await getProduct(params.slug);
 
@@ -87,28 +88,17 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
         notFound();
     }
 
-    // Parallel fetch related products and review statistics
-    const [relatedProducts, reviewStats] = await Promise.all([
-        prisma.product.findMany({
-            where: {
-                categoryId: product.categoryId,
-                id: { not: product.id },
-                brand: { isActive: true },
-            },
-            take: 4,
-        }),
-        prisma.review.aggregate({
-            where: { productId: product.id, isApproved: true },
-            _avg: { rating: true },
-            _count: { id: true },
-        }),
-    ]);
-    
-    const averageRating = reviewStats._avg.rating || 0;
-    const totalReviews = reviewStats._count.id || 0;
+    // Related products are optional, so a brief database issue should not
+    // prevent the main product details from rendering.
+    const relatedResult = await laravelJson<{ products: Record<string, any>[] }>(
+        `/api/products?categoryIds=${encodeURIComponent(product.categoryId)}&limit=5`,
+        { products: [] },
+        { forwardSession: false },
+    );
+    const relatedProducts = relatedResult.products.filter((item) => item.id !== product.id).slice(0, 4);
 
     const displayName = (language === 'ar' ? product.nameAr : product.nameEn) || product.name || product.nameAr || '';
-    const mainImage = (product.images as string).split(',').map((img: string) => img.trim()).filter(Boolean)[0] || '';
+    const mainImage = productImages(product.images)[0] || '';
 
     // Schema.org Product Structured Data
     const productSchema = {
@@ -122,25 +112,18 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
             "@type": "Brand",
             "name": product.brand?.name || "Zad Land",
         },
-        "offers": {
+        ...(canViewPrices ? { "offers": {
             "@type": "Offer",
             "url": `https://zadland.com/products/${product.slug}`,
-            "priceCurrency": "SYP",
+            "priceCurrency": "USD",
             "price": Number(product.discountPrice || product.price),
             "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "itemCondition": "https://schema.org/NewCondition",
-        },
-        ...(totalReviews > 0 ? {
-            "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": averageRating,
-                "reviewCount": totalReviews,
-            }
-        } : {})
+        } } : {}),
     };
 
     return (
-        <main className="grow w-full mx-auto container-custom py-4 lg:py-8">
+        <main className="grow w-full mx-auto container-custom !max-w-[1360px] py-4 lg:py-6">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
@@ -169,13 +152,11 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
                         nameEn={product.nameEn}
                         brandName={product.brand?.name}
                         categoryName={product.category?.name}
-                        averageRating={averageRating}
-                        totalReviews={totalReviews}
                     />
 
                     <ProductPrice
-                        price={product.price.toString()}
-                        discountPrice={product.discountPrice?.toString()}
+                        price={canViewPrices ? product.price.toString() : null}
+                        discountPrice={canViewPrices ? product.discountPrice?.toString() : null}
                     />
 
                     <ProductActions
@@ -184,10 +165,13 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
                             name: product.name,
                             nameAr: product.nameAr,
                             nameEn: product.nameEn,
-                            price: Number(product.discountPrice || product.price),
+                            price: canViewPrices ? Number(product.discountPrice || product.price) : null,
                             image: mainImage,
                             slug: product.slug,
                             options: product.options,
+                            minOrder: product.minOrder,
+                            packaging: product.packaging,
+                            itemsPerPackage: product.itemsPerPackage,
                             description: product.description,
                             descriptionAr: product.descriptionAr,
                             descriptionEn: product.descriptionEn,
@@ -210,24 +194,15 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
                 </div>
             </div>
 
-            {/* Product Reviews Anchor */}
-            <div id="product-reviews" className="scroll-mt-32">
-                <RelatedProducts products={relatedProducts.map(p => ({
-                    ...p,
-                    price: Number(p.price),
-                    discountPrice: p.discountPrice ? Number(p.discountPrice) : null,
-                    discountType: p.discountType,
-                    discountValue: p.discountValue ? Number(p.discountValue) : null,
-                    createdAt: p.createdAt.toISOString(),
-                    updatedAt: p.updatedAt.toISOString(),
-                }))} />
-
-                <ProductReviews
-                    productId={product.id}
-                    productName={product.name}
-                    productImage={mainImage}
-                />
-            </div>
+            <RelatedProducts products={relatedProducts.map(p => ({
+                ...p,
+                price: canViewPrices ? Number(p.price) : null,
+                discountPrice: canViewPrices && p.discountPrice ? Number(p.discountPrice) : null,
+                discountType: canViewPrices ? p.discountType : null,
+                discountValue: canViewPrices && p.discountValue ? Number(p.discountValue) : null,
+                createdAt: p.createdAt,
+                updatedAt: p.updatedAt,
+            }))} />
         </main>
     );
 }

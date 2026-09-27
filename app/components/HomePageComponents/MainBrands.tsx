@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from "next/link";
-import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { ChevronLeft as MdChevronLeft, ChevronRight as MdChevronRight } from 'lucide-react';
 import ResilientImage from "@/app/components/ResilientImage";
 import type { HomeBrand } from "@/lib/admin-actions";
 import { useProductRail } from './useProductRail';
@@ -68,7 +68,7 @@ export default function MainBrands({ brands }: MainBrandsProps) {
 
                 {canScrollForward && (
                     <button
-                        className="hidden md:flex absolute ltr:right-[-20px] rtl:left-[-20px] top-[75px] md:top-[90px] -translate-y-1/2 z-10 h-10 w-10 items-center justify-center rounded-full bg-white/95 text-text-main border border-gray-200 transition-all hover:bg-[#B8860B] hover:text-white hover:border-[#B8860B] dark:bg-surface-dark dark:border-white/10"
+                        className="hidden md:flex absolute ltr:right-[-20px] rtl:left-[-20px] top-[75px] md:top-[90px] -translate-y-1/2 z-10 h-10 w-10 items-center justify-center rounded-full bg-white/95 text-text-main border border-gray-200 transition-all hover:bg-[var(--color-accent)] hover:text-white hover:border-[var(--color-accent)] dark:bg-surface-dark dark:border-white/10"
                         aria-label="Next"
                         onClick={scrollForward}
                         type="button"
@@ -78,7 +78,7 @@ export default function MainBrands({ brands }: MainBrandsProps) {
                 )}
                 {canScrollBackward && (
                     <button
-                        className="hidden md:flex absolute ltr:left-[-20px] rtl:right-[-20px] top-[75px] md:top-[90px] -translate-y-1/2 z-10 h-10 w-10 items-center justify-center rounded-full bg-white/95 text-text-main border border-gray-200 transition-all hover:bg-[#B8860B] hover:text-white hover:border-[#B8860B] dark:bg-surface-dark dark:border-white/10"
+                        className="hidden md:flex absolute ltr:left-[-20px] rtl:right-[-20px] top-[75px] md:top-[90px] -translate-y-1/2 z-10 h-10 w-10 items-center justify-center rounded-full bg-white/95 text-text-main border border-gray-200 transition-all hover:bg-[var(--color-accent)] hover:text-white hover:border-[var(--color-accent)] dark:bg-surface-dark dark:border-white/10"
                         aria-label="Previous"
                         onClick={scrollBackward}
                         type="button"

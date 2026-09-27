@@ -1,7 +1,9 @@
 "use client";
 
+import { laravelClientFetch } from "@/lib/laravel-client";
+
 import React, { useState, useRef } from 'react';
-import { MdClose, MdCloudUpload, MdStar, MdStarOutline } from 'react-icons/md';
+import { X as MdClose, CloudUpload as MdCloudUpload, Star as MdStar, Star as MdStarOutline } from 'lucide-react';
 import { useLanguage } from '@/app/context/LanguageContext';
 import { toast } from 'react-hot-toast';
 
@@ -46,7 +48,7 @@ export default function ReviewModal({ isOpen, onClose, productId, productName, p
         formData.append('file', imageFile);
         
         try {
-            const res = await fetch('/api/upload', {
+            const res = await laravelClientFetch('/api/upload', {
                 method: 'POST',
                 body: formData,
             });
@@ -75,7 +77,7 @@ export default function ReviewModal({ isOpen, onClose, productId, productName, p
                 uploadedImageUrl = await uploadImage();
             }
 
-            const res = await fetch('/api/reviews', {
+            const res = await laravelClientFetch('/api/reviews', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

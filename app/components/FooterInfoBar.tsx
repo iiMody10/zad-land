@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdEmail, MdCameraAlt, MdLocalOffer, MdStar } from 'react-icons/md';
+import { Mail as MdEmail, Camera as MdCameraAlt, Tag as MdLocalOffer, Star as MdStar } from 'lucide-react';
 import { getI18n } from '@/lib/i18n';
 
 const FooterInfoBar = async () => {

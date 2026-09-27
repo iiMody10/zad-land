@@ -17,7 +17,7 @@ export interface ReviewItem {
 }
 
 const StarIcons = () => (
-    <div className="flex text-[#B8860B] gap-1 mb-3 rtl:justify-end ltr:justify-start">
+    <div className="flex text-[var(--color-accent)] gap-1 mb-3 rtl:justify-end ltr:justify-start">
         {[...Array(5)].map((_, i) => (
             <svg key={i} className="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16">
                 <path d="M8 0.5L10.0784 5.63932L15.6085 6.02786L11.3629 9.59268L12.7023 14.9721L8 12.036L3.29772 14.9721L4.63706 9.59268L0.391548 6.02786L5.92159 5.63932L8 0.5Z" />
@@ -53,7 +53,7 @@ const TestimonialsMasonry = ({ reviews = [], products }: TestimonialsMasonryProp
             <div className="container-custom">
                 {/* Header */}
                 <div className="text-center max-w-2xl mx-auto mb-10 md:mb-14">
-                    <h2 className="text-2xl md:text-[32px] font-bold text-[#072835] dark:text-white leading-tight">
+                    <h2 className="text-2xl md:text-[32px] font-bold text-[var(--color-brand)] dark:text-white leading-tight">
                         {language === 'ar' 
                             ? 'آراء وتقييمات شركائنا في التوزيع' 
                             : 'Verified Wholesale Customer Reviews'}
@@ -78,16 +78,16 @@ const TestimonialsMasonry = ({ reviews = [], products }: TestimonialsMasonryProp
                                 return (
                                     <div 
                                         key={review.id} 
-                                        className="w-[300px] shrink-0 snap-start md:w-auto break-inside-avoid mb-0 md:mb-6 bg-[#FAF9F5] dark:bg-[#1E1E16] border border-[#B8860B]/15 hover:border-[#B8860B]/40 rounded-2xl p-5 md:p-6 flex flex-col h-fit text-right transition-all shadow-xs"
+                                        className="w-[300px] shrink-0 snap-start md:w-auto break-inside-avoid mb-0 md:mb-6 bg-[var(--color-canvas)] dark:bg-[var(--color-surface-dark)] border border-[var(--color-accent)]/15 hover:border-[var(--color-accent)]/40 rounded-2xl p-5 md:p-6 flex flex-col h-fit text-right transition-all shadow-xs"
                                         style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}
                                     >
                                         <div className="flex flex-col mb-3">
-                                            <h3 className="font-bold text-[#072835] dark:text-white text-base md:text-lg">
+                                            <h3 className="font-bold text-[var(--color-brand)] dark:text-white text-base md:text-lg">
                                                 {language === 'ar' 
                                                     ? review.name.split('-')[0].trim() 
                                                     : (review.name.split('-')[1]?.trim() || review.name.split('-')[0].trim())}
                                             </h3>
-                                            <span className="text-xs text-[#2E7D32] dark:text-[#4ade80] font-semibold mt-0.5 flex items-center gap-1">
+                                            <span className="text-xs text-[var(--color-brand-hover)] dark:text-[var(--color-brand-light)] font-semibold mt-0.5 flex items-center gap-1">
                                                 <span>✓</span>
                                                 <span>{language === 'ar' ? 'عميل جملة معتمد' : 'Verified Wholesale Buyer'}</span>
                                             </span>
@@ -95,7 +95,7 @@ const TestimonialsMasonry = ({ reviews = [], products }: TestimonialsMasonryProp
 
                                         <StarIcons />
 
-                                        <p className="text-[#4a4a3e] dark:text-[#C4B89A] text-sm md:text-base leading-relaxed mb-6">
+                                        <p className="text-[#4a4a3e] dark:text-[var(--color-text-muted-dark)] text-sm md:text-base leading-relaxed mb-6">
                                             {review.feedback}
                                         </p>
 
@@ -109,7 +109,7 @@ const TestimonialsMasonry = ({ reviews = [], products }: TestimonialsMasonryProp
                                                     loading="lazy"
                                                 />
                                             </div>
-                                            <span className="text-sm font-bold text-[#072835] dark:text-white line-clamp-2 text-right flex-1 group-hover:text-[#B8860B] transition-colors">
+                                            <span className="text-sm font-bold text-[var(--color-brand)] dark:text-white line-clamp-2 text-right flex-1 group-hover:text-[var(--color-accent)] transition-colors">
                                                 <span>{productName}</span>
                                             </span>
                                         </Link>

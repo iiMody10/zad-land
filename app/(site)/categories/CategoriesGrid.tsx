@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { MdExpandMore } from "react-icons/md";
+import { ChevronDown as MdExpandMore } from 'lucide-react';
 import { useLanguage } from "@/app/context/LanguageContext";
 import { getSafeImageUrl } from '@/lib/image-utils';
 
@@ -37,7 +37,7 @@ const CategoriesGrid = ({ categories }: CategoriesGridProps) => {
                     <Link
                         key={category.id}
                         href={`/categories/${category.slug}`}
-                        className="group flex flex-col gap-5 p-2 rounded-2xl bg-surface-light dark:bg-surface-dark border border-[#B8860B]/15 hover:border-[#B8860B] transition-all animate-in fade-in zoom-in-95 duration-500"
+                        className="group flex flex-col gap-5 p-2 rounded-2xl bg-surface-light dark:bg-surface-dark border border-[var(--color-accent)]/15 hover:border-[var(--color-accent)] transition-all animate-in fade-in zoom-in-95 duration-500"
                     >
                         <div className="relative aspect-16/10 overflow-hidden rounded-xl bg-background-light dark:bg-background-dark">
                             <img
@@ -48,7 +48,7 @@ const CategoriesGrid = ({ categories }: CategoriesGridProps) => {
                             />
                         </div>
                         <div className="px-4 pb-4">
-                            <h3 className="text-2xl font-bold text-text-main-light dark:text-text-main-dark transition-colors group-hover:text-[#B8860B]">
+                            <h3 className="text-2xl font-bold text-text-main-light dark:text-text-main-dark transition-colors group-hover:text-[var(--color-accent)]">
                                 <span className="group-hover-underline-animated">{category.name}</span>
                             </h3>
                             <p className="text-sm text-text-muted-light dark:text-text-muted-dark mt-1 font-medium">{category.description || t('categoriesPage.premiumCollection')}</p>
@@ -61,10 +61,10 @@ const CategoriesGrid = ({ categories }: CategoriesGridProps) => {
                 <div className="mt-16 flex justify-center">
                     <button
                         onClick={handleLoadMore}
-                        className="group relative px-10 py-4 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 rounded-full font-bold text-sm text-text-main-light dark:text-white hover:border-[#B8860B] hover:text-[#B8860B] transition-all duration-300 flex items-center gap-2 active:scale-95"
+                        className="group relative px-10 py-4 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 rounded-full font-bold text-sm text-text-main-light dark:text-white hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-all duration-300 flex items-center gap-2 active:scale-95"
                     >
                         {t('categoriesPage.loadMoreCategories')}
-                        <MdExpandMore className="text-[18px] group-hover:translate-y-1 transition-transform text-[#B8860B]" />
+                        <MdExpandMore className="text-[18px] group-hover:translate-y-1 transition-transform text-[var(--color-accent)]" />
                     </button>
                 </div>
             )}

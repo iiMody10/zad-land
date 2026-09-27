@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import ProductCard from '../ProductsPageComponents/ProductCard';
-import { MdChevronRight, MdChevronLeft } from 'react-icons/md';
+import { ChevronRight as MdChevronRight } from 'lucide-react';
 
 import { useLanguage } from '@/app/context/LanguageContext';
 import { useProductRail } from './useProductRail';
@@ -73,15 +73,15 @@ const FeaturedCollection = ({ newArrivals, bundles, bestSellers }: FeaturedColle
     return (
         <section className="container-custom">
             <div className="mb-6 px-2">
-                <div className="mb-3 flex items-center justify-center gap-3 text-[#B8860B] sm:gap-4 md:mb-5 md:gap-6">
-                    <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-r from-transparent via-[#C5A059]/40 to-[#B8860B] sm:max-w-[90px] md:max-w-[200px] dark:to-[#E5B54A]" />
+                <div className="mb-3 flex items-center justify-center gap-3 text-[var(--color-accent)] sm:gap-4 md:mb-5 md:gap-6">
+                    <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-r from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
                     <svg className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M12 2C11.5 4 10.5 6 9 7.5C10.5 9 11.5 11 12 13C12.5 11 13.5 9 15 7.5C13.5 6 12.5 4 12 2Z" opacity="0.9" />
                         <path d="M7 6C6.5 8 5.5 10 4 11.5C5.5 13 6.5 15 7 17C7.5 15 8.5 13 10 11.5C8.5 10 7.5 8 7 6Z" />
                         <path d="M17 6C16.5 8 15.5 10 14 11.5C15.5 13 16.5 15 17 17C17.5 15 18.5 13 20 11.5C18.5 10 17.5 8 17 6Z" />
                         <path d="M12 11V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
-                    <h2 id="featured-collection-title" className="whitespace-nowrap px-1 text-base font-extrabold tracking-tight text-[#072835] sm:text-2xl md:text-[28px] dark:text-white">
+                    <h2 id="featured-collection-title" className="whitespace-nowrap px-1 text-base font-extrabold tracking-tight text-[var(--color-brand)] sm:text-2xl md:text-[28px] dark:text-white">
                         {t('home.featuredCollection')}
                     </h2>
                     <svg className="h-4 w-4 shrink-0 scale-x-[-1] sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -90,7 +90,7 @@ const FeaturedCollection = ({ newArrivals, bundles, bestSellers }: FeaturedColle
                         <path d="M17 6C16.5 8 15.5 10 14 11.5C15.5 13 16.5 15 17 17C17.5 15 18.5 13 20 11.5C18.5 10 17.5 8 17 6Z" />
                         <path d="M12 11V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
-                    <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-l from-transparent via-[#C5A059]/40 to-[#B8860B] sm:max-w-[90px] md:max-w-[200px] dark:to-[#E5B54A]" />
+                    <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-l from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
                 </div>
 
                 <div className="flex items-center justify-between gap-3">
@@ -103,7 +103,7 @@ const FeaturedCollection = ({ newArrivals, bundles, bestSellers }: FeaturedColle
                                     aria-selected={activeTab === index}
                                     onClick={() => setActiveTab(index)}
                                     className={`tabs__btn whitespace-nowrap px-6 py-2.5 text-[15px] transition-all border-b-2 ${activeTab === index
-                                        ? 'border-[#B8860B] text-[#B8860B] dark:text-[#E5B54A] font-bold'
+                                        ? 'border-[var(--color-accent)] text-[var(--color-accent)] dark:text-[var(--color-accent-light)] font-bold'
                                         : 'border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-medium'
                                         }`}
                                 >
@@ -115,7 +115,7 @@ const FeaturedCollection = ({ newArrivals, bundles, bestSellers }: FeaturedColle
 
                     <Link
                         href="/products"
-                        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full border border-[#B8860B]/30 bg-[#FAF6ED] px-4 py-2 text-xs font-bold text-[#072835] transition-colors hover:border-[#B8860B] hover:text-[#B8860B] dark:bg-white/5 dark:text-[#E5B54A]"
+                        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full border border-[var(--color-accent)]/30 bg-[var(--color-canvas)] px-4 py-2 text-xs font-bold text-[var(--color-brand)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] dark:bg-white/5 dark:text-[var(--color-accent-light)]"
                     >
                         <span>{t('products.allProducts')}</span>
                         <MdChevronRight className={`text-base ${dir === 'rtl' ? 'rotate-180' : ''}`} />

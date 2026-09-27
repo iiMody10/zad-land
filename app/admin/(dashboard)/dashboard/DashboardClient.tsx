@@ -8,23 +8,7 @@ import { useState, useMemo } from "react";
 import OrderDetailsModal from "../orders/OrderDetailsModal";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { DashboardStats } from "@/lib/admin-actions";
-import { 
-    MdAttachMoney, 
-    MdShoppingBag, 
-    MdInventory2, 
-    MdChevronRight, 
-    MdChevronLeft, 
-    MdTrendingUp, 
-    MdAdd, 
-    MdViewCarousel, 
-    MdStorefront, 
-    MdInbox, 
-    MdLocalShipping, 
-    MdWarningAmber, 
-    MdLocationOn, 
-    MdShowChart, 
-    MdOutlineCheckCircle
-} from "react-icons/md";
+import { CircleDollarSign as MdAttachMoney, ShoppingBag as MdShoppingBag, Package as MdInventory2, ChevronRight as MdChevronRight, ChevronLeft as MdChevronLeft, TrendingUp as MdTrendingUp, Plus as MdAdd, GalleryHorizontalEnd as MdViewCarousel, Store as MdStorefront, Inbox as MdInbox, Truck as MdLocalShipping, TriangleAlert as MdWarningAmber, MapPin as MdLocationOn, ChartNoAxesColumnIncreasing as MdShowChart, CircleCheck as MdOutlineCheckCircle } from 'lucide-react';
 
 export default function DashboardClient({ stats }: { stats: DashboardStats }) {
     const { openSidebar } = useAdminSidebar();
@@ -110,7 +94,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
     }, [svgPathD, chartPoints, chartHeight, chartPadding]);
 
     return (
-        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/70 dark:bg-[#0b1120]">
+        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/70 dark:bg-[var(--color-background-dark)]">
             <AdminHeader title={t('admin.overview')} onMenuClick={openSidebar} />
 
             {/* Scrollable Dashboard Content */}
@@ -140,9 +124,9 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
 
                             <Link
                                 href="/admin/orders"
-                                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#072835] hover:bg-[#0c4054] text-white text-xs font-bold transition-all shadow-sm active:scale-95"
+                                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white text-xs font-bold transition-all shadow-sm active:scale-95"
                             >
-                                <MdInventory2 className="text-base text-[#E5B54A]" />
+                                <MdInventory2 className="text-base text-[var(--color-accent-light)]" />
                                 <span>{t('admin.quickActionOrders')}</span>
                             </Link>
 
@@ -150,7 +134,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                 href="/admin/banners"
                                 className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-white/10 transition-all active:scale-95"
                             >
-                                <MdViewCarousel className="text-base text-[#B8860B]" />
+                                <MdViewCarousel className="text-base text-[var(--color-accent)]" />
                                 <span>{t('admin.quickActionBanners')}</span>
                             </Link>
                         </div>
@@ -171,7 +155,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                 </div>
                                 <Link
                                     href="/admin/orders"
-                                    className="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl bg-[#072835] text-white text-[11px] sm:text-xs font-bold hover:bg-[#0c4054] transition-all whitespace-nowrap shrink-0"
+                                    className="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl bg-[var(--color-brand)] text-white text-[11px] sm:text-xs font-bold hover:bg-[var(--color-brand-hover)] transition-all whitespace-nowrap shrink-0"
                                 >
                                     {t('admin.reviewPendingBtn')}
                                 </Link>
@@ -203,7 +187,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6">
                         
                         {/* Card 1: Total Completed Revenue */}
-                        <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all">
+                        <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all">
                             <div>
                                 <div className="flex justify-between items-center gap-1">
                                     <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider truncate">
@@ -231,13 +215,13 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                         </div>
 
                         {/* Card 2: Total Orders & Processing Rate */}
-                        <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all">
+                        <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all">
                             <div>
                                 <div className="flex justify-between items-center gap-1">
                                     <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider truncate">
                                         {t('admin.totalOrders')}
                                     </p>
-                                    <div className="p-1.5 sm:p-2.5 bg-sky-50 dark:bg-sky-950/50 rounded-lg sm:rounded-xl text-[#072835] dark:text-sky-300 shrink-0">
+                                    <div className="p-1.5 sm:p-2.5 bg-sky-50 dark:bg-sky-950/50 rounded-lg sm:rounded-xl text-[var(--color-brand)] dark:text-sky-300 shrink-0">
                                         <MdInventory2 className="text-lg sm:text-2xl" />
                                     </div>
                                 </div>
@@ -258,7 +242,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                         </div>
 
                         {/* Card 3: Average Order Value (AOV) */}
-                        <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all">
+                        <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all">
                             <div>
                                 <div className="flex justify-between items-center gap-1">
                                     <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider truncate">
@@ -285,7 +269,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                         </div>
 
                         {/* Card 4: Inventory Health */}
-                        <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all">
+                        <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs hover:shadow-md transition-all">
                             <div>
                                 <div className="flex justify-between items-center gap-1">
                                     <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-xs font-extrabold uppercase tracking-wider truncate">
@@ -330,12 +314,12 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                     {/* Middle Row: Sales Velocity Chart (65%) & Fulfillment Pipeline (35%) */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                              {/* Interactive Sales Velocity Chart */}
-                        <div className="lg:col-span-8 flex flex-col justify-between rounded-xl sm:rounded-2xl p-4 sm:p-6 bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-xs">
+                        <div className="lg:col-span-8 flex flex-col justify-between rounded-xl sm:rounded-2xl p-4 sm:p-6 bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs">
                             <div>
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <MdShowChart className="text-xl text-emerald-600" />
+                                            <MdShowChart className="text-xl text-[var(--color-brand-hover)]" />
                                             <h3 className="text-slate-900 dark:text-white text-base sm:text-lg font-bold tracking-tight">
                                                 {t('admin.salesVelocity')}
                                             </h3>
@@ -351,7 +335,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                             onClick={() => setChartMode('revenue')}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                                                 chartMode === 'revenue'
-                                                    ? 'bg-white dark:bg-[#0f172a] text-emerald-600 dark:text-emerald-400 shadow-xs'
+                                                    ? 'bg-white dark:bg-[var(--color-surface-dark)] text-[var(--color-brand-hover)] dark:text-[var(--color-brand-light)] shadow-xs'
                                                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                             }`}
                                         >
@@ -361,7 +345,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                             onClick={() => setChartMode('orders')}
                                             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                                                 chartMode === 'orders'
-                                                    ? 'bg-white dark:bg-[#0f172a] text-sky-600 dark:text-sky-400 shadow-xs'
+                                                    ? 'bg-white dark:bg-[var(--color-surface-dark)] text-[var(--color-accent)] dark:text-[var(--color-accent-light)] shadow-xs'
                                                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                                             }`}
                                         >
@@ -381,12 +365,12 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                         >
                                             <defs>
                                                 <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
-                                                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                                                    <stop offset="0%" stopColor="var(--color-brand-hover)" stopOpacity="0.4" />
+                                                    <stop offset="100%" stopColor="var(--color-brand-hover)" stopOpacity="0.0" />
                                                 </linearGradient>
                                                 <linearGradient id="ordersGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="#0284c7" stopOpacity="0.4" />
-                                                    <stop offset="100%" stopColor="#0284c7" stopOpacity="0.0" />
+                                                    <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.4" />
+                                                    <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0.0" />
                                                 </linearGradient>
                                             </defs>
 
@@ -431,7 +415,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                             <path 
                                                 d={svgPathD} 
                                                 fill="none" 
-                                                stroke={chartMode === 'revenue' ? "#10b981" : "#0284c7"} 
+                                                stroke={chartMode === 'revenue' ? "var(--color-brand-hover)" : "var(--color-accent)"}
                                                 strokeWidth="2.5" 
                                                 strokeLinecap="round" 
                                                 strokeLinejoin="round" 
@@ -471,7 +455,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                                             y1={chartPadding.top}
                                                             x2={p.x}
                                                             y2={chartHeight - chartPadding.bottom}
-                                                            stroke={chartMode === 'revenue' ? '#10b981' : '#0284c7'}
+                                                            stroke={chartMode === 'revenue' ? 'var(--color-brand-hover)' : 'var(--color-accent)'}
                                                             strokeWidth="1.5"
                                                             strokeDasharray="3 3"
                                                             opacity="0.8"
@@ -484,10 +468,10 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                                         cy={p.y}
                                                         r={hoveredPointIndex === idx ? 6 : 3.5}
                                                         fill={hoveredPointIndex === idx 
-                                                            ? (chartMode === 'revenue' ? '#10b981' : '#0284c7') 
+                                                            ? (chartMode === 'revenue' ? 'var(--color-brand-hover)' : 'var(--color-accent)')
                                                             : '#ffffff'
                                                         }
-                                                        stroke={chartMode === 'revenue' ? '#10b981' : '#0284c7'}
+                                                        stroke={chartMode === 'revenue' ? 'var(--color-brand-hover)' : 'var(--color-accent)'}
                                                         strokeWidth={hoveredPointIndex === idx ? 2.5 : 2}
                                                         className="transition-all duration-150 pointer-events-none"
                                                     />
@@ -554,7 +538,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                         </div>
 
                         {/* Order Fulfillment Pipeline (35%) */}
-                        <div className="lg:col-span-4 flex flex-col justify-between rounded-2xl p-6 bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-xs">
+                        <div className="lg:col-span-4 flex flex-col justify-between rounded-2xl p-6 bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs">
                             <div>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -565,7 +549,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                     </div>
                                     <Link 
                                         href="/admin/orders" 
-                                        className="text-xs font-bold text-[#B8860B] hover:underline"
+                                        className="text-xs font-bold text-[var(--color-accent)] hover:underline"
                                     >
                                         {t('admin.viewAll')}
                                     </Link>
@@ -688,11 +672,11 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         
                         {/* Top Selling Products */}
-                        <div className="lg:col-span-7 flex flex-col rounded-2xl p-6 bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-xs">
+                        <div className="lg:col-span-7 flex flex-col rounded-2xl p-6 bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs">
                             <div className="flex items-center justify-between mb-4">
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <MdShoppingBag className="text-xl text-[#B8860B]" />
+                                        <MdShoppingBag className="text-xl text-[var(--color-accent)]" />
                                         <h3 className="text-slate-900 dark:text-white text-base sm:text-lg font-bold tracking-tight">
                                             {t('admin.topSellingProducts')}
                                         </h3>
@@ -703,7 +687,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                 </div>
                                 <Link 
                                     href="/admin/products"
-                                    className="text-xs font-bold text-[#B8860B] hover:underline"
+                                    className="text-xs font-bold text-[var(--color-accent)] hover:underline"
                                 >
                                     {t('admin.viewAll')}
                                 </Link>
@@ -787,7 +771,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                         <div className="lg:col-span-5 flex flex-col gap-6">
                             
                             {/* Restock Watchlist */}
-                            <div className="flex flex-col rounded-2xl p-6 bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-xs">
+                            <div className="flex flex-col rounded-2xl p-6 bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs">
                                 <div className="flex items-center justify-between mb-3">
                                     <div className="flex items-center gap-2">
                                         <MdWarningAmber className="text-xl text-rose-500" />
@@ -858,7 +842,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                             </div>
 
                             {/* Top Regional Demand */}
-                            <div className="flex flex-col rounded-2xl p-5 bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-xs">
+                            <div className="flex flex-col rounded-2xl p-5 bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 shadow-xs">
                                 <div className="flex items-center gap-2 mb-1">
                                     <MdLocationOn className="text-lg text-indigo-600" />
                                     <h3 className="text-slate-900 dark:text-white text-sm font-bold tracking-tight">
@@ -900,14 +884,14 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between px-1">
                             <div className="flex items-center gap-2">
-                                <MdInventory2 className="text-lg text-[#072835] dark:text-[#E5B54A]" />
+                                <MdInventory2 className="text-lg text-[var(--color-brand)] dark:text-[var(--color-accent-light)]" />
                                 <h3 className="text-slate-900 dark:text-white text-lg font-bold tracking-tight">
                                     {t('admin.recentOrders')}
                                 </h3>
                             </div>
                             <Link
                                 href="/admin/orders"
-                                className="text-[#B8860B] dark:text-[#E5B54A] hover:underline text-xs font-bold transition-all flex items-center gap-1"
+                                className="text-[var(--color-accent)] dark:text-[var(--color-accent-light)] hover:underline text-xs font-bold transition-all flex items-center gap-1"
                             >
                                 <span>{t('admin.viewAll')}</span>
                                 {dir === 'rtl' ? <MdChevronLeft /> : <MdChevronRight />}
@@ -923,7 +907,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                             order={selectedOrder as any}
                         />
 
-                        <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0f172a] overflow-hidden shadow-xs">
+                        <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[var(--color-surface-dark)] overflow-hidden shadow-xs">
                             <div className="overflow-x-auto">
                                 <table className={`w-full min-w-[800px] ${dir === 'rtl' ? 'text-end' : 'text-start'}`}>
                                     <thead>
@@ -971,7 +955,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                                     <td className="px-6 py-4 text-xs text-slate-500 dark:text-slate-400 font-medium">
                                                         {new Date(order.createdAt).toLocaleDateString(dir === 'rtl' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                     </td>
-                                                    <td className="px-6 py-4 text-xs font-extrabold text-[#072835] dark:text-[#E5B54A]">
+                                                    <td className="px-6 py-4 text-xs font-extrabold text-[var(--color-brand)] dark:text-[var(--color-accent-light)]">
                                                         {order.amount}
                                                     </td>
                                                     <td className="px-6 py-4">

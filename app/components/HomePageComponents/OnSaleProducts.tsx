@@ -3,7 +3,7 @@
 import React from 'react';
 import ProductCard from '../ProductsPageComponents/ProductCard';
 import Link from 'next/link';
-import { MdChevronRight, MdChevronLeft } from 'react-icons/md';
+import { ChevronRight as MdChevronRight } from 'lucide-react';
 import { useLanguage } from '@/app/context/LanguageContext';
 import { useProductRail } from './useProductRail';
 

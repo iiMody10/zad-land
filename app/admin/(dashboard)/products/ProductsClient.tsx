@@ -7,30 +7,12 @@ import AdminHeader from "../../components/AdminHeader";
 import AddProductModal from "./AddProductModal";
 import { deleteProduct, toggleProductTrending, bulkToggleTrending, bulkCreateProducts, bulkRemoveSale, bulkDeleteProducts } from "../../../../lib/admin-actions";
 import { toast } from "react-hot-toast";
-import { useSession } from "next-auth/react";
+import { useAdminSession } from "../../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { getSafeImageUrl } from '@/lib/image-utils';
-import {
-    MdChevronRight,
-    MdChevronLeft,
-    MdFileUpload,
-    MdFileDownload,
-    MdAdd,
-    MdSearch,
-    MdExpandMore,
-    MdLocalFireDepartment,
-    MdSell,
-    MdTrendingDown,
-    MdMoneyOff,
-    MdDelete,
-    MdEdit,
-    MdSync,
-    MdArrowUpward,
-    MdArrowDownward,
-    MdShare,
-    MdContentCopy
-} from 'react-icons/md';
-import { FaFacebook, FaWhatsapp } from 'react-icons/fa';
+import { formatItemsPerPackage, formatPackaging } from '@/lib/packaging';
+import { ChevronRight as MdChevronRight, ChevronLeft as MdChevronLeft, Upload as MdFileUpload, Download as MdFileDownload, Plus as MdAdd, Search as MdSearch, ChevronDown as MdExpandMore, Flame as MdLocalFireDepartment, BadgePercent as MdSell, TrendingDown as MdTrendingDown, BadgeMinus as MdMoneyOff, Trash2 as MdDelete, Pencil as MdEdit, RefreshCw as MdSync, ArrowUp as MdArrowUpward, ArrowDown as MdArrowDownward, Share2 as MdShare, Copy as MdContentCopy } from 'lucide-react';
+import { ThumbsUp as FaFacebook, MessageCircle as FaWhatsapp } from 'lucide-react';
 
 interface Product {
     id: string;
@@ -49,6 +31,9 @@ interface Product {
     discountType: string | null;
     discountValue: number | null;
     stock: number;
+    minOrder: number;
+    packaging: string | null;
+    itemsPerPackage: string | null;
     options?: string | null;
     images: string;
     isTrending: boolean;
@@ -105,7 +90,7 @@ export default function ProductsClient({
     brands: Brand[],
     mainCategories?: MainCategory[]
 }) {
-    const { data: session } = useSession() || {};
+    const { data: session } = useAdminSession();
     const { t, dir, language } = useLanguage();
     const isArabic = language === 'ar';
     const canDelete = session?.user?.role === 'SUPER_ADMIN' || session?.user?.canDeleteProducts;
@@ -423,6 +408,9 @@ export default function ProductsClient({
                 "description en",
                 "Price",
                 "Quantity",
+                "Packaging",
+                "Items Per Package",
+                "Min Order",
                 "Options",
                 "Images"
             ];
@@ -438,6 +426,9 @@ export default function ProductsClient({
                 `"${(p.descriptionEn || p.description || '').replace(/"/g, '""')}"`,
                 p.price,
                 p.stock,
+                `"${(p.packaging || 'طرد').replace(/"/g, '""')}"`,
+                `"${(p.itemsPerPackage || '').replace(/"/g, '""')}"`,
+                p.minOrder,
                 `"${(p.options || '').replace(/"/g, '""')}"`,
                 `"${(p.images || '').replace(/"/g, '""')}"`
             ]);
@@ -473,7 +464,7 @@ export default function ProductsClient({
         try {
             const XLSX = await import('xlsx');
 
-            // Standard 11 columns
+            // Keep packaging rules alongside stock for a reusable wholesale catalog export.
             const data = products.map((p) => ({
                 "Main Category": p.mainCategory?.name || '',
                 "Sub Category": p.category?.name || 'General',
@@ -484,6 +475,9 @@ export default function ProductsClient({
                 "description en": p.descriptionEn || p.description || '',
                 "Price": p.price,
                 "Quantity": p.stock,
+                "Packaging": p.packaging || 'طرد',
+                "Items Per Package": p.itemsPerPackage || '',
+                "Min Order": p.minOrder,
                 "Options": p.options || '',
                 "Images": p.images || ''
             }));
@@ -578,12 +572,12 @@ export default function ProductsClient({
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <span className="h-2.5 w-2.5 rounded-full bg-[#B8860B]" />
-                                <span className="text-xs font-bold uppercase tracking-wider text-[#B8860B] dark:text-[#E5B54A]">
+                                <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-accent)]" />
+                                <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-accent)] dark:text-[var(--color-accent-light)]">
                                     {isArabic ? 'إدارة كتالوج المنتجات والمخزون' : 'Food Wholesale Product Inventory'}
                                 </span>
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#072835] dark:text-white tracking-tight">
+                            <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-brand)] dark:text-white tracking-tight">
                                 {t('admin.products')}
                             </h1>
                             <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-gray-400">
@@ -596,7 +590,7 @@ export default function ProductsClient({
                             <div className="relative">
                                 <button
                                     onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
-                                    className="bg-white dark:bg-zinc-800 border border-slate-200 dark:border-white/10 hover:border-[#B8860B] text-[#072835] dark:text-white h-11 px-4 sm:px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-2xs cursor-pointer"
+                                    className="bg-white dark:bg-zinc-800 border border-slate-200 dark:border-white/10 hover:border-[var(--color-accent)] text-[var(--color-brand)] dark:text-white h-11 px-4 sm:px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-2xs cursor-pointer"
                                 >
                                     <MdFileUpload className="text-[18px]" />
                                     {t('admin.exportData')}
@@ -626,7 +620,7 @@ export default function ProductsClient({
                                 )}
                             </div>
 
-                            <label className="bg-white dark:bg-zinc-800 border border-slate-200 dark:border-white/10 hover:border-[#B8860B] text-[#072835] dark:text-white h-11 px-4 sm:px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-2xs cursor-pointer">
+                            <label className="bg-white dark:bg-zinc-800 border border-slate-200 dark:border-white/10 hover:border-[var(--color-accent)] text-[var(--color-brand)] dark:text-white h-11 px-4 sm:px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-2xs cursor-pointer">
                                 <MdFileDownload className="text-[18px]" />
                                 {t('admin.importData')}
                                 <input
@@ -643,7 +637,7 @@ export default function ProductsClient({
                                         setSelectedProduct(null);
                                         setIsAddModalOpen(true);
                                     }}
-                                    className="h-11 px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-[#072835] hover:bg-[#0c4054] dark:bg-[#B8860B] dark:hover:bg-[#9a7009] text-white transition-all shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
+                                    className="h-11 px-5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] dark:bg-[var(--color-accent)] dark:hover:bg-[var(--color-accent-hover)] text-white transition-all shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
                                 >
                                     <MdAdd className="text-xl" />
                                     <span>{t('admin.addNewProduct')}</span>
@@ -949,6 +943,11 @@ export default function ProductsClient({
                                                                 <span>{t('admin.sku')}: {product.sku || 'N/A'}</span>
                                                                 {product.options && <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[10px] font-bold">{product.options}</span>}
                                                             </div>
+                                                            <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                                                                {formatPackaging(product.packaging, language)}
+                                                                {product.itemsPerPackage ? ` · ${formatItemsPerPackage(product.itemsPerPackage, product.packaging, language)}` : ''}
+                                                                {` · min ${product.minOrder}`}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </td>

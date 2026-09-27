@@ -6,11 +6,7 @@ export async function middleware(req: NextRequest) {
 
     // Only protect /admin routes (except /admin/login)
     if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-        const hasSessionToken =
-            req.cookies.has("__Secure-next-auth.session-token") ||
-            req.cookies.has("next-auth.session-token") ||
-            req.cookies.has("__Secure-next-auth.session-token.0") ||
-            req.cookies.has("next-auth.session-token.0");
+        const hasSessionToken = req.cookies.has("zad-land-api-session") || req.cookies.has("laravel_session") || req.cookies.has("zadland_session");
 
         if (!hasSessionToken) {
             const loginUrl = new URL("/admin/login", req.url);

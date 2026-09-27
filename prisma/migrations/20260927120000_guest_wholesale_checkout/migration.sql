@@ -1,0 +1,6 @@
+ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "shopName" TEXT;
+ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "notes" TEXT;
+ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "idempotencyKey" TEXT;
+ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "requestHash" TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS "Order_idempotencyKey_key" ON "Order"("idempotencyKey");

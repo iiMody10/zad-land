@@ -1,21 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import { MdClose, MdShoppingBag, MdDelete, MdArrowForward, MdArrowBack } from 'react-icons/md';
+import { X as MdClose, ShoppingBag as MdShoppingBag, Trash2 as MdDelete, ArrowRight as MdArrowForward, ArrowLeft as MdArrowBack } from 'lucide-react';
 import { useCart } from '@/app/context/CartContext';
 import { useLanguage } from '@/app/context/LanguageContext';
-import { useCurrency } from '@/app/context/CurrencyContext';
+import PriceText from '@/app/components/PriceText';
+import { formatItemsPerPackage, formatPackageQuantity } from '@/lib/packaging';
 
 const CartDrawer = () => {
-    const { items, isDrawerOpen, closeDrawer, subtotal, updateQuantity, removeItem } = useCart();
-    const { t, dir, language } = useLanguage();
-    const { formatPrice } = useCurrency();
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const { items, subtotal, isDrawerOpen, closeDrawer, updateQuantity, removeItem } = useCart();
+    const { dir, language } = useLanguage();
+    const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
 
     // Prevent body scroll when drawer is open
     useEffect(() => {
@@ -73,8 +69,8 @@ const CartDrawer = () => {
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
                     {items.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-center p-8 text-gray-400">
-                            <div className="w-16 h-16 rounded-full bg-[#FAF6EC] dark:bg-[#1A1A14] flex items-center justify-center mb-4 border border-[#B8860B]/20">
-                                <MdShoppingBag className="text-3xl text-[#B8860B]" />
+                            <div className="w-16 h-16 rounded-full bg-[var(--color-canvas)] dark:bg-[var(--color-background-dark)] flex items-center justify-center mb-4 border border-[var(--color-accent)]/20">
+                                <MdShoppingBag className="text-3xl text-[var(--color-accent)]" />
                             </div>
                             <p className="text-base font-bold text-zinc-900 dark:text-white mb-1">
                                 {language === 'ar' ? 'سلة التسوق فارغة' : 'Your cart is empty'}
@@ -84,7 +80,7 @@ const CartDrawer = () => {
                             </p>
                             <button 
                                 onClick={closeDrawer}
-                                className="px-6 py-2.5 bg-[#072835] hover:bg-[#0c4054] text-white rounded-xl font-bold text-xs transition-all active:scale-95"
+                                className="px-6 py-2.5 bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white rounded-xl font-bold text-xs transition-all active:scale-95"
                             >
                                 {language === 'ar' ? 'متابعة التسوق' : 'Continue Shopping'}
                             </button>
@@ -106,15 +102,19 @@ const CartDrawer = () => {
                                                 onClick={closeDrawer}
                                                 className={`font-semibold text-xs sm:text-sm text-zinc-900 dark:text-white line-clamp-2 leading-snug block ${dir === 'rtl' ? 'text-right' : 'text-left'}`}
                                             >
-                                                <span className="hover:text-[#B8860B] dark:hover:text-[#E5B54A] transition-colors">{item.name}</span>
+                                                <span className="hover:text-[var(--color-accent)] dark:hover:text-[var(--color-accent-light)] transition-colors">{item.name}</span>
                                             </Link>
                                             {item.selectedOption && (
-                                                <span className="inline-block mt-1 text-[10px] font-bold bg-[#B8860B]/10 text-[#B8860B] border border-[#B8860B]/20 px-2 py-0.5 rounded">
+                                                <span className="inline-block mt-1 text-[10px] font-bold bg-[var(--color-accent)]/10 text-[var(--color-accent)] border border-[var(--color-accent)]/20 px-2 py-0.5 rounded">
                                                     {item.selectedOption}
                                                 </span>
                                             )}
+                                            <p className="mt-1 text-[10px] text-slate-500 dark:text-slate-400">
+                                                {formatPackageQuantity(item.quantity, item.packaging, language)}
+                                                {item.itemsPerPackage ? ` · ${formatItemsPerPackage(item.itemsPerPackage, item.packaging, language)}` : ''}
+                                            </p>
                                             <p className="text-zinc-900 dark:text-white font-extrabold text-xs sm:text-sm mt-1" dir="ltr">
-                                                {formatPrice(item.price)}
+                                                <PriceText amount={item.price} />
                                             </p>
                                         </div>
                                         
@@ -122,12 +122,12 @@ const CartDrawer = () => {
                                             <div className="flex items-center bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-white/10 h-7 px-1">
                                                 <button 
                                                     onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedOption)}
-                                                    className="w-6 h-full flex items-center justify-center text-gray-500 hover:text-[#B8860B] transition-colors text-xs font-bold"
+                                                    className="w-6 h-full flex items-center justify-center text-gray-500 hover:text-[var(--color-accent)] transition-colors text-xs font-bold"
                                                 >-</button>
                                                 <span className="w-6 text-center text-xs font-bold text-zinc-900 dark:text-white select-none">{item.quantity}</span>
                                                 <button 
                                                     onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedOption)}
-                                                    className="w-6 h-full flex items-center justify-center text-gray-500 hover:text-[#B8860B] transition-colors text-xs font-bold"
+                                                    className="w-6 h-full flex items-center justify-center text-gray-500 hover:text-[var(--color-accent)] transition-colors text-xs font-bold"
                                                 >+</button>
                                             </div>
                                         </div>
@@ -151,14 +151,14 @@ const CartDrawer = () => {
                     <div className="p-4 sm:p-5 border-t border-gray-100 dark:border-white/10 bg-white dark:bg-zinc-900 shrink-0 space-y-3">
                         <div className="flex items-center justify-between text-sm">
                             <span className="text-gray-500 font-medium">{language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
-                            <span className="font-extrabold text-zinc-900 dark:text-white text-base" dir="ltr">{formatPrice(subtotal)}</span>
+                            <PriceText amount={subtotal} className="text-base font-extrabold text-zinc-900 dark:text-white" />
                         </div>
                         
                         <div className="grid grid-cols-2 gap-2 pt-1">
                             <Link
                                 href="/cart"
                                 onClick={closeDrawer}
-                                className="w-full py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-[#B8860B]/10 hover:border-[#B8860B] border border-gray-200 dark:border-white/10 text-zinc-900 dark:text-white text-center rounded-xl font-bold text-xs transition-colors flex items-center justify-center"
+                                className="w-full py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-[var(--color-accent)]/10 hover:border-[var(--color-accent)] border border-gray-200 dark:border-white/10 text-zinc-900 dark:text-white text-center rounded-xl font-bold text-xs transition-colors flex items-center justify-center"
                             >
                                 {language === 'ar' ? 'عرض السلة' : 'View Cart'}
                             </Link>
@@ -166,7 +166,7 @@ const CartDrawer = () => {
                             <Link
                                 href="/place-order"
                                 onClick={closeDrawer}
-                                className="w-full py-3 bg-[#2E7D32] hover:bg-[#256628] text-white text-center rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1 active:scale-95"
+                                className="w-full py-3 bg-[var(--color-brand-hover)] hover:bg-[var(--color-brand-hover)] text-white text-center rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1 active:scale-95"
                             >
                                 <span>{language === 'ar' ? 'إتمام الطلب' : 'Checkout'}</span>
                                 {dir === 'rtl' ? <MdArrowBack className="text-sm" /> : <MdArrowForward className="text-sm" />}

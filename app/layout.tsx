@@ -1,25 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Figtree, Noto_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { getI18n } from "@/lib/i18n";
 import { getSiteSettings } from "@/lib/admin-actions";
-
-const figtree = Figtree({
-  variable: "--font-figtree",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const noto_sans_arabic = Noto_Sans_Arabic({
-  variable: "--font-noto-sans-arabic",
-  subsets: ["arabic"],
-  display: "swap",
-});
+import { canViewWholesalePrices } from "@/lib/price-visibility";
 
 const metadataBase =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  process.env.NEXTAUTH_URL ||
   "https://zadland.com";
 
 export const viewport: Viewport = {
@@ -132,9 +119,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [{ language, dir }, settings] = await Promise.all([
+  const [{ language, dir }, settings, priceVisible] = await Promise.all([
     getI18n(),
     getSiteSettings(),
+    canViewWholesalePrices(),
   ]);
   const exchangeRate = settings?.exchangeRate ? Number(settings.exchangeRate) : 135;
 
@@ -156,8 +144,11 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang={language} dir={dir} suppressHydrationWarning className={`${figtree.variable} ${noto_sans_arabic.variable}`}>
+    <html lang={language} dir={dir} suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&family=Figtree:wght@300..900&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
@@ -183,11 +174,11 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${figtree.className} ${noto_sans_arabic.className} antialiased`}
+        className="font-sans antialiased"
         suppressHydrationWarning
       >
         <div id="app-shell">
-          <Providers initialExchangeRate={exchangeRate} initialLanguage={language}>
+          <Providers initialExchangeRate={exchangeRate} initialLanguage={language} priceVisible={priceVisible}>
             {children}
           </Providers>
         </div>

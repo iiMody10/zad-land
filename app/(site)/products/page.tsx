@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { redirect } from "next/navigation";
-import ProductsClient from "./ProductsClient";
-import { getCatalogInitialData } from "@/lib/catalog";
+import CatalogClient from "./CatalogClient";
+import { getCatalogBrands, getCatalogCategories, getCatalogInitialData } from "@/lib/catalog";
 import { findCategoryByIdentifier } from "@/lib/category-utils";
 
 import { Metadata } from "next";
@@ -48,16 +48,26 @@ export default async function ProductsPage({
         redirect(resolvedCategory ? `/categories/${resolvedCategory.slug}` : "/products");
     }
 
-    const { categories, products, totalProducts } = await getCatalogInitialData();
+    const { categories, products, totalProducts } = await getCatalogInitialData(undefined, undefined, undefined, 32);
+    const [brands, subcategories] = await Promise.all([
+        getCatalogBrands(),
+        getCatalogCategories(),
+    ]);
+    const initialQuery = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+        if (typeof value === "string" && key !== "category") initialQuery.set(key, value);
+    }
 
     return (
         <Suspense fallback={<CatalogLoadingFallback />}>
-            <ProductsClient
-                key="all-products"
+            <CatalogClient
+                key={initialQuery.toString()}
                 initialCategories={categories}
+                initialSubcategories={subcategories.map(({ id, name, slug, description, brandId, mainCategoryId }) => ({ id, name, slug, description, brandId, mainCategoryId }))}
+                initialBrands={brands.map(({ id, name, slug, mainCategory }) => ({ id, name, slug, mainCategoryId: mainCategory?.id || null }))}
                 initialProducts={products}
                 initialTotal={totalProducts}
-                activeCategory={null}
+                initialQuery={initialQuery.toString()}
             />
         </Suspense>
     );
@@ -65,28 +75,32 @@ export default async function ProductsPage({
 
 function CatalogLoadingFallback() {
     return (
-        <div className="flex-1 container-custom py-4 md:py-6" aria-busy="true">
-            <div className="flex items-center gap-2 mb-6">
-                <div className="w-16 h-3.5 bg-gray-200 dark:bg-zinc-800 rounded animate-pulse" />
-                <span className="text-gray-300 dark:text-zinc-700">/</span>
-                <div className="w-24 h-3.5 bg-gray-200 dark:bg-zinc-800 rounded animate-pulse" />
-            </div>
-            <div className="flex items-center gap-2.5 overflow-x-auto scrollbar-hide py-2 mb-6">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div key={i} className="h-10 w-28 shrink-0 rounded-full bg-gray-100 dark:bg-zinc-800 border border-gray-200/50 dark:border-white/5 animate-pulse" />
-                ))}
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                    <div key={i} className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-white/10 p-3 sm:p-4 flex flex-col gap-3">
-                        <div className="w-full aspect-square rounded-xl bg-gray-100 dark:bg-zinc-800 overflow-hidden relative">
-                            <div className="image-shimmer absolute inset-0" />
+        <div className="min-h-screen bg-[#fafbf9] pb-16 dark:bg-[var(--color-background-dark)]" aria-busy="true">
+            <div className="container-custom animate-pulse pt-5 md:pt-7">
+                <div className="mb-4 h-3 w-36 rounded bg-gray-100 dark:bg-white/10" />
+                <div className="mb-6 h-9 w-48 rounded bg-gray-100 dark:bg-white/10" />
+                <div className="grid gap-6 lg:grid-cols-[272px_minmax(0,1fr)] xl:grid-cols-[288px_minmax(0,1fr)] xl:gap-8">
+                    <div className="hidden h-[560px] rounded-2xl border border-slate-200 bg-white dark:border-white/10 dark:bg-white/5 lg:block" />
+                    <div>
+                        <div className="mb-5 flex justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-3 dark:border-white/10 dark:bg-white/5">
+                            <div className="h-11 w-[440px] max-w-full rounded-xl bg-gray-100 dark:bg-white/10" />
+                            <div className="h-11 w-44 rounded-xl bg-gray-100 dark:bg-white/10" />
                         </div>
-                        <div className="w-20 h-3 bg-gray-200 dark:bg-zinc-800 rounded animate-pulse" />
-                        <div className="w-full h-4 bg-gray-200 dark:bg-zinc-800 rounded animate-pulse" />
-                        <div className="w-28 h-5 bg-gray-100 dark:bg-zinc-800 rounded animate-pulse mt-auto" />
+                        <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3 2xl:grid-cols-4">
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                <div key={i} className="rounded-2xl border border-gray-200 p-3 dark:border-white/10">
+                                    <div className="aspect-square rounded-xl bg-gray-100 dark:bg-white/5" />
+                                    <div className="space-y-3 pt-4">
+                                        <div className="h-3 w-20 rounded bg-gray-100 dark:bg-white/10" />
+                                        <div className="h-4 w-full rounded bg-gray-100 dark:bg-white/10" />
+                                        <div className="h-4 w-2/3 rounded bg-gray-100 dark:bg-white/10" />
+                                        <div className="h-9 rounded-xl bg-gray-100 dark:bg-white/10" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                ))}
+                </div>
             </div>
         </div>
     );

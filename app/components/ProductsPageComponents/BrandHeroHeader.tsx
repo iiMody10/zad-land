@@ -3,7 +3,7 @@
 import React from 'react';
 import ResilientImage from '@/app/components/ResilientImage';
 import { useLanguage } from '@/app/context/LanguageContext';
-import { MdVerified, MdInventory2 } from 'react-icons/md';
+
 
 interface BrandHeroHeaderProps {
     brand: {
@@ -34,8 +34,8 @@ export default function BrandHeroHeader({ brand, totalProducts }: BrandHeroHeade
         : null;
 
     return (
-        <div className="relative rounded-2xl bg-white dark:bg-[#0C1821] border border-slate-200/80 dark:border-white/10 p-5 sm:p-7 mb-6 shadow-xs overflow-hidden">
-            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#072835] via-[#B8860B] to-[#072835]" />
+        <div className="relative rounded-2xl bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 p-5 sm:p-7 mb-6 shadow-xs overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[var(--color-brand)] via-[var(--color-accent)] to-[var(--color-brand)]" />
 
             <div className={`flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 relative z-10 ${dir === 'rtl' ? 'sm:text-right' : 'sm:text-left'} text-center`}>
                 {/* Brand Logo Plinth */}
@@ -58,7 +58,7 @@ export default function BrandHeroHeader({ brand, totalProducts }: BrandHeroHeade
                     </div>
 
                     <div className="flex flex-wrap items-baseline justify-center sm:justify-start gap-x-3 gap-y-1 mb-2">
-                        <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#072835] dark:text-white tracking-tight">
+                        <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--color-brand)] dark:text-white tracking-tight">
                             {primaryName}
                         </h1>
                         {secondaryName && (

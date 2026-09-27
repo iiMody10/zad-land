@@ -1,13 +1,12 @@
 import { getUsers } from "@/lib/user-actions";
 import UsersClient from "./UsersClient";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getLaravelAdmin } from "@/lib/laravel-server";
 import { redirect } from "next/navigation";
 
 export default async function AdminUsersPage() {
-    const session = await getServerSession(authOptions);
+    const session = await getLaravelAdmin();
 
-    if (!session || session.user.role !== 'SUPER_ADMIN') {
+    if (!session || session.role !== 'SUPER_ADMIN') {
         redirect('/admin/dashboard');
     }
 

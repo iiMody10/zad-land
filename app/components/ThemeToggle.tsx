@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { MdLightMode, MdDarkMode } from "react-icons/md";
+import { Sun as MdLightMode, Moon as MdDarkMode } from 'lucide-react';
 
 export default function ThemeToggle() {
     const { theme, setTheme } = useTheme();

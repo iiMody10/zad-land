@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MdClose, MdSync, MdStar, MdInfoOutline } from "react-icons/md";
+import { X as MdClose, RefreshCw as MdSync, Star as MdStar, Info as MdInfoOutline } from 'lucide-react';
 import { createMainCategory, updateMainCategory } from "../../../../lib/admin-actions";
 import { toast } from "react-hot-toast";
 import ImageUploadField from "../../components/ImageUploadField";
@@ -101,7 +101,7 @@ export default function MainCategoryModal({ isOpen, onClose, mainCategory }: Mai
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 px-6 py-5">
                     <div>
-                        <h2 className="text-lg font-bold text-[#072835] dark:text-white">
+                        <h2 className="text-lg font-bold text-[var(--color-brand)] dark:text-white">
                             {mainCategory 
                                 ? (isArabic ? "تعديل القسم الرئيسي" : "Edit Main Category") 
                                 : (isArabic ? "إضافة قسم رئيسي جديد" : "Add Main Category")}
@@ -134,7 +134,7 @@ export default function MainCategoryModal({ isOpen, onClose, mainCategory }: Mai
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder={isArabic ? "مثال: لحوم باردة ومفرزات" : "e.g. مأكولات وفطور"}
-                            className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-800 px-4 py-2.5 text-sm text-[#072835] dark:text-white outline-none transition-all focus:border-[#B8860B] focus:ring-2 focus:ring-[#B8860B]/20"
+                            className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-800 px-4 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none transition-all focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
                         />
                     </label>
 
@@ -147,7 +147,7 @@ export default function MainCategoryModal({ isOpen, onClose, mainCategory }: Mai
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             placeholder="e.g. Cold Cuts & Meats / Sauces & Condiments"
-                            className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-800 px-4 py-2.5 text-sm text-[#072835] dark:text-white outline-none transition-all focus:border-[#B8860B] focus:ring-2 focus:ring-[#B8860B]/20"
+                            className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-800 px-4 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none transition-all focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
                         />
                         <span className="text-[10px] text-slate-400 flex items-center gap-1">
                             <MdInfoOutline className="text-xs" />
@@ -175,10 +175,10 @@ export default function MainCategoryModal({ isOpen, onClose, mainCategory }: Mai
                                 type="checkbox"
                                 checked={formData.isActive}
                                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                                className="size-4 rounded border-gray-300 text-[#2E7D32] focus:ring-[#2E7D32]"
+                                className="size-4 rounded border-gray-300 text-[var(--color-brand-hover)] focus:ring-[var(--color-brand-hover)]"
                             />
                             <div className="flex flex-col">
-                                <span className="text-xs font-bold text-[#072835] dark:text-white">
+                                <span className="text-xs font-bold text-[var(--color-brand)] dark:text-white">
                                     {isArabic ? "نشط" : "Active"}
                                 </span>
                                 <span className="text-[10px] text-slate-500">
@@ -199,7 +199,7 @@ export default function MainCategoryModal({ isOpen, onClose, mainCategory }: Mai
                                 className="size-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
                             />
                             <div className="flex flex-col">
-                                <span className="text-xs font-bold text-[#072835] dark:text-white flex items-center gap-1">
+                                <span className="text-xs font-bold text-[var(--color-brand)] dark:text-white flex items-center gap-1">
                                     <MdStar className="text-amber-500 text-sm" />
                                     <span>{isArabic ? "مميز" : "Featured"}</span>
                                 </span>
@@ -211,17 +211,17 @@ export default function MainCategoryModal({ isOpen, onClose, mainCategory }: Mai
 
                         <label className={`flex items-center gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${
                             formData.showInNav 
-                                ? "border-[#072835]/40 bg-[#072835]/5 dark:border-white/20 dark:bg-white/5" 
+                                ? "border-[var(--color-brand)]/40 bg-[var(--color-brand)]/5 dark:border-white/20 dark:bg-white/5"
                                 : "border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-zinc-800/50"
                         }`}>
                             <input
                                 type="checkbox"
                                 checked={formData.showInNav}
                                 onChange={(e) => setFormData({ ...formData, showInNav: e.target.checked })}
-                                className="size-4 rounded border-gray-300 text-[#072835] focus:ring-[#072835]"
+                                className="size-4 rounded border-gray-300 text-[var(--color-brand)] focus:ring-[var(--color-brand)]"
                             />
                             <div className="flex flex-col">
-                                <span className="text-xs font-bold text-[#072835] dark:text-white">
+                                <span className="text-xs font-bold text-[var(--color-brand)] dark:text-white">
                                     {isArabic ? "القائمة الرئيسية" : "Navbar"}
                                 </span>
                                 <span className="text-[10px] text-slate-500">
@@ -240,7 +240,7 @@ export default function MainCategoryModal({ isOpen, onClose, mainCategory }: Mai
                             type="number"
                             value={formData.navOrder}
                             onChange={(e) => setFormData({ ...formData, navOrder: parseInt(e.target.value) || 0 })}
-                            className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-800 px-4 py-2.5 text-sm text-[#072835] dark:text-white outline-none transition-all focus:border-[#B8860B] focus:ring-2 focus:ring-[#B8860B]/20"
+                            className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-800 px-4 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none transition-all focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20"
                         />
                         <span className="text-[10px] text-slate-400">
                             {isArabic ? "الرقم الأقل يظهر أولاً في الشريط العلوي وقسم الفئات المميزة" : "Lower number appears first on the website"}
@@ -259,7 +259,7 @@ export default function MainCategoryModal({ isOpen, onClose, mainCategory }: Mai
                         <button 
                             type="submit" 
                             disabled={isSubmitting} 
-                            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#072835] hover:bg-[#0c4054] dark:bg-[#B8860B] dark:hover:bg-[#9a7009] px-4 py-2.5 font-bold text-white transition-all shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer text-sm"
+                            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] dark:bg-[var(--color-accent)] dark:hover:bg-[var(--color-accent-hover)] px-4 py-2.5 font-bold text-white transition-all shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer text-sm"
                         >
                             {isSubmitting && <MdSync className="animate-spin text-base" />}
                             <span>

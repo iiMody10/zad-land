@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MdWarning } from "react-icons/md";
+import { TriangleAlert as MdWarning } from 'lucide-react';
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import { updateAdminCredentials } from "../../../../lib/admin-actions";
 import { toast } from "react-hot-toast";
-import { signOut } from "next-auth/react";
+import { signOutAdmin } from "../../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
 
 interface AdminUser {
@@ -74,7 +74,7 @@ export default function SettingsClient({
                  if (newPassword) {
                      toast.success(t('admin.passwordChangedLogout'));
                      setTimeout(() => {
-                         signOut({ callbackUrl: "/admin/login" });
+                         void signOutAdmin();
                      }, 2000);
                  }
              } else {
@@ -194,7 +194,7 @@ export default function SettingsClient({
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="flex-1 bg-[#072835] hover:bg-[#0c4054] text-white py-3 rounded-xl font-bold transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white py-3 rounded-xl font-bold transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isSubmitting ? (
                                         <span className="flex items-center justify-center gap-2">

@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { prisma } from '@/lib/prisma';
+import { laravelJson } from '@/lib/laravel-server';
 
 export const revalidate = 3600; // Revalidate sitemap hourly
 
@@ -47,68 +47,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             },
         ];
 
-        // 2. Fetch all active products
-        const products = await prisma.product.findMany({
-            where: {
-                brand: { isActive: true },
-            },
-            select: {
-                slug: true,
-                updatedAt: true,
-            },
-        });
+        const catalog = await laravelJson<{
+            products: { slug: string; updatedAt: string }[];
+            departments: { slug: string; updatedAt: string }[];
+            brands: { slug: string; updatedAt: string }[];
+            categories: { slug: string; updatedAt: string }[];
+        }>("/api/sitemap", { products: [], departments: [], brands: [], categories: [] }, { forwardSession: false });
 
-        const productRoutes: MetadataRoute.Sitemap = products.map((product) => ({
+        const productRoutes: MetadataRoute.Sitemap = catalog.products.map((product) => ({
             url: `${baseUrl}/products/${product.slug}`,
-            lastModified: product.updatedAt,
+            lastModified: new Date(product.updatedAt),
             changeFrequency: 'weekly',
             priority: 0.8,
         }));
 
         // 3. Fetch all active Main Categories (Departments)
-        const departments = await prisma.mainCategory.findMany({
-            where: { isActive: true },
-            select: {
-                slug: true,
-                updatedAt: true,
-            },
-        });
-
-        const departmentRoutes: MetadataRoute.Sitemap = departments.map((dept) => ({
+        const departmentRoutes: MetadataRoute.Sitemap = catalog.departments.map((dept) => ({
             url: `${baseUrl}/department/${dept.slug}`,
-            lastModified: dept.updatedAt,
+            lastModified: new Date(dept.updatedAt),
             changeFrequency: 'weekly',
             priority: 0.85,
         }));
 
         // 4. Fetch all active Brands
-        const brands = await prisma.brand.findMany({
-            where: { isActive: true },
-            select: {
-                slug: true,
-                updatedAt: true,
-            },
-        });
-
-        const brandRoutes: MetadataRoute.Sitemap = brands.map((brand) => ({
+        const brandRoutes: MetadataRoute.Sitemap = catalog.brands.map((brand) => ({
             url: `${baseUrl}/brands/${brand.slug}`,
-            lastModified: brand.updatedAt,
+            lastModified: new Date(brand.updatedAt),
             changeFrequency: 'weekly',
             priority: 0.8,
         }));
 
         // 5. Fetch all active Categories
-        const categories = await prisma.category.findMany({
-            where: { brand: { isActive: true } },
-            select: {
-                slug: true,
-                updatedAt: true,
-            },
-        });
-
-        const categoryRoutes: MetadataRoute.Sitemap = categories.map((cat) => ({
+        const categoryRoutes: MetadataRoute.Sitemap = catalog.categories.map((cat) => ({
             url: `${baseUrl}/categories/${cat.slug}`,
-            lastModified: cat.updatedAt,
+            lastModified: new Date(cat.updatedAt),
             changeFrequency: 'weekly',
             priority: 0.75,
         }));

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdSupportAgent, MdRefresh, MdVerifiedUser, MdLocalShipping } from 'react-icons/md';
+import { Headset as MdSupportAgent, RefreshCw as MdRefresh, ShieldCheck as MdVerifiedUser, Truck as MdLocalShipping } from 'lucide-react';
 import { getI18n } from '@/lib/i18n';
 
 const FeatureBar = async () => {

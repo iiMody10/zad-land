@@ -1,11 +1,11 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLanguage } from "@/app/context/LanguageContext";
 import LanguageToggle from "@/app/components/LanguageToggle";
-import { MdPerson, MdLock } from "react-icons/md";
+import { UserRound as MdPerson, LockKeyhole as MdLock } from 'lucide-react';
+import { laravelClientFetch } from "@/lib/laravel-client";
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -22,17 +22,17 @@ export default function AdminLoginPage() {
         setLoading(true);
 
         try {
-            const result = await signIn("credentials", {
-                username,
-                password,
-                rememberMe: rememberMe ? "true" : "false",
-                redirect: false,
+            const response = await laravelClientFetch("/api/admin/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password, rememberMe }),
             });
+            const result = await response.json().catch(() => ({}));
 
-            if (result?.error) {
+            if (!response.ok) {
                 setError(t("admin.login.invalidCredentials"));
                 setLoading(false);
-            } else if (result?.ok) {
+            } else if (result?.user) {
                 const rawCallback = new URLSearchParams(window.location.search).get("callbackUrl");
                 const destination = (rawCallback && !rawCallback.startsWith("/admin/login")) 
                     ? rawCallback 

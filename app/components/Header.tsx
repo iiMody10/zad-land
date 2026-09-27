@@ -1,15 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import Image from 'next/image';
-import React, { useRef, useState, useEffect } from 'react';
-import { MdOutlineShoppingBag, MdMenu, MdClose, MdKeyboardArrowDown, MdSearch } from 'react-icons/md';
-import { useLanguage } from '@/app/context/LanguageContext';
+import Link from 'next/link';
+import React, { useEffect, useRef, useState } from 'react';
+import { X as MdClose, ChevronDown as MdKeyboardArrowDown, Menu as MdMenu, ShoppingBag as MdOutlineShoppingBag, UserRound as MdPersonOutline, Search as MdSearch } from 'lucide-react';
 import { useCart } from '@/app/context/CartContext';
+import { useLanguage } from '@/app/context/LanguageContext';
 import HeaderSearch from './HeaderSearch';
-import MobileMenu from './MobileMenu';
-import CurrencyToggle from './CurrencyToggle';
 import LanguageToggle from './LanguageToggle';
+import MobileMenu from './MobileMenu';
 import MegaMenu, { type NavMainCategory } from './HeaderComponents/MegaMenu';
 import TopBar from './HeaderComponents/TopBar';
 
@@ -28,406 +27,350 @@ interface HeaderProps {
     language: 'en' | 'ar';
 }
 
-const Header = ({ initialCategories = [], initialNavData = [], dir }: HeaderProps) => {
-    const { language } = useLanguage();
+const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) => {
+    const { language, dir } = useLanguage();
     const { totalItems, openDrawer } = useCart();
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [manualToggle, setManualToggle] = useState(false);
-    const isNavVisible = !isScrolled || manualToggle;
-    const desktopSpacerHeight = !isScrolled
-        ? 'lg:h-[150px]'
-        : isNavVisible
-            ? 'lg:h-[118px]'
-            : 'lg:h-[70px]';
-    const isScrolledRef = useRef(false);
     const headerRef = useRef<HTMLElement>(null);
     const [headerHeight, setHeaderHeight] = useState(64);
-
-    useEffect(() => {
-        const updateHeight = () => {
-            if (headerRef.current) {
-                setHeaderHeight(headerRef.current.offsetHeight);
-            }
-        };
-        updateHeight();
-        window.addEventListener('resize', updateHeight);
-        return () => window.removeEventListener('resize', updateHeight);
-    }, [isMobileSearchOpen, isScrolled, isMobileMenuOpen]);
-
-    // Mega menu state
-    const navData = initialNavData;
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
-    const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    // Adaptive Visible Items & More Dropdown
     const [isMoreOpen, setIsMoreOpen] = useState(false);
-    const moreTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const [visibleCount, setVisibleCount] = useState(5);
+    const [isHeaderCompact, setIsHeaderCompact] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(4);
+    const isArabic = language === 'ar';
 
     useEffect(() => {
-        const handleResize = () => {
-            const width = window.innerWidth;
-            if (width >= 1536) {
-                setVisibleCount(8);
-            } else if (width >= 1280) {
-                setVisibleCount(6);
-            } else if (width >= 1080) {
-                setVisibleCount(5);
-            } else {
-                setVisibleCount(4);
-            }
+        const updateVisibleCount = () => {
+            setVisibleCount(window.innerWidth >= 1440 ? 7 : window.innerWidth >= 1200 ? 5 : 4);
         };
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        updateVisibleCount();
+        window.addEventListener('resize', updateVisibleCount);
+        return () => window.removeEventListener('resize', updateVisibleCount);
     }, []);
 
-    const handleMoreEnter = () => {
-        if (moreTimeoutRef.current) {
-            clearTimeout(moreTimeoutRef.current);
-            moreTimeoutRef.current = null;
-        }
-        if (closeTimeoutRef.current) {
-            clearTimeout(closeTimeoutRef.current);
-            closeTimeoutRef.current = null;
-        }
-        setActiveMegaMenu(null);
-        setIsMoreOpen(true);
-    };
+    useEffect(() => {
+        if (!headerRef.current) return;
+        const observer = new ResizeObserver(() => {
+            if (headerRef.current) setHeaderHeight(headerRef.current.offsetHeight);
+        });
+        observer.observe(headerRef.current);
+        return () => observer.disconnect();
+    }, []);
 
-    const handleMoreLeave = () => {
-        moreTimeoutRef.current = setTimeout(() => {
-            setIsMoreOpen(false);
-        }, 120);
-    };
+    useEffect(() => {
+        document.documentElement.style.setProperty(
+            '--site-header-sticky-offset',
+            isHeaderCompact ? '81px' : '173px'
+        );
+    }, [isHeaderCompact]);
 
-    React.useEffect(() => {
-        let ticking = false;
-
-        const updateScroll = () => {
-            const currentScrollY = window.scrollY;
-            
-            // If we are at the very top, always show navbar
-            if (currentScrollY <= 10) {
-                if (isScrolledRef.current) {
-                    isScrolledRef.current = false;
-                    setIsScrolled(false);
-                    setManualToggle(false);
-                }
-                ticking = false;
+    useEffect(() => {
+        const desktop = window.matchMedia('(min-width: 1024px)');
+        const initialFrame = window.requestAnimationFrame(() => setIsHeaderCompact(compactState));
+        let compactState = desktop.matches && window.scrollY > 64;
+        let wheelStartY: number | null = null;
+        let wheelTimer: number | undefined;
+        const setCompact = (compact: boolean) => {
+            if (compactState === compact) return;
+            compactState = compact;
+            setIsHeaderCompact(compact);
+            if (compact) {
+                setActiveMegaMenu(null);
+                setIsMoreOpen(false);
+            }
+        };
+        const updateHeaderFromWheel = () => {
+            if (!desktop.matches) {
+                setCompact(false);
                 return;
             }
+            if (wheelStartY === null) wheelStartY = window.scrollY;
+            if (wheelTimer !== undefined) window.clearTimeout(wheelTimer);
+            wheelTimer = window.setTimeout(() => {
+                wheelTimer = undefined;
+                const startY = wheelStartY ?? window.scrollY;
+                const currentY = window.scrollY;
+                const pageDelta = currentY - startY;
+                wheelStartY = null;
 
-            // Collapse the header immediately upon scrolling past 10px
-            if (currentScrollY > 10) {
-                if (!isScrolledRef.current) {
-                    isScrolledRef.current = true;
-                    setIsScrolled(true);
+                if (currentY < 40) setCompact(false);
+                else if (pageDelta > 14) setCompact(true);
+                else if (pageDelta < -14) setCompact(false);
+            }, 120);
+        };
+        const updateHeaderFromScroll = () => {
+            // Scrolling to the top always restores the full header. Direction
+            // changes are handled after wheel input settles, avoiding feedback
+            // from the header's own height animation.
+            if (window.scrollY < 40) {
+                wheelStartY = null;
+                if (wheelTimer !== undefined) {
+                    window.clearTimeout(wheelTimer);
+                    wheelTimer = undefined;
                 }
-            }
-
-            ticking = false;
-        };
-
-        const handleScroll = () => {
-            if (!ticking) {
-                window.requestAnimationFrame(updateScroll);
-                ticking = true;
+                setCompact(false);
             }
         };
+        const resetForViewport = () => {
+            if (!desktop.matches) setCompact(false);
+            else if (window.scrollY > 64) setCompact(true);
+        };
 
-        // Initialize state on mount
-        updateScroll();
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener('wheel', updateHeaderFromWheel, { passive: true });
+        window.addEventListener('scroll', updateHeaderFromScroll, { passive: true });
+        window.addEventListener('resize', resetForViewport);
+        return () => {
+            window.removeEventListener('wheel', updateHeaderFromWheel);
+            window.removeEventListener('scroll', updateHeaderFromScroll);
+            window.removeEventListener('resize', resetForViewport);
+            window.cancelAnimationFrame(initialFrame);
+            if (wheelTimer !== undefined) window.clearTimeout(wheelTimer);
+        };
     }, []);
 
-    const handleNavEnter = (slug: string) => {
-        if (closeTimeoutRef.current) {
-            clearTimeout(closeTimeoutRef.current);
-            closeTimeoutRef.current = null;
-        }
-        if (moreTimeoutRef.current) {
-            clearTimeout(moreTimeoutRef.current);
-            moreTimeoutRef.current = null;
-        }
-        setIsMoreOpen(false);
-        setActiveMegaMenu(slug);
-    };
+    useEffect(() => {
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setActiveMegaMenu(null);
+                setIsMoreOpen(false);
+                setIsMobileMenuOpen(false);
+                setIsMobileSearchOpen(false);
+            }
+        };
+        document.addEventListener('keydown', closeOnEscape);
+        return () => document.removeEventListener('keydown', closeOnEscape);
+    }, []);
 
-    const handleNavLeave = () => {
-        closeTimeoutRef.current = setTimeout(() => {
-            setActiveMegaMenu(null);
-        }, 120);
-    };
+    useEffect(() => {
+        if (!isMobileSearchOpen) return;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = previousOverflow; };
+    }, [isMobileSearchOpen]);
 
-    const handleMegaMenuClose = () => {
+    const activeNavData = initialNavData.find((item) => item.slug === activeMegaMenu);
+    const visibleNavItems = initialNavData.slice(0, visibleCount);
+    const overflowNavItems = initialNavData.slice(visibleCount);
+    const closeDesktopMenus = () => {
         setActiveMegaMenu(null);
+        setIsMoreOpen(false);
     };
-
-    const activeNavData = navData.find((mc) => mc.slug === activeMegaMenu);
-
-    const visibleNavItems = navData.slice(0, visibleCount);
-    const overflowNavItems = navData.slice(visibleCount);
 
     return (
-        <>
-            {/* Spacer to prevent layout shift when header collapses */}
-            <div className={`w-full transition-all duration-300 ${isMobileSearchOpen ? 'h-[116px]' : 'h-[54px] sm:h-[60px]'} ${desktopSpacerHeight}`} aria-hidden="true" />
+        <header ref={headerRef} dir={dir} className="sticky top-0 z-[60] w-full border-b border-[var(--color-line)] bg-white dark:border-white/10 dark:bg-[var(--color-background-dark)]">
+            <div
+                aria-hidden={isHeaderCompact}
+                inert={isHeaderCompact}
+                className="hidden overflow-hidden transition-[height,opacity,transform] duration-300 ease-out motion-reduce:transition-none lg:block"
+                style={{ height: isHeaderCompact ? 0 : 30, opacity: isHeaderCompact ? 0 : 1, transform: isHeaderCompact ? 'translateY(-8px)' : 'translateY(0)' }}
+            >
+                <TopBar />
+            </div>
 
-            <header ref={headerRef} className="fixed top-0 left-0 z-50 w-full bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-white/10 transition-all duration-300">
-                {/* Disappearing Top Bar */}
-                <TopBar isVisible={!isScrolled} />
-                
-                <div className="container-custom">
-                    {/* Main Header Row */}
-                    <div className="py-2 lg:py-[11px] h-auto lg:h-[70px] flex flex-col lg:flex-row lg:items-center relative">
-                        {/* Desktop Version (lg and up) */}
-                        <div className="hidden lg:flex items-center justify-between gap-6 w-full">
-                            {/* Left: Logo and Menu Toggle Group */}
-                            <div className="flex items-center shrink-0">
-                                <button
-                                    onClick={() => setManualToggle(prev => !prev)}
-                                    className={`flex items-center justify-center transition-all duration-500 ease-in-out h-10 overflow-hidden text-zinc-900 dark:text-white ${isScrolled ? 'w-10 opacity-100' : 'w-0 opacity-0 pointer-events-none'
-                                        }`}
-                                >
-                                    <div className="w-5 h-5 flex flex-col items-center justify-center gap-[4px]">
-                                        <span className={`block w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${isNavVisible && isScrolled ? 'translate-y-[6px] rotate-45' : ''
-                                            }`} />
-                                        <span className={`block w-5 h-0.5 bg-current rounded-full transition-all duration-300 ${isNavVisible && isScrolled ? 'opacity-0 scale-0' : ''
-                                            }`} />
-                                        <span className={`block w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${isNavVisible && isScrolled ? '-translate-y-[6px] -rotate-45' : ''
-                                            }`} />
-                                    </div>
-                                </button>
+            <div className="container-custom">
+                <div className={`hidden items-center gap-5 transition-[height] duration-300 ease-out motion-reduce:transition-none lg:flex ${isHeaderCompact ? 'h-[64px]' : 'h-[76px]'}`}>
+                    <Link href="/" aria-label={isArabic ? 'زاد لاند، الرئيسية' : 'Zad Land, home'} className="flex w-[170px] shrink-0 items-center">
+                        <Image src="/logo.png" alt="Zad Land" width={162} height={68} priority className={`w-auto object-contain transition-[height] duration-300 motion-reduce:transition-none ${isHeaderCompact ? 'h-[48px]' : 'h-[58px]'}`} />
+                    </Link>
 
-                                <div className={`transition-all duration-500 ease-in-out ${isScrolled ? 'ms-2' : 'ms-0'}`}>
-                                    <Link href="/" className="flex items-center group">
-                                        <Image
-                                            src="/logo.png"
-                                            alt="ZAD LAND - زاد لاند"
-                                            width={180}
-                                            height={65}
-                                            priority
-                                            className="h-[48px] xl:h-[54px] w-auto object-contain transition-transform duration-300 group-hover:scale-105"
-                                        />
-                                    </Link>
-                                </div>
-                            </div>
-
-                            {/* Center: Search */}
-                            <div className="flex-1 max-w-2xl xl:max-w-3xl px-2 xl:px-4">
-                                <HeaderSearch />
-                            </div>
-
-                            {/* Right: Cart Button Drawer Trigger */}
-                            <div className="flex items-center gap-3 lg:gap-4 shrink-0">
-                                <button
-                                    onClick={openDrawer}
-                                    className="w-10 h-10 xl:w-11 xl:h-11 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-xl text-zinc-900 dark:text-white hover:bg-[#072835] hover:text-white dark:hover:bg-white dark:hover:text-black transition-all relative"
-                                    aria-label="Open Shopping Cart"
-                                >
-                                    <MdOutlineShoppingBag />
-                                    {totalItems > 0 && (
-                                        <span className="absolute -top-1 -right-1 bg-[#2E7D32] text-white text-[10px] font-extrabold w-4.5 h-4.5 flex items-center justify-center rounded-full shadow-sm">
-                                            {totalItems}
-                                        </span>
-                                    )}
-                                </button>
-                            </div>
+                    <div className="min-w-0 flex-1 px-2 xl:px-10">
+                        <div className="mx-auto max-w-[660px]">
+                            <HeaderSearch />
                         </div>
+                    </div>
 
-                        {/* Mobile & Tablet Version (below lg) - Exact Target Design: Hamburger Left, Logo Center, AR + Search Right */}
-                        <div className="flex lg:hidden flex-col w-full">
-                            <div className="flex items-center justify-between h-[48px] sm:h-[54px] px-1">
-                                {/* Left: Hamburger Menu */}
-                                <button
-                                    onClick={() => {
-                                        setIsMobileSearchOpen(false);
-                                        setIsMobileMenuOpen((prev) => !prev);
-                                    }}
-                                    className="p-1.5 text-zinc-900 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-                                    aria-label="Toggle Menu"
-                                >
-                                    {isMobileMenuOpen ? (
-                                        <MdClose className="text-2xl" />
-                                    ) : (
-                                        <MdMenu className="text-2xl" />
-                                    )}
-                                </button>
-
-                                {/* Center: Circular Zad Land Logo */}
-                                <Link href="/" className="flex items-center justify-center">
-                                    <Image
-                                        src="/logo.png"
-                                        alt="ZAD LAND - زاد لاند"
-                                        width={52}
-                                        height={52}
-                                        priority
-                                        className="h-[40px] sm:h-[46px] w-auto object-contain transition-transform duration-300 active:scale-95"
-                                    />
-                                </Link>
-
-                                {/* Right: Language Toggle (AR ⌵) + Search Icon (🔍) */}
-                                <div className="flex items-center gap-1 sm:gap-2">
-                                    <LanguageToggle />
-                                    <button
-                                        onClick={() => {
-                                            setIsMobileMenuOpen(false);
-                                            setIsMobileSearchOpen((prev) => !prev);
-                                        }}
-                                        className="p-1.5 text-zinc-900 dark:text-white rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-                                        aria-label="Toggle Search"
-                                    >
-                                        <MdSearch className="text-2xl" />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Expandable Search Drawer on Mobile (when search icon is tapped) */}
-                            {isMobileSearchOpen && (
-                                <div className="w-full pt-2 pb-3 px-1 border-t border-gray-100 dark:border-white/10 animate-fadeInDown">
-                                    <div className="relative flex items-center gap-2">
-                                        <div className="flex-1">
-                                            <HeaderSearch autoFocus={true} onClose={() => setIsMobileSearchOpen(false)} />
-                                        </div>
-                                        <button
-                                            onClick={() => setIsMobileSearchOpen(false)}
-                                            className="p-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white text-lg shrink-0"
-                                            aria-label="Close search"
-                                        >
-                                            <MdClose />
-                                        </button>
-                                    </div>
-                                </div>
+                    <div className="flex w-[170px] shrink-0 items-center justify-end gap-2">
+                        <Link
+                            href="/account"
+                            className="flex h-11 items-center gap-2 rounded-[10px] px-3 text-sm font-semibold text-[var(--color-brand)] transition-colors hover:bg-[var(--color-brand-soft)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] dark:text-white dark:hover:bg-white/10"
+                        >
+                            <MdPersonOutline className="text-[22px]" aria-hidden="true" />
+                            <span>{isArabic ? 'حسابي' : 'Account'}</span>
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={openDrawer}
+                            aria-label={isArabic ? `السلة، ${totalItems} منتجات` : `Cart, ${totalItems} items`}
+                            className="relative flex h-11 w-11 items-center justify-center rounded-[10px] bg-[var(--color-brand)] text-white transition-colors hover:bg-[var(--color-brand-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)]"
+                        >
+                            <MdOutlineShoppingBag className="text-[22px]" aria-hidden="true" />
+                            {totalItems > 0 && (
+                                <span className="absolute -top-1 -end-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--color-accent)] px-1 text-[10px] font-bold text-white">
+                                    {totalItems > 99 ? '99+' : totalItems}
+                                </span>
                             )}
-                        </div>
-
-                        {/* Mobile Overlays Wrapper */}
-                        <MobileMenu
-                            initialCategories={initialCategories}
-                            navData={navData}
-                            isOpen={isMobileMenuOpen}
-                            setIsOpen={setIsMobileMenuOpen}
-                            isSearchOpen={isMobileSearchOpen}
-                            setIsSearchOpen={setIsMobileSearchOpen}
-                            hideTriggers={true}
-                            headerHeight={headerHeight}
-                        />
+                        </button>
                     </div>
                 </div>
 
-                {/* Navigation Links Row - Desktop only (lg and up) */}
-                <nav
-                    className={`hidden lg:grid bg-[#F8F8F8] dark:bg-[#1C1C14] border-t border-b border-gray-200/60 dark:border-white/5 transition-all duration-300 ease-in-out relative ${
-                        !isNavVisible ? 'grid-rows-[0fr] opacity-0 border-t-0 border-b-0 pointer-events-none' : 'grid-rows-[1fr] opacity-100'
-                    }`}
-                >
-                    <div className={`relative min-h-0 ${isNavVisible ? 'overflow-visible' : 'overflow-hidden'}`}>
-                        <div className="container-custom relative flex items-center justify-center h-[48px]">
-                            {/* Primary Visible Departments */}
-                            <div className="flex items-center justify-center gap-5 xl:gap-8 flex-nowrap">
-                                {visibleNavItems.map((mc) => {
-                                    const displayName = language === 'ar' ? mc.name : (mc.nameEn || mc.name);
-                                    return (
-                                        <div
-                                            key={mc.id}
-                                            className="relative shrink-0 group"
-                                            onMouseEnter={() => {
-                                                setIsMoreOpen(false);
-                                                handleNavEnter(mc.slug);
-                                            }}
-                                            onMouseLeave={handleNavLeave}
-                                        >
-                                            <Link
-                                                href={`/department/${mc.slug}`}
-                                                prefetch={true}
-                                                className={`text-[14px] xl:text-[15px] font-medium relative flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${
-                                                    activeMegaMenu === mc.slug
-                                                        ? 'text-[#B8860B] dark:text-[#E5B54A]'
-                                                        : 'text-[#1A1A1A] dark:text-gray-200 hover:text-[#B8860B] dark:hover:text-[#E5B54A]'
-                                                }`}
-                                            >
-                                                <span>{displayName}</span>
-                                                <MdKeyboardArrowDown className={`text-base text-gray-500 group-hover:text-[#B8860B] dark:text-gray-400 dark:group-hover:text-[#E5B54A] transition-transform duration-200 ${activeMegaMenu === mc.slug ? 'rotate-180 text-[#B8860B] dark:text-[#E5B54A]' : ''}`} />
-                                            </Link>
-                                        </div>
-                                    );
-                                })}
+                <div className="flex h-[64px] items-center justify-between gap-3 lg:hidden">
+                    <Link href="/" aria-label={isArabic ? 'زاد لاند، الرئيسية' : 'Zad Land, home'} className="flex shrink-0 items-center">
+                        <Image src="/logo.png" alt="Zad Land" width={112} height={54} priority className="h-[48px] w-auto object-contain" />
+                    </Link>
+                    <div className="flex items-center gap-1">
+                        <LanguageToggle />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                setIsMobileSearchOpen(true);
+                            }}
+                            aria-label={isArabic ? 'البحث' : 'Search'}
+                            aria-expanded={isMobileSearchOpen}
+                            aria-controls="mobile-search-dialog"
+                            className="flex h-10 w-10 items-center justify-center rounded-[9px] text-[var(--color-brand)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10"
+                        >
+                            <MdSearch className="text-2xl" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsMobileSearchOpen(false);
+                                setIsMobileMenuOpen((open) => !open);
+                            }}
+                            aria-label={isArabic ? 'القائمة' : 'Menu'}
+                            aria-expanded={isMobileMenuOpen}
+                            className="flex h-10 w-10 items-center justify-center rounded-[9px] bg-[var(--color-brand)] text-white"
+                        >
+                            {isMobileMenuOpen ? <MdClose className="text-2xl" /> : <MdMenu className="text-2xl" />}
+                        </button>
+                    </div>
+                </div>
 
-                                {/* More Departments Dropdown (Plain text + chevron matching screenshot) */}
-                                {overflowNavItems.length > 0 && (
-                                    <div
-                                        className="relative shrink-0 group"
-                                        onMouseEnter={handleMoreEnter}
-                                        onMouseLeave={handleMoreLeave}
+            </div>
+
+            {isMobileSearchOpen && (
+                <div className="fixed inset-0 z-[120] lg:hidden">
+                    <button
+                        type="button"
+                        onClick={() => setIsMobileSearchOpen(false)}
+                        aria-label={isArabic ? 'إغلاق البحث' : 'Close search'}
+                        className="absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+                    />
+                    <section
+                        id="mobile-search-dialog"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={isArabic ? 'البحث عن المنتجات' : 'Search products'}
+                          className="absolute inset-0 flex h-[100dvh] flex-col overflow-hidden bg-white px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] shadow-2xl dark:bg-[var(--color-surface-dark)] sm:inset-x-4 sm:inset-y-4 sm:h-auto sm:rounded-3xl sm:border sm:border-slate-200 sm:px-5 sm:pb-5 sm:pt-5 sm:shadow-2xl dark:sm:border-white/10"
+                    >
+                          <div className="mb-3 flex shrink-0 items-center justify-between">
+                            <h2 className="text-base font-extrabold text-[var(--color-brand)] dark:text-white">{isArabic ? 'ابحث عن المنتجات' : 'Search products'}</h2>
+                            <button
+                                type="button"
+                                onClick={() => setIsMobileSearchOpen(false)}
+                                aria-label={isArabic ? 'إغلاق البحث' : 'Close search'}
+                                className="flex size-10 items-center justify-center rounded-xl text-2xl text-slate-600 hover:bg-slate-100 dark:text-white dark:hover:bg-white/10"
+                            >
+                                <MdClose aria-hidden="true" />
+                            </button>
+                        </div>
+                          <HeaderSearch mobileModal autoFocus onClose={() => setIsMobileSearchOpen(false)} />
+                    </section>
+                </div>
+            )}
+
+            <nav
+                aria-label={isArabic ? 'الأقسام الرئيسية' : 'Main navigation'}
+                aria-hidden={isHeaderCompact}
+                inert={isHeaderCompact}
+                className="relative hidden border-t border-[var(--color-line)] bg-[var(--color-canvas)] transition-[height,opacity,transform] duration-300 ease-out motion-reduce:transition-none dark:border-white/10 dark:bg-[var(--color-surface-dark)] lg:block"
+                style={{ height: isHeaderCompact ? 0 : 50, overflow: isHeaderCompact ? 'hidden' : 'visible', opacity: isHeaderCompact ? 0 : 1, transform: isHeaderCompact ? 'translateY(-8px)' : 'translateY(0)', borderColor: isHeaderCompact ? 'transparent' : undefined }}
+                onMouseLeave={closeDesktopMenus}
+            >
+                <div className="container-custom flex h-[50px] items-center gap-1">
+                    <Link
+                        href="/products"
+                        onMouseEnter={closeDesktopMenus}
+                        className="me-3 flex h-9 shrink-0 items-center gap-2 rounded-[7px] bg-[var(--color-brand)] px-4 text-[13px] font-bold text-white transition-colors hover:bg-[var(--color-brand-hover)]"
+                    >
+                        <MdMenu className="text-lg" aria-hidden="true" />
+                        {isArabic ? 'جميع المنتجات' : 'Shop all'}
+                    </Link>
+
+                    <div className="flex min-w-0 flex-1 items-center gap-0.5">
+                        {visibleNavItems.map((item) => {
+                            const name = isArabic ? item.name : item.nameEn || item.name;
+                            const isOpen = activeMegaMenu === item.slug;
+                            return (
+                                <div key={item.id} className="flex shrink-0 items-center" onMouseEnter={() => { setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}>
+                                    <Link
+                                        href={`/department/${item.slug}`}
+                                        onFocus={() => setActiveMegaMenu(item.slug)}
+                                        onClick={closeDesktopMenus}
+                                        className={`flex h-10 items-center rounded-s-[7px] ps-3 pe-1 text-[13px] font-semibold transition-colors xl:text-sm ${isOpen ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10'}`}
                                     >
-                                        <button
-                                            type="button"
-                                            className={`text-[14px] xl:text-[15px] font-medium relative flex items-center gap-1 transition-colors whitespace-nowrap py-1 ${
-                                                isMoreOpen
-                                                    ? 'text-[#B8860B] dark:text-[#E5B54A]'
-                                                    : 'text-[#1A1A1A] dark:text-gray-200 hover:text-[#B8860B] dark:hover:text-[#E5B54A]'
-                                            }`}
-                                        >
-                                            <span>{language === 'ar' ? 'المزيد' : 'More'}</span>
-                                            <MdKeyboardArrowDown className={`text-base text-gray-500 group-hover:text-[#B8860B] dark:text-gray-400 dark:group-hover:text-[#E5B54A] transition-transform duration-200 ${isMoreOpen ? 'rotate-180 text-[#B8860B] dark:text-[#E5B54A]' : ''}`} />
-                                        </button>
-
-                                        {/* Floating More Dropdown Menu */}
-                                        {isMoreOpen && (
-                                            <div
-                                                className="absolute top-full ltr:right-0 rtl:left-0 mt-1.5 w-64 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200/80 dark:border-white/10 p-2 z-50 animate-mega-menu-enter"
+                                        {name}
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        aria-label={isArabic ? `عرض أقسام ${name}` : `Explore ${name}`}
+                                        aria-expanded={isOpen}
+                                        aria-controls="desktop-category-panel"
+                                        onClick={() => { setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}
+                                        className={`flex h-10 w-7 items-center justify-center rounded-e-[7px] transition-colors ${isOpen ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[#5b6c60] hover:bg-[var(--color-brand-soft)] dark:text-gray-300 dark:hover:bg-white/10'}`}
+                                    >
+                                        <MdKeyboardArrowDown className={`text-lg transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                                    </button>
+                                </div>
+                            );
+                        })}
+                        {overflowNavItems.length > 0 && (
+                            <div className="relative shrink-0" onMouseEnter={() => { setActiveMegaMenu(null); setIsMoreOpen(true); }}>
+                                <button
+                                    type="button"
+                                    aria-expanded={isMoreOpen}
+                                    onClick={() => { setActiveMegaMenu(null); setIsMoreOpen((open) => !open); }}
+                                    className="flex h-10 items-center gap-1 rounded-[7px] px-3 text-[13px] font-semibold text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10"
+                                >
+                                    {isArabic ? 'المزيد' : 'More'}
+                                    <MdKeyboardArrowDown className={`text-lg transition-transform ${isMoreOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                {isMoreOpen && (
+                                    <div className="absolute top-full start-0 z-50 mt-1 w-60 rounded-[10px] border border-[var(--color-line)] bg-white p-2 shadow-[0_16px_35px_rgba(17,43,31,0.13)] dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                                        {overflowNavItems.map((item) => (
+                                            <Link
+                                                key={item.id}
+                                                href={`/department/${item.slug}`}
+                                                onClick={closeDesktopMenus}
+                                                className="block rounded-[6px] px-3 py-2.5 text-sm text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10"
                                             >
-                                                <div className="flex flex-col gap-0.5 max-h-[340px] overflow-y-auto scrollbar-hide py-1">
-                                                    {overflowNavItems.map((mc) => {
-                                                        const name = language === 'ar' ? mc.name : (mc.nameEn || mc.name);
-                                                        return (
-                                                            <Link
-                                                                key={mc.id}
-                                                                href={`/department/${mc.slug}`}
-                                                                onClick={() => setIsMoreOpen(false)}
-                                                                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13px] font-semibold text-zinc-800 dark:text-white/90 hover:bg-[#B8860B]/10 hover:text-[#B8860B] dark:hover:text-[#E5B54A] transition-all"
-                                                            >
-                                                                <span className="truncate">{name}</span>
-                                                                {mc.categories?.length > 0 && (
-                                                                    <span className="text-[11px] text-gray-400 font-normal shrink-0 ms-3">
-                                                                        {mc.categories.length} {language === 'ar' ? 'فئات' : 'cats'}
-                                                                    </span>
-                                                                )}
-                                                            </Link>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        )}
+                                                {isArabic ? item.name : item.nameEn || item.name}
+                                            </Link>
+                                        ))}
                                     </div>
                                 )}
                             </div>
-                        </div>
+                        )}
                     </div>
 
-                    {/* Mega Menu Dropdown */}
-                    {activeMegaMenu && activeNavData && (
-                        <MegaMenu
-                            key={activeMegaMenu}
-                            data={activeNavData}
-                            onClose={handleMegaMenuClose}
-                            onMouseEnter={() => {
-                                if (closeTimeoutRef.current) {
-                                    clearTimeout(closeTimeoutRef.current);
-                                    closeTimeoutRef.current = null;
-                                }
-                            }}
-                            onMouseLeave={handleNavLeave}
-                        />
-                    )}
-                </nav>
-            </header>
-        </>
+                    <div className="flex shrink-0 items-center gap-1 border-s border-[var(--color-line)] ps-3 dark:border-white/15">
+                        <Link href="/brands" onMouseEnter={closeDesktopMenus} className="rounded-[7px] px-3 py-2 text-[13px] font-semibold text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10">{isArabic ? 'الشركات' : 'Brands'}</Link>
+                        <Link href="/about-us" onMouseEnter={closeDesktopMenus} className="rounded-[7px] px-3 py-2 text-[13px] font-semibold text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10">{isArabic ? 'من نحن' : 'About'}</Link>
+                        <Link href="/contact" onMouseEnter={closeDesktopMenus} className="rounded-[7px] px-3 py-2 text-[13px] font-semibold text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10">{isArabic ? 'تواصل' : 'Contact'}</Link>
+                    </div>
+                </div>
+
+                {activeNavData && (
+                    <MegaMenu
+                        key={activeNavData.id}
+                        data={activeNavData}
+                        onClose={closeDesktopMenus}
+                        onMouseEnter={() => setIsMoreOpen(false)}
+                    />
+                )}
+            </nav>
+
+            <MobileMenu
+                initialCategories={initialCategories}
+                navData={initialNavData}
+                isOpen={isMobileMenuOpen}
+                setIsOpen={setIsMobileMenuOpen}
+                hideTriggers
+                headerHeight={headerHeight}
+            />
+        </header>
     );
 };
 

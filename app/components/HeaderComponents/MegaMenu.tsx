@@ -1,12 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import Link from "next/link";
-import { useLanguage } from "@/app/context/LanguageContext";
-import { useCurrency } from "@/app/context/CurrencyContext";
-import { useCart } from "@/app/context/CartContext";
-import ResilientImage from "@/app/components/ResilientImage";
-import { MdSearch } from "react-icons/md";
+import Link from 'next/link';
+import { ArrowRight as MdArrowForward, ArrowLeft as MdArrowBack } from 'lucide-react';
+import { useLanguage } from '@/app/context/LanguageContext';
+import PriceText from '@/app/components/PriceText';
+import ResilientImage from '@/app/components/ResilientImage';
 
 interface Brand {
     id: string;
@@ -33,8 +31,12 @@ interface TrendingProduct {
     nameEn?: string | null;
     slug: string;
     images: string;
-    price: number;
+    price: number | null;
     discountPrice: number | null;
+    minOrder: number;
+    stock: number;
+    packaging: string | null;
+    itemsPerPackage: string | null;
     brand?: { name: string } | null;
 }
 
@@ -57,264 +59,142 @@ interface MegaMenuProps {
     onMouseLeave?: () => void;
 }
 
-// ─── Mini Product Card (matches ProductCard.tsx design exactly) ───────────────
-function MiniProductCard({ product, onClose }: { product: TrendingProduct; onClose: () => void }) {
-    const { formatPrice } = useCurrency();
-    const { addItem } = useCart();
-    const { language, dir } = useLanguage();
+const imageFromJson = (images: string) => {
+    try {
+        const parsed = JSON.parse(images);
+        return Array.isArray(parsed) ? String(parsed[0] || '') : String(parsed || '');
+    } catch {
+        return images.split(',')[0]?.trim() || '';
+    }
+};
 
-    const displayName = (language === "ar" ? product.nameAr : product.nameEn) || product.name || product.nameAr || "";
+const localizedBrandName = (name: string, isArabic: boolean) => {
+    const parts = name.split('-').map((part) => part.trim());
+    return parts.find((part) => isArabic ? /[\u0600-\u06FF]/.test(part) : !/[\u0600-\u06FF]/.test(part)) || name;
+};
 
-    const getImages = (images: string) => {
-        try {
-            const parsed = JSON.parse(images);
-            return Array.isArray(parsed) ? parsed : [images];
-        } catch {
-            return images.split(",").map(i => i.trim()).filter(Boolean);
-        }
-    };
-
-    const imgs = getImages(product.images);
-    const primaryImage = imgs[0] || "";
-    const secondaryImage = imgs.length > 1 && imgs[1] !== imgs[0] ? imgs[1] : null;
-
-    const handleAddToCart = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        addItem({
-            id: product.id,
-            name: displayName,
-            price: Number(product.discountPrice || product.price),
-            image: primaryImage,
-            slug: product.slug,
-            quantity: 1,
-        });
-    };
-
-    return (
-        <div className="group relative flex flex-col bg-[#F7F7F5] dark:bg-surface-dark rounded-[10px] overflow-hidden transition-transform duration-300 w-[177px] shrink-0">
-
-            {/* Quick View Icon */}
-            <button
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                className="absolute z-20 top-3 left-3 w-8 h-8 bg-white text-black hover:bg-[#B8860B] hover:text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100 border border-gray-100"
-                aria-label="Quick View"
-            >
-                <MdSearch size={18} />
-            </button>
-
-            {/* Image Area — 177×177px */}
-            <div className="relative w-[177px] h-[177px] shrink-0 overflow-hidden">
-                <Link href={`/products/${product.slug}`} onClick={onClose} className="absolute inset-0 block w-full h-full" aria-label={displayName}>
-                    {/* Primary Image */}
-                    <div className={`absolute inset-0 transition-opacity duration-500 z-10 ${secondaryImage ? "group-hover:opacity-0" : ""}`}>
-                        <ResilientImage
-                            src={primaryImage}
-                            alt={displayName}
-                            className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal"
-                            loading="lazy"
-                        />
-                    </div>
-                    {/* Secondary Image */}
-                    {secondaryImage && (
-                        <div className="absolute inset-0 transition-opacity duration-500 opacity-0 group-hover:opacity-100 z-0">
-                            <ResilientImage
-                                src={secondaryImage}
-                                alt={displayName}
-                                className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal"
-                                loading="lazy"
-                            />
-                        </div>
-                    )}
-                </Link>
-
-                {/* Add to Cart — slides up on hover */}
-                <div className="absolute inset-x-2 bottom-3 z-20 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                    <button
-                        onClick={handleAddToCart}
-                        className="w-full bg-[#072835] hover:bg-[#2E7D32] text-white h-[36px] rounded-full text-[12px] font-bold transition-all duration-300 flex items-center justify-center cursor-pointer"
-                    >
-                        {language === "ar" ? "اضافة للعربة" : "Add to Cart"}
-                    </button>
-                </div>
-            </div>
-
-            {/* Product Info */}
-            <div className={`flex flex-col p-2.5 pt-2 ${dir === "rtl" ? "text-right" : "text-left"}`}>
-                {/* Brand */}
-                {product.brand && (
-                    <p className="text-[rgba(7,40,53,0.6)] dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1 truncate">
-                        {product.brand.name}
-                    </p>
-                )}
-                {/* Title */}
-                <h3
-                    className={`text-[rgb(7,40,53)] dark:text-white text-[12px] font-semibold leading-tight mb-1 line-clamp-2 ${dir === "rtl" ? "text-right" : "text-left"}`}
-                >
-                    <Link href={`/products/${product.slug}`} onClick={onClose}>
-                        {displayName}
-                    </Link>
-                </h3>
-                {/* Price */}
-                <div className="flex items-center gap-1.5 mt-auto">
-                    {product.discountPrice ? (
-                        <>
-                            <span className="text-[13px] font-bold text-[rgb(7,40,53)] dark:text-white">
-                                {formatPrice(product.discountPrice)}
-                            </span>
-                            <span className="text-[11px] text-gray-400 line-through font-normal">
-                                {formatPrice(product.price)}
-                            </span>
-                        </>
-                    ) : (
-                        <span className="text-[13px] font-bold text-[rgb(7,40,53)] dark:text-white">
-                            {formatPrice(product.price)}
-                        </span>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ─── Mega Menu ────────────────────────────────────────────────────────────────
 export default function MegaMenu({ data, onClose, onMouseEnter, onMouseLeave }: MegaMenuProps) {
-    const { dir, language } = useLanguage();
-    const visibleTrending = data.trendingProducts.slice(0, 3);
+    const { language } = useLanguage();
+    const isArabic = language === 'ar';
+    const title = isArabic ? data.name : data.nameEn || data.name;
+    const Arrow = isArabic ? MdArrowBack : MdArrowForward;
+    const products = data.trendingProducts.slice(0, 3);
 
     return (
         <div
-            className="absolute top-full left-0 right-0 z-40"
+            id="desktop-category-panel"
+            className="absolute inset-x-0 top-full z-40 border-t border-[var(--color-line)] bg-white shadow-[0_22px_35px_rgba(15,40,29,0.14)] dark:border-white/10 dark:bg-[var(--color-background-dark)]"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
-            <div
-                className="bg-white dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden origin-top animate-mega-menu-enter"
-            >
-                <div className="container-custom py-8">
-                    <div
-                        className={`grid gap-8 ${dir === "rtl" ? "text-right" : "text-left"}`}
-                        style={{ gridTemplateColumns: "1fr 1fr 1fr 2fr" }}
-                    >
-                        {/* Column 1: Brands */}
-                        <div>
-                            <h3 className="text-[15px] font-medium text-[rgb(46,46,46)] dark:text-white uppercase tracking-wider mb-4 pb-2 border-b border-gray-100 dark:border-white/10">
-                                {language === "ar" ? "الماركات" : "Brands"}
-                            </h3>
-                            <ul className="flex flex-col gap-2">
-                                {data.brands.length > 0 ? data.brands.map((brand) => {
-                                    const formatBrandName = (name: string) => {
-                                        if (!name.includes('-')) return name.trim();
-                                        const parts = name.split('-').map(s => s.trim());
-                                        if (parts.length >= 2) {
-                                            const arabicPart = parts.find(p => /[\u0600-\u06FF]/.test(p));
-                                            const englishPart = parts.find(p => !/[\u0600-\u06FF]/.test(p));
-                                            if (language === 'ar' && arabicPart) return arabicPart;
-                                            if (language !== 'ar' && englishPart) return englishPart;
-                                        }
-                                        return name;
-                                    };
-
-                                    return (
-                                        <li key={brand.id}>
-                                            <Link 
-                                                href={`/brands/${brand.slug}`} 
-                                                onClick={onClose}
-                                                className="text-[15px] font-medium text-[rgb(46,46,46)] dark:text-gray-300 hover:text-[#072835] dark:hover:text-[#E5B54A] leading-relaxed inline hover-underline-animated"
-                                            >
-                                                {formatBrandName(brand.name)}
-                                            </Link>
-                                        </li>
-                                    );
-                                }) : (
-                                    <li className="text-[15px] font-medium text-[rgb(46,46,46)]/50 dark:text-gray-500">
-                                        {language === "ar" ? "لا توجد ماركات" : "No brands yet"}
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
-
-                        {/* Column 2: Categories */}
-                        <div>
-                            <h3 className="text-[15px] font-medium text-[rgb(46,46,46)] dark:text-white uppercase tracking-wider mb-4 pb-2 border-b border-gray-100 dark:border-white/10">
-                                {language === "ar" ? "الأقسام" : "Categories"}
-                            </h3>
-                            <ul className="flex flex-col gap-2">
-                                {data.categories.length > 0 ? data.categories.map((cat) => (
-                                    <li key={cat.id}>
-                                        <Link 
-                                            href={`/department/${data.slug}?category=${cat.slug}`} 
-                                            onClick={onClose}
-                                            className="text-[15px] font-medium text-[rgb(46,46,46)] dark:text-gray-300 hover:text-black dark:hover:text-white leading-relaxed inline hover-underline-animated"
-                                        >
-                                            {cat.name}
-                                        </Link>
-                                    </li>
-                                )) : (
-                                    <li className="text-[15px] font-medium text-[rgb(46,46,46)]/50 dark:text-gray-500">
-                                        {language === "ar" ? "لا توجد أقسام" : "No categories yet"}
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
-
-                        {/* Column 3: Top Products */}
-                        <div>
-                            <h3 className="text-[15px] font-medium text-[rgb(46,46,46)] dark:text-white uppercase tracking-wider mb-4 pb-2 border-b border-gray-100 dark:border-white/10">
-                                {language === "ar" ? "المنتجات" : "Products"}
-                            </h3>
-                            <ul className="flex flex-col gap-2">
-                                {data.topProducts.length > 0 ? data.topProducts.map((product) => (
-                                    <li key={product.id}>
-                                        <Link 
-                                            href={`/products/${product.slug}`} 
-                                            onClick={onClose}
-                                            className="text-[15px] font-medium text-[rgb(46,46,46)] dark:text-gray-300 hover:text-black dark:hover:text-white leading-relaxed line-clamp-1 inline hover-underline-animated"
-                                        >
-                                            {product.name}
-                                        </Link>
-                                    </li>
-                                )) : (
-                                    <li className="text-[15px] font-medium text-[rgb(46,46,46)]/50 dark:text-gray-500">
-                                        {language === "ar" ? "لا توجد منتجات" : "No products yet"}
-                                    </li>
-                                )}
-                                {data.topProducts.length > 0 && (
-                                    <li className="mt-2">
-                                        <Link 
-                                            href={`/department/${data.slug}`} 
-                                            onClick={onClose}
-                                            className="text-[15px] font-medium text-[rgb(46,46,46)] dark:text-white inline hover-underline-animated"
-                                        >
-                                            {language === "ar" ? "عرض كل المنتجات ←" : "View All →"}
-                                        </Link>
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
-
-                        {/* Column 4: Best Sellers — mini product cards */}
-                        <div>
-                            <h3 className="text-[15px] font-medium text-[rgb(46,46,46)] dark:text-white uppercase tracking-wider mb-4 pb-2 border-b border-gray-100 dark:border-white/10">
-                                {language === "ar" ? "الأكثر مبيعاً" : "Best Sellers"}
-                            </h3>
-                            {visibleTrending.length > 0 ? (
-                                <div className="flex flex-row gap-3">
-                                    {visibleTrending.map((product) => (
-                                        <MiniProductCard
-                                            key={product.id}
-                                            product={product}
-                                            onClose={onClose}
-                                        />
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-[15px] font-medium text-[rgb(46,46,46)]/50 dark:text-gray-500">
-                                    {language === "ar" ? "لا توجد منتجات رائجة" : "No trending products"}
-                                </p>
-                            )}
-                        </div>
+            <div className="container-custom grid max-h-[min(66vh,500px)] grid-cols-12 gap-6 overflow-y-auto py-6 xl:gap-8">
+                <div className="col-span-3 flex min-h-[280px] flex-col justify-between bg-[var(--color-brand)] p-6 text-white">
+                    <div>
+                        <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--color-accent-light)]">
+                            {isArabic ? 'تصفح القسم' : 'Explore department'}
+                        </span>
+                        <h2 className="mt-4 text-2xl font-bold leading-tight xl:text-[28px]">{title}</h2>
+                        <p className="mt-3 text-[13px] text-white/75">
+                            {isArabic
+                                ? `${data.categories.length} فئات · ${data.brands.length} علامات`
+                                : `${data.categories.length} categories · ${data.brands.length} brands`}
+                        </p>
                     </div>
+                    <Link
+                        href={`/department/${data.slug}`}
+                        onClick={onClose}
+                        className="inline-flex w-fit items-center gap-2 border-b border-[var(--color-accent-light)] pb-1 text-[13px] font-bold text-[var(--color-accent-light)] transition-colors hover:text-white"
+                    >
+                        {isArabic ? 'عرض جميع المنتجات' : 'View all products'}
+                        <Arrow aria-hidden="true" className="text-lg" />
+                    </Link>
+                </div>
+
+                <div className="col-span-3 min-w-0">
+                    <h3 className="mb-3 border-b border-[var(--color-line)] pb-3 text-[12px] font-bold text-[#66786b] dark:border-white/10 dark:text-gray-400">
+                        {isArabic ? 'الفئات' : 'Categories'}
+                    </h3>
+                    <ul className="space-y-0.5">
+                        {data.categories.slice(0, 8).map((category) => (
+                            <li key={category.id}>
+                                <Link
+                                    href={`/department/${data.slug}?category=${category.slug}`}
+                                    onClick={onClose}
+                                    className="block rounded-[6px] px-2 py-2 text-[13px] font-medium leading-snug text-[var(--color-ink)] transition-colors hover:bg-[var(--color-brand-soft)] hover:text-[var(--color-brand-hover)] dark:text-white dark:hover:bg-white/10"
+                                >
+                                    {category.name}
+                                </Link>
+                            </li>
+                        ))}
+                        {data.categories.length === 0 && (
+                            <li className="text-[13px] text-[#7a877c]">{isArabic ? 'لا توجد فئات' : 'No categories yet'}</li>
+                        )}
+                    </ul>
+                </div>
+
+                <div className="col-span-2 min-w-0">
+                    <h3 className="mb-3 border-b border-[var(--color-line)] pb-3 text-[12px] font-bold text-[#66786b] dark:border-white/10 dark:text-gray-400">
+                        {isArabic ? 'العلامات' : 'Brands'}
+                    </h3>
+                    <ul className="space-y-0.5">
+                        {data.brands.slice(0, 8).map((brand) => (
+                            <li key={brand.id}>
+                                <Link
+                                    href={`/brands/${brand.slug}`}
+                                    onClick={onClose}
+                                    className="block rounded-[6px] px-2 py-2 text-[13px] font-medium leading-snug text-[var(--color-ink)] transition-colors hover:bg-[var(--color-brand-soft)] hover:text-[var(--color-brand-hover)] dark:text-white dark:hover:bg-white/10"
+                                >
+                                    {localizedBrandName(brand.name, isArabic)}
+                                </Link>
+                            </li>
+                        ))}
+                        {data.brands.length === 0 && (
+                            <li className="text-[13px] text-[#7a877c]">{isArabic ? 'لا توجد علامات' : 'No brands yet'}</li>
+                        )}
+                    </ul>
+                </div>
+
+                <div className="col-span-4 min-w-0">
+                    <h3 className="mb-3 border-b border-[var(--color-line)] pb-3 text-[12px] font-bold text-[#66786b] dark:border-white/10 dark:text-gray-400">
+                        {isArabic ? 'منتجات مختارة' : 'Featured products'}
+                    </h3>
+                    {products.length > 0 ? (
+                        <div className="space-y-1">
+                            {products.map((product) => {
+                                const name = (isArabic ? product.nameAr : product.nameEn) || product.name;
+                                return (
+                                    <Link
+                                        key={product.id}
+                                        href={`/products/${product.slug}`}
+                                        onClick={onClose}
+                                        className="flex items-center gap-3 rounded-[7px] p-2 transition-colors hover:bg-[var(--color-brand-soft)] dark:hover:bg-white/10"
+                                    >
+                                        <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center overflow-hidden rounded-[5px] bg-[#f4f4ef] dark:bg-white/10">
+                                            <ResilientImage src={imageFromJson(product.images)} alt="" className="h-full w-full object-contain" loading="lazy" />
+                                        </span>
+                                        <span className="min-w-0 flex-1">
+                                            <span className="line-clamp-2 text-[12px] font-semibold leading-snug text-[var(--color-ink)] dark:text-white">{name}</span>
+                                            {product.price != null && (
+                                                <span className="mt-1 block text-[12px] font-bold text-[var(--color-accent)]">
+                                                    <PriceText amount={product.discountPrice || product.price} />
+                                                </span>
+                                            )}
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <ul className="space-y-1">
+                            {data.topProducts.slice(0, 5).map((product) => (
+                                <li key={product.id}>
+                                    <Link href={`/products/${product.slug}`} onClick={onClose} className="block rounded-[6px] px-2 py-2 text-[13px] text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10">
+                                        {product.name}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
             </div>
         </div>

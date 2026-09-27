@@ -8,7 +8,7 @@ import CategorySelector from "@/app/components/ProductsPageComponents/CategorySe
 import EditorialProductCard from "@/app/components/ProductsPageComponents/EditorialProductCard";
 import CustomSortDropdown from "@/app/components/ProductsPageComponents/CustomSortDropdown";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdSearchOff } from "react-icons/md";
+import { SearchX as MdSearchOff } from 'lucide-react';
 
 interface Category {
     id: string;

@@ -10,7 +10,7 @@ import 'swiper/css/free-mode';
 import 'swiper/css/thumbs';
 import ResilientImage from '../ResilientImage';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MdClose } from 'react-icons/md';
+import { X as MdClose } from 'lucide-react';
 
 interface ProductGalleryProps {
     images: any;
@@ -77,7 +77,7 @@ const ProductGallery = ({ images, isTrending }: ProductGalleryProps) => {
     return (
         <div className="flex flex-col gap-4 self-start h-fit w-full">
             {/* Main Image Slider */}
-            <div className="relative w-full aspect-square max-w-[882px] mx-auto overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 cursor-zoom-in">
+            <div className="relative w-full aspect-square max-w-[720px] mx-auto overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 cursor-zoom-in">
                 <Swiper
                     spaceBetween={10}
                     thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
@@ -112,7 +112,7 @@ const ProductGallery = ({ images, isTrending }: ProductGalleryProps) => {
                 {/* Trending Badge */}
                 {isTrending && (
                     <div className="absolute top-4 right-4 z-20 pointer-events-none">
-                        <span className="inline-block bg-[#2E7D32] text-white px-2.5 py-1 rounded text-[10px] font-bold tracking-wider uppercase leading-tight">
+                        <span className="inline-block bg-[var(--color-brand-hover)] text-white px-2.5 py-1 rounded text-[10px] font-bold tracking-wider uppercase leading-tight">
                             Trending
                         </span>
                     </div>
@@ -121,7 +121,7 @@ const ProductGallery = ({ images, isTrending }: ProductGalleryProps) => {
 
             {/* Thumbnails */}
             {allImages.length > 1 && (
-                <div className="w-full max-w-[882px] mx-auto">
+                <div className="w-full max-w-[720px] mx-auto">
                     <Swiper
                         onSwiper={setThumbsSwiper}
                         spaceBetween={12}
@@ -164,10 +164,10 @@ const ProductGallery = ({ images, isTrending }: ProductGalleryProps) => {
                     height: auto;
                 }
                 .thumbs-swiper .swiper-slide-thumb-active .relative {
-                    border-color: #B8860B !important;
+                    border-color: var(--color-accent) !important;
                 }
                 .dark .thumbs-swiper .swiper-slide-thumb-active .relative {
-                    border-color: #B8860B !important;
+                    border-color: var(--color-accent) !important;
                 }
             `}</style>
         </div>

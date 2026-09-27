@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useLanguage } from '@/app/context/LanguageContext';
-import { MdLocalShipping } from 'react-icons/md';
+import { Truck as MdLocalShipping } from 'lucide-react';
 
 const AnnouncementBar = () => {
     const { t } = useLanguage();

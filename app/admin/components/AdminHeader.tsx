@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdMenu, MdLanguage, MdOpenInNew } from "react-icons/md";
+import { Menu as MdMenu, Languages as MdLanguage, ExternalLink as MdOpenInNew } from 'lucide-react';
 
 interface AdminHeaderProps {
     title: string;
@@ -14,7 +14,7 @@ export default function AdminHeader({ title, onMenuClick }: AdminHeaderProps) {
     const isArabic = language === 'ar';
 
     return (
-        <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-3.5 bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-white/10 shadow-2xs">
+        <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-3.5 bg-white/90 dark:bg-[var(--color-surface-dark)]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-white/10 shadow-2xs">
             <div className="flex items-center gap-4">
                 {/* Mobile Menu Button */}
                 <button
@@ -36,7 +36,7 @@ export default function AdminHeader({ title, onMenuClick }: AdminHeaderProps) {
                 <Link
                     href="/"
                     target="_blank"
-                    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#072835] dark:text-[#E5B54A] hover:bg-[#FAF6EC] dark:hover:bg-white/5 rounded-xl border border-slate-200/80 dark:border-white/10 transition-all hover:border-[#B8860B]/40"
+                    className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[var(--color-brand)] dark:text-[var(--color-accent-light)] hover:bg-[var(--color-canvas)] dark:hover:bg-white/5 rounded-xl border border-slate-200/80 dark:border-white/10 transition-all hover:border-[var(--color-accent)]/40"
                     title={isArabic ? "زيارة المتجر المباشر" : "Visit Live Storefront"}
                 >
                     <MdOpenInNew className="text-[14px]" />
@@ -49,7 +49,7 @@ export default function AdminHeader({ title, onMenuClick }: AdminHeaderProps) {
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl border border-slate-200/80 dark:border-white/10 transition-all"
                     title={language === 'en' ? 'Switch to Arabic' : 'Switch to English'}
                 >
-                    <MdLanguage className="text-[15px] text-[#B8860B]" />
+                    <MdLanguage className="text-[15px] text-[var(--color-accent)]" />
                     <span>{language === 'en' ? 'العربية' : 'English'}</span>
                 </button>
             </div>

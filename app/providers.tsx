@@ -5,23 +5,28 @@ import { CartProvider } from "./context/CartContext";
 import { LanguageProvider } from "./context/LanguageContext";
 import { CurrencyProvider } from "./context/CurrencyContext";
 import { Toaster } from "react-hot-toast";
-import { SessionProvider } from "next-auth/react";
 import CartDrawer from "./components/CartDrawer";
+import { PriceVisibilityProvider } from "./context/PriceVisibilityContext";
+import { WishlistProvider } from "./context/WishlistContext";
 
 export function Providers({ 
     children, 
     session, 
     initialExchangeRate = 135,
-    initialLanguage = 'ar'
+    initialLanguage = 'ar',
+    priceVisible = false
 }: { 
     children: React.ReactNode, 
     session?: any, 
     initialExchangeRate?: number,
-    initialLanguage?: 'en' | 'ar'
+    initialLanguage?: 'en' | 'ar',
+    priceVisible?: boolean
 }) {
-    const content = (
+    return (
         <LanguageProvider initialLanguage={initialLanguage}>
             <CurrencyProvider initialExchangeRate={initialExchangeRate}>
+                <PriceVisibilityProvider allowed={priceVisible}>
+                <WishlistProvider>
                 <CartProvider>
                     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
                         {children}
@@ -33,7 +38,7 @@ export function Providers({
                                 style: {
                                     background: 'var(--color-surface-light)',
                                     color: 'var(--color-text-main-light)',
-                                    border: '1px solid var(--color-background-dark)',
+                                    border: '1px solid var(--color-line)',
                                     padding: '16px',
                                     borderRadius: '12px',
                                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
@@ -42,11 +47,11 @@ export function Providers({
                                 },
                                 success: {
                                     iconTheme: {
-                                        primary: '#2E7D32',
+                                        primary: 'var(--color-brand-hover)',
                                         secondary: 'white',
                                     },
                                     style: {
-                                        border: '1px solid rgba(46, 125, 50, 0.2)',
+                                        border: '1px solid var(--color-line)',
                                     }
                                 },
                                 error: {
@@ -63,13 +68,10 @@ export function Providers({
                         />
                     </ThemeProvider>
                 </CartProvider>
+                </WishlistProvider>
+                </PriceVisibilityProvider>
             </CurrencyProvider>
         </LanguageProvider>
     );
 
-    if (session) {
-        return <SessionProvider session={session}>{content}</SessionProvider>;
-    }
-
-    return content;
 }

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/app/context/LanguageContext';
 import { useProductRail } from './useProductRail';
 
-import { MdRestaurant, MdSetMeal, MdAcUnit, MdLocalCafe, MdBakeryDining, MdFastfood } from 'react-icons/md';
+import { Utensils as MdRestaurant, Fish as MdSetMeal, Snowflake as MdAcUnit, Coffee as MdLocalCafe, Croissant as MdBakeryDining, Sandwich as MdFastfood } from 'lucide-react';
 
 const CATEGORIES = [
     {

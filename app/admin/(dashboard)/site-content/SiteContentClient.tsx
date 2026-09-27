@@ -1,21 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { 
-    MdImage, 
-    MdImageNotSupported, 
-    MdSchedule, 
-    MdLocalShipping, 
-    MdWarning, 
-    MdCleanHands, 
-    MdAssignmentReturn, 
-    MdVerified,
-    MdCurrencyExchange,
-    MdViewCarousel,
-    MdInfoOutline,
-    MdSave,
-    MdStorefront
-} from "react-icons/md";
+import { Image as MdImage, Truck as MdLocalShipping, ArrowLeftRight as MdCurrencyExchange, GalleryHorizontalEnd as MdViewCarousel, Info as MdInfoOutline, Save as MdSave, Store as MdStorefront } from 'lucide-react';
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import { updateSiteSettings } from "../../../../lib/admin-actions";
@@ -365,11 +351,11 @@ export default function SiteContentClient({
     ];
 
     return (
-        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 dark:bg-[#0b1120]">
+        <div className="flex-1 flex flex-col overflow-hidden bg-slate-50 dark:bg-[var(--color-background-dark)]">
             <AdminHeader title={t('admin.siteContent')} onMenuClick={openSidebar} />
 
             {/* Sub-Header & Sticky Action Bar */}
-            <div className="bg-white dark:bg-[#0f172a] border-b border-slate-200/80 dark:border-white/10 px-6 md:px-10 py-5 sticky top-0 z-20">
+            <div className="bg-white dark:bg-[var(--color-surface-dark)] border-b border-slate-200/80 dark:border-white/10 px-6 md:px-10 py-5 sticky top-0 z-20">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -383,7 +369,7 @@ export default function SiteContentClient({
                     <button
                         onClick={() => handleSaveAll()}
                         disabled={isSubmitting}
-                        className="bg-[#072835] hover:bg-[#0c4054] text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed self-start md:self-auto"
+                        className="bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed self-start md:self-auto"
                     >
                         {isSubmitting ? (
                             <>
@@ -409,11 +395,11 @@ export default function SiteContentClient({
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all whitespace-nowrap ${
                                     isActive
-                                        ? 'bg-[#072835] text-white shadow-xs'
+                                        ? 'bg-[var(--color-brand)] text-white shadow-xs'
                                         : 'bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800'
                                 }`}
                             >
-                                <span className={isActive ? 'text-[#E5B54A]' : 'text-slate-400'}>{tab.icon}</span>
+                                <span className={isActive ? 'text-[var(--color-accent-light)]' : 'text-slate-400'}>{tab.icon}</span>
                                 <span>{tab.label}</span>
                             </button>
                         );
@@ -426,9 +412,9 @@ export default function SiteContentClient({
                 <div className="max-w-6xl mx-auto pb-12">
                     {/* TAB 1: CURRENCY & EXCHANGE RATES */}
                     {activeTab === "currency" && (
-                        <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs animate-in fade-in-50 duration-200">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs animate-in fade-in-50 duration-200">
                             <div className="mb-6 flex items-start gap-4">
-                                <div className="p-3 bg-amber-50 dark:bg-amber-950/40 text-[#B8860B] dark:text-[#E5B54A] rounded-xl">
+                                <div className="p-3 bg-amber-50 dark:bg-amber-950/40 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] rounded-xl">
                                     <MdCurrencyExchange className="text-2xl" />
                                 </div>
                                 <div>
@@ -452,7 +438,7 @@ export default function SiteContentClient({
                                         min="0"
                                         value={exchangeRate}
                                         onChange={(e) => setExchangeRate(parseFloat(e.target.value) || 0)}
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 border border-slate-200/80 dark:border-white/10 rounded-xl text-lg font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[#072835] outline-none transition-all"
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 border border-slate-200/80 dark:border-white/10 rounded-xl text-lg font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[var(--color-brand)] outline-none transition-all"
                                         placeholder="135"
                                         required
                                     />
@@ -483,7 +469,7 @@ export default function SiteContentClient({
                     {activeTab === "banners" && (
                         <div className="space-y-8 animate-in fade-in-50 duration-200">
                             {/* Categories CTA Banner */}
-                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
                                 <div className="mb-6">
                                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                         {t('admin.categoriesCtaBanner') || "Categories CTA Banner"}
@@ -503,7 +489,7 @@ export default function SiteContentClient({
                                                 type="text"
                                                 value={ctaImage}
                                                 onChange={(e) => setCtaImage(e.target.value)}
-                                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#072835] outline-none text-sm"
+                                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-[var(--color-brand)] outline-none text-sm"
                                                 placeholder="https://images.unsplash.com/..."
                                             />
                                             <div className="w-28 h-16 rounded-xl border border-slate-200/80 dark:border-white/10 overflow-hidden bg-slate-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
@@ -545,7 +531,7 @@ export default function SiteContentClient({
                             </div>
 
                             {/* Middle Banner 1 */}
-                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
                                 <div className="mb-6">
                                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                         {t('admin.middleBanner1') || "Middle Banner 1 (After Trending)"}
@@ -568,7 +554,7 @@ export default function SiteContentClient({
                             </div>
 
                             {/* Middle Banner 2 */}
-                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
                                 <div className="mb-6">
                                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                         {t('admin.middleBanner2') || "Middle Banner 2 (After Featured Collection)"}
@@ -613,7 +599,7 @@ export default function SiteContentClient({
                     {activeTab === "shipping" && (
                         <div className="space-y-8 animate-in fade-in-50 duration-200">
                             {/* Shipping & Delivery Timelines */}
-                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
                                 <div className="mb-6">
                                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                         {t('admin.shippingSection') || "Shipping & Delivery Policy"}
@@ -664,7 +650,7 @@ export default function SiteContentClient({
                             </div>
 
                             {/* Returns Policy */}
-                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
                                 <div className="mb-6">
                                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                         {t('admin.returnsSection') || "Quality & Claims Policy"}
@@ -707,7 +693,7 @@ export default function SiteContentClient({
                     {activeTab === "about" && (
                         <div className="space-y-8 animate-in fade-in-50 duration-200">
                             {/* Hero Header */}
-                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
                                 <div className="mb-6">
                                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                         {t('admin.aboutHero') || "About Us Hero Header"}
@@ -739,7 +725,7 @@ export default function SiteContentClient({
                             </div>
 
                             {/* Narrative */}
-                            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
                                 <div className="mb-6">
                                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                                         {t('admin.aboutNarrative') || "Company Story & Narrative"}

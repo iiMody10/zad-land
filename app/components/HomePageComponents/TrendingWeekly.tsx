@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { MdChevronRight } from 'react-icons/md';
+import { ChevronRight as MdChevronRight } from 'lucide-react';
 import { useLanguage } from '@/app/context/LanguageContext';
-import { useCurrency } from '@/app/context/CurrencyContext';
+import PriceText from '@/app/components/PriceText';
 import ResilientImage from '@/app/components/ResilientImage';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,7 +15,7 @@ interface Product {
     nameAr?: string | null;
     nameEn?: string | null;
     description: string | null;
-    price: number;
+    price: number | null;
     discountPrice?: number | null;
     images: string;
     categoryId: string;
@@ -34,10 +34,9 @@ interface TrendingWeeklyProps {
 }
 
 const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
-    const { dir, language } = useLanguage();
+    const { dir } = useLanguage();
     const isArabic = dir === 'rtl';
     const [showAll, setShowAll] = useState(false);
-    const { formatPrice } = useCurrency();
 
     if (!products || products.length === 0) {
         return null;
@@ -66,27 +65,37 @@ const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
     };
 
     return (
-        <section className="container-custom">
-            {/* Header */}
-            <div 
-                className={`flex items-center justify-between mb-6 md:mb-8 px-1 gap-2 ${isArabic ? 'flex-row' : 'flex-row'}`}
-            >
-                <div>
-                    <span className="text-[11px] font-bold uppercase tracking-widest text-[#B8860B] dark:text-[#E5B54A] block mb-1">
-                        {isArabic ? 'الأكثر طلباً هذا الأسبوع' : 'High Volume Demand'}
-                    </span>
-                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#072835] dark:text-white leading-tight">
+        <section className="container-custom" dir={dir}>
+            <div className="mb-6 px-2">
+                <div className="mb-3 flex items-center justify-center gap-3 text-[var(--color-accent)] sm:gap-4 md:mb-5 md:gap-6">
+                    <div className="h-[1.5px] max-w-[36px] flex-1 bg-gradient-to-r from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
+                    <svg className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2C11.5 4 10.5 6 9 7.5C10.5 9 11.5 11 12 13C12.5 11 13.5 9 15 7.5C13.5 6 12.5 4 12 2Z" opacity="0.9" />
+                        <path d="M7 6C6.5 8 5.5 10 4 11.5C5.5 13 6.5 15 7 17C7.5 15 8.5 13 10 11.5C8.5 10 7.5 8 7 6Z" />
+                        <path d="M17 6C16.5 8 15.5 10 14 11.5C15.5 13 16.5 15 17 17C17.5 15 18.5 13 20 11.5C18.5 10 17.5 8 17 6Z" />
+                        <path d="M12 11V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    <h2 id="trending-weekly-title" className="whitespace-nowrap px-1 text-base font-extrabold tracking-tight text-[var(--color-brand)] sm:text-2xl md:text-[28px] dark:text-white">
                         {isArabic ? 'تريندات هذا الأسبوع' : 'Trending This Week'}
                     </h2>
+                    <svg className="h-4 w-4 shrink-0 scale-x-[-1] sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2C11.5 4 10.5 6 9 7.5C10.5 9 11.5 11 12 13C12.5 11 13.5 9 15 7.5C13.5 6 12.5 4 12 2Z" opacity="0.9" />
+                        <path d="M7 6C6.5 8 5.5 10 4 11.5C5.5 13 6.5 15 7 17C7.5 15 8.5 13 10 11.5C8.5 10 7.5 8 7 6Z" />
+                        <path d="M17 6C16.5 8 15.5 10 14 11.5C15.5 13 16.5 15 17 17C17.5 15 18.5 13 20 11.5C18.5 10 17.5 8 17 6Z" />
+                        <path d="M12 11V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                    <div className="h-[1.5px] max-w-[36px] flex-1 bg-gradient-to-l from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
                 </div>
 
-                <Link
-                    href="/products"
-                    className="flex items-center gap-1 text-xs sm:text-sm font-bold text-[#072835] dark:text-[#E5B54A] hover:text-[#B8860B] transition-colors whitespace-nowrap"
-                >
-                    <span>{isArabic ? 'تسوق كل المنتجات' : 'View All'}</span>
-                    <MdChevronRight className={`text-lg transition-transform ${isArabic ? 'rotate-180' : ''}`} />
-                </Link>
+                <div className="flex items-center justify-center text-center">
+                    <Link
+                        href="/products"
+                        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--color-accent)]/25 bg-[var(--color-canvas)] px-3 py-1 text-xs font-bold text-[var(--color-brand)] transition-colors hover:border-[var(--color-accent)]/60 hover:text-[var(--color-accent)] dark:bg-white/5 dark:text-[var(--color-accent-light)]"
+                    >
+                        <span>{isArabic ? 'تسوق كل المنتجات' : 'View All'}</span>
+                        <MdChevronRight className={`text-base transition-transform ${isArabic ? 'rotate-180' : ''}`} />
+                    </Link>
+                </div>
             </div>
 
             {/* Product Grid */}
@@ -100,7 +109,7 @@ const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 10 }}
                                 transition={{ duration: 0.25 }}
-                                className="group flex items-center gap-3 sm:gap-4 bg-[#FAF9F5] dark:bg-[#1E1E16] border border-[#B8860B]/15 hover:border-[#B8860B]/50 rounded-2xl p-3 sm:p-4 h-[112px] transition-all duration-300 shadow-2xs hover:shadow-xs"
+                                className="group flex items-center gap-3 sm:gap-4 bg-[var(--color-canvas)] dark:bg-[var(--color-surface-dark)] border border-[var(--color-accent)]/15 hover:border-[var(--color-accent)]/50 rounded-2xl p-3 sm:p-4 h-[112px] transition-all duration-300 shadow-2xs hover:shadow-xs"
                             >
                                 {/* Product Image */}
                                 <Link
@@ -120,15 +129,15 @@ const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
                                 <div className={`flex-1 min-w-0 ${isArabic ? 'text-right' : 'text-left'}`}>
                                     {/* Brand */}
                                     {product.brand && (
-                                        <p className="text-[10px] sm:text-[11px] font-bold text-[#B8860B] dark:text-[#E5B54A] mb-0.5 truncate uppercase tracking-wider">
+                                        <p className="text-[10px] sm:text-[11px] font-bold text-[var(--color-accent)] dark:text-[var(--color-accent-light)] mb-0.5 truncate uppercase tracking-wider">
                                             {getBrandName(product.brand.name)}
                                         </p>
                                     )}
                                     {/* Product Name */}
-                                    <h3 className="text-xs sm:text-sm font-bold text-[#072835] dark:text-white truncate leading-snug mb-1">
+                                    <h3 className="text-xs sm:text-sm font-bold text-[var(--color-brand)] dark:text-white truncate leading-snug mb-1">
                                         <Link
                                             href={`/products/${product.slug}`}
-                                            className="hover:text-[#B8860B] transition-colors"
+                                            className="hover:text-[var(--color-accent)] transition-colors"
                                         >
                                             {isArabic ? (product.nameAr || product.name) : (product.nameEn || product.name)}
                                         </Link>
@@ -137,16 +146,16 @@ const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
                                     <div className="flex items-center gap-2">
                                         {product.discountPrice ? (
                                             <>
-                                                <span className="text-xs sm:text-sm md:text-base font-extrabold text-[#2E7D32] dark:text-[#4ade80]">
-                                                    {formatPrice(Number(product.discountPrice))}
+                                                <span className="text-xs sm:text-sm md:text-base font-extrabold text-[var(--color-brand-hover)] dark:text-[var(--color-brand-light)]">
+                                                    <PriceText amount={product.discountPrice} />
                                                 </span>
                                                 <span className="text-[11px] text-gray-400 line-through">
-                                                    {formatPrice(Number(product.price))}
+                                                    <PriceText amount={product.price} />
                                                 </span>
                                             </>
                                         ) : (
-                                            <span className="text-xs sm:text-sm md:text-base font-extrabold text-[#072835] dark:text-white">
-                                                {formatPrice(Number(product.price))}
+                                            <span className="text-xs sm:text-sm md:text-base font-extrabold text-[var(--color-brand)] dark:text-white">
+                                                <PriceText amount={product.price} />
                                             </span>
                                         )}
                                     </div>
@@ -156,7 +165,7 @@ const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
                                 <Link
                                     href={`/products/${product.slug}`}
                                     aria-label={isArabic ? `عرض تفاصيل ${product.nameAr || product.name}` : `View details for ${product.nameEn || product.name}`}
-                                    className="shrink-0 w-8 h-8 rounded-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all group-hover:bg-[#B8860B] group-hover:border-[#B8860B] group-hover:text-white shadow-2xs"
+                                    className="shrink-0 w-8 h-8 rounded-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 transition-all group-hover:bg-[var(--color-accent)] group-hover:border-[var(--color-accent)] group-hover:text-white shadow-2xs"
                                 >
                                     <svg className={`w-3.5 h-3.5 ${isArabic ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M7.5 3.75L13.75 10L7.5 16.25" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -173,7 +182,7 @@ const TrendingWeekly = ({ products }: TrendingWeeklyProps) => {
                 <div className="flex justify-center mt-6">
                     <button
                         onClick={() => setShowAll(!showAll)}
-                        className="px-8 py-2.5 bg-[#072835] hover:bg-[#0c4054] text-white rounded-full font-bold text-xs sm:text-sm transition-all active:scale-95 shadow-xs cursor-pointer"
+                        className="px-8 py-2.5 bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white rounded-full font-bold text-xs sm:text-sm transition-all active:scale-95 shadow-xs cursor-pointer"
                     >
                         {showAll
                             ? (isArabic ? 'عرض أقل' : 'Show Less')

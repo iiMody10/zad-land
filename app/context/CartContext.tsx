@@ -11,10 +11,16 @@ export interface CartItem {
     slug: string;
     description?: string;
     selectedOption?: string;
+    minOrder?: number;
+    /** Maximum total quantity available across all options for this product. */
+    stock?: number;
+    packaging?: string | null;
+    itemsPerPackage?: string | null;
 }
 
 interface CartContextType {
     items: CartItem[];
+    isHydrated: boolean;
     addItem: (item: CartItem) => void;
     removeItem: (id: string, selectedOption?: string) => void;
     updateQuantity: (id: string, quantity: number, selectedOption?: string) => void;
@@ -40,15 +46,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     // Load from local storage on mount
     useEffect(() => {
-        const savedCart = localStorage.getItem('cart');
-        if (savedCart) {
-            try {
-                setItems(JSON.parse(savedCart));
-            } catch (error) {
-                console.error("Failed to parse cart from local storage", error);
+        let cancelled = false;
+        queueMicrotask(() => {
+            if (cancelled) return;
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                try {
+                    setItems(JSON.parse(savedCart));
+                } catch (error) {
+                    console.error("Failed to parse cart from local storage", error);
+                }
             }
-        }
-        setIsLoaded(true);
+            setIsLoaded(true);
+        });
+        return () => { cancelled = true; };
     }, []);
 
     // Save to local storage on change
@@ -59,17 +70,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }, [items, isLoaded]);
 
     const addItem = (newItem: CartItem) => {
+        const minOrder = Math.max(1, newItem.minOrder || 1);
+        const normalizedItem = { ...newItem, quantity: Math.max(minOrder, newItem.quantity) };
         setItems(prev => {
-            const targetKey = getItemKey(newItem);
+            const productQuantity = prev.reduce((sum, item) => item.id === normalizedItem.id ? sum + item.quantity : sum, 0);
+            const stock = normalizedItem.stock ?? prev.find(item => item.id === normalizedItem.id)?.stock;
+            const remaining = stock === undefined ? Number.POSITIVE_INFINITY : Math.max(0, stock - productQuantity);
+            if (remaining < minOrder) return prev;
+            const quantityToAdd = Math.min(normalizedItem.quantity, remaining);
+            if (quantityToAdd < minOrder) return prev;
+            const targetKey = getItemKey(normalizedItem);
             const existing = prev.find(item => getItemKey(item) === targetKey);
             if (existing) {
                 return prev.map(item =>
                     getItemKey(item) === targetKey
-                        ? { ...item, quantity: item.quantity + newItem.quantity }
+                        ? { ...item, ...normalizedItem, quantity: item.quantity + quantityToAdd }
                         : item
                 );
             }
-            return [...prev, newItem];
+            return [...prev, { ...normalizedItem, quantity: quantityToAdd }];
         });
     };
 
@@ -86,12 +105,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const updateQuantity = (id: string, quantity: number, selectedOption?: string) => {
         if (quantity < 1) return;
         const targetKey = `${id}:${selectedOption || ''}`;
-        setItems(prev => prev.map(item => {
-            if (selectedOption !== undefined) {
-                return getItemKey(item) === targetKey ? { ...item, quantity } : item;
-            }
-            return item.id === id ? { ...item, quantity } : item;
-        }));
+        setItems(prev => {
+            const targetItems = prev.filter(item => selectedOption !== undefined
+                ? getItemKey(item) === targetKey
+                : item.id === id);
+            if (!targetItems.length) return prev;
+            const item = targetItems[0];
+            const stock = item.stock ?? prev.find(candidate => candidate.id === id && candidate.stock !== undefined)?.stock;
+            const otherQuantity = prev.reduce((sum, candidate) =>
+                candidate.id === id && !targetItems.includes(candidate) ? sum + candidate.quantity : sum, 0);
+            const maxForTarget = stock === undefined ? Number.POSITIVE_INFINITY : Math.max(0, stock - otherQuantity);
+            const nextQuantity = Math.min(Math.max(item.minOrder || 1, quantity), maxForTarget);
+            if (nextQuantity < (item.minOrder || 1)) return prev;
+            return prev.map(candidate => targetItems.includes(candidate)
+                ? { ...candidate, quantity: nextQuantity }
+                : candidate);
+        });
     };
 
     const clearCart = () => {
@@ -106,7 +135,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     return (
-        <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, cartCount, totalItems: cartCount, subtotal, isDrawerOpen, openDrawer, closeDrawer, toggleDrawer }}>
+        <CartContext.Provider value={{ items, isHydrated: isLoaded, addItem, removeItem, updateQuantity, clearCart, cartCount, totalItems: cartCount, subtotal, isDrawerOpen, openDrawer, closeDrawer, toggleDrawer }}>
             {children}
         </CartContext.Provider>
     );

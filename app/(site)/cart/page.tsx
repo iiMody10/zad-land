@@ -7,7 +7,11 @@ import CartItemsList from '@/app/components/CartPageComponents/CartItemsList';
 import CartSummary from '@/app/components/CartPageComponents/CartSummary';
 
 const CartPage = () => {
-    const { items, removeItem, updateQuantity, subtotal, cartCount } = useCart();
+    const { items, removeItem, updateQuantity, subtotal, cartCount, isHydrated } = useCart();
+
+    if (!isHydrated) {
+        return <main className="container-custom min-h-[55vh] py-8" aria-busy="true"><div className="h-10 w-48 animate-pulse rounded-lg bg-slate-100 dark:bg-white/10" /></main>;
+    }
 
     if (items.length === 0) {
         return <EmptyCart />;

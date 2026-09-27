@@ -1,15 +1,14 @@
-import React, { Suspense, cache } from "react";
+import { cache } from "react";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import ProductsClient from "../../products/ProductsClient";
-import { getCatalogInitialData } from "@/lib/catalog";
+import { laravelJson } from "@/lib/laravel-server";
+import CatalogClient from "../../products/CatalogClient";
+import { getCatalogBrands, getCatalogCategories, getCatalogInitialData } from "@/lib/catalog";
 
-export const revalidate = 3600; // Cache for 1 hour
+export const revalidate = 60;
 
 const getDepartment = cache(async (slug: string) => {
-    return prisma.mainCategory.findUnique({
-        where: { slug },
-    });
+    const departments = await laravelJson<Array<Record<string, any>>>("/api/main-categories", [], { forwardSession: false });
+    return departments.find((department) => department.slug === slug) || null;
 });
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
@@ -51,44 +50,46 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
     };
 }
 
-export default async function DepartmentPage(props: { params: Promise<{ slug: string }> }) {
-    const params = await props.params;
-    
-    // 1. Fetch the main category (department)
+export default async function DepartmentPage(props: {
+    params: Promise<{ slug: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+    const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
     const department = await getDepartment(params.slug);
 
     if (!department || !department.isActive) {
         notFound();
     }
 
-    // 2. Fetch the catalog data specifically for this department
-    const { categories, products, totalProducts } = await getCatalogInitialData(
-        undefined,
-        undefined,
-        department.id
-    );
+    const { categories, products, totalProducts } = await getCatalogInitialData(undefined, undefined, department.id, 32);
+    const [brands, subcategories] = await Promise.all([
+        getCatalogBrands(),
+        getCatalogCategories(),
+    ]);
+    const mainCategories = categories.some((category) => category.id === department.id)
+        ? categories
+        : [...categories, { id: department.id, name: department.name, slug: department.slug, description: department.description, image: department.image }];
+    const initialQuery = new URLSearchParams();
+    for (const [key, value] of Object.entries(searchParams)) {
+        if (typeof value === "string" && key !== "department" && key !== "mainCategoryId") initialQuery.set(key, value);
+    }
 
     return (
-        <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
-            {/* 
-                We can reuse ProductsClient. We pass the mainCategoryId so that 
-                pagination/Load More requests append ?mainCategoryId=... to the API url.
-            */}
-            <ProductsClient
-                key={`department-${department.id}`}
-                initialCategories={categories}
-                initialProducts={products}
-                initialTotal={totalProducts}
-                activeCategory={null}
-                activeBrand={null}
-                activeMainCategory={{
-                    id: department.id,
-                    name: department.name,
-                    slug: department.slug,
-                    description: department.description,
-                    image: department.image,
-                }}
-            />
-        </Suspense>
+        <CatalogClient
+            key={`${department.id}-${initialQuery.toString()}`}
+            activeDepartment={{
+                id: department.id,
+                name: department.name,
+                slug: department.slug,
+                description: department.description,
+                image: department.image,
+            }}
+            initialCategories={mainCategories}
+            initialSubcategories={subcategories.map(({ id, name, slug, description, brandId, mainCategoryId }) => ({ id, name, slug, description, brandId, mainCategoryId }))}
+            initialBrands={brands.map(({ id, name, slug, mainCategory }) => ({ id, name, slug, mainCategoryId: mainCategory?.id || null }))}
+            initialProducts={products}
+            initialTotal={totalProducts}
+            initialQuery={initialQuery.toString()}
+        />
     );
 }

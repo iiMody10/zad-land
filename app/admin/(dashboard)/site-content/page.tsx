@@ -1,13 +1,12 @@
 import { getAdminCategories, getSiteSettings } from "../../../../lib/admin-actions";
 import SiteContentClient from "./SiteContentClient";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { getLaravelAdmin } from "@/lib/laravel-server";
 import { redirect } from "next/navigation";
 
 export default async function SiteContentPage() {
-    const session = await getServerSession(authOptions);
+    const session = await getLaravelAdmin();
 
-    if (!session || session.user.role !== 'SUPER_ADMIN') {
+    if (!session || session.role !== 'SUPER_ADMIN') {
         redirect('/admin/dashboard');
     }
 

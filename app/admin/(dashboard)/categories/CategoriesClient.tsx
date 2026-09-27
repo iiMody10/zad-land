@@ -3,29 +3,12 @@
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import { useState, useMemo } from "react";
-import { 
-    MdDelete, 
-    MdCheckBox, 
-    MdCheckBoxOutlineBlank, 
-    MdSearch, 
-    MdAdd, 
-    MdCheck, 
-    MdImage, 
-    MdStar, 
-    MdStarBorder, 
-    MdEdit,
-    MdSearchOff,
-    MdSync,
-    MdVisibility,
-    MdShoppingBag,
-    MdStorefront,
-    MdCategory
-} from "react-icons/md";
+import { Trash2 as MdDelete, SquareCheck as MdCheckBox, Square as MdCheckBoxOutlineBlank, Search as MdSearch, Plus as MdAdd, Check as MdCheck, Image as MdImage, Star as MdStar, Star as MdStarBorder, Pencil as MdEdit, RefreshCw as MdSync, Eye as MdVisibility, ShoppingBag as MdShoppingBag, Store as MdStorefront, Shapes as MdCategory } from 'lucide-react';
 import CategoryModal from "./CategoryModal";
 import { deleteCategory, toggleCategoryFeatured, bulkDeleteCategories } from "../../../../lib/admin-actions";
 import RelatedItemsModal from "../components/RelatedItemsModal";
 import { toast } from "react-hot-toast";
-import { useSession } from "next-auth/react";
+import { useAdminSession } from "../../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
 
 interface Category {
@@ -56,7 +39,7 @@ interface Brand {
 }
 
 export default function CategoriesClient({ categories: initialCategories, brands }: { categories: Category[], brands: Brand[] }) {
-    const { data: session } = useSession() || {};
+    const { data: session } = useAdminSession();
     const { t, dir, language } = useLanguage();
     const isArabic = language === 'ar';
     const canManage = session?.user?.role === 'SUPER_ADMIN' || session?.user?.canManageCategories;
@@ -211,7 +194,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
     };
 
     return (
-        <div className="flex-1 flex flex-col overflow-hidden bg-[#F8F9FA] dark:bg-[#0B0F14]">
+        <div className="flex-1 flex flex-col overflow-hidden bg-[var(--color-canvas)] dark:bg-[var(--color-background-dark)]">
             <AdminHeader title={t('admin.categories')} onMenuClick={openSidebar} />
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
@@ -220,12 +203,12 @@ export default function CategoriesClient({ categories: initialCategories, brands
                     <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <span className="h-2.5 w-2.5 rounded-full bg-[#B8860B]" />
-                                <span className="text-xs font-bold uppercase tracking-wider text-[#B8860B] dark:text-[#E5B54A]">
+                                <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-accent)]" />
+                                <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-accent)] dark:text-[var(--color-accent-light)]">
                                     {isArabic ? 'إدارة فئات الماركات والمنتجات' : 'Brand Subcategories & Lines'}
                                 </span>
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#072835] dark:text-white tracking-tight">
+                            <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-brand)] dark:text-white tracking-tight">
                                 {t('admin.productCategories')}
                             </h1>
                             <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-gray-400">
@@ -242,7 +225,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
                                 <input
                                     type="text"
                                     placeholder={isArabic ? 'بحث بالفئة أو الماركة...' : 'Search categories...'}
-                                    className="h-11 w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-900 ps-9 pe-4 text-sm text-[#072835] dark:text-white outline-none focus:border-[#B8860B] focus:ring-2 focus:ring-[#B8860B]/20 shadow-2xs"
+                                    className="h-11 w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-900 ps-9 pe-4 text-sm text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 shadow-2xs"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
@@ -252,7 +235,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
                             <select
                                 value={selectedBrand}
                                 onChange={(e) => setSelectedBrand(e.target.value)}
-                                className="h-11 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-900 px-3.5 text-xs sm:text-sm font-semibold text-[#072835] dark:text-white outline-none focus:border-[#B8860B] shadow-2xs cursor-pointer"
+                                className="h-11 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-900 px-3.5 text-xs sm:text-sm font-semibold text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] shadow-2xs cursor-pointer"
                             >
                                 <option value="ALL">{isArabic ? 'كافة الماركات' : 'All Brands'}</option>
                                 {brands.map((brand) => (
@@ -263,7 +246,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
                             {canManage && (
                                 <button
                                     onClick={handleAdd}
-                                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#072835] hover:bg-[#0c4054] dark:bg-[#B8860B] dark:hover:bg-[#9a7009] px-5 text-sm font-bold text-white transition-all shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
+                                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] dark:bg-[var(--color-accent)] dark:hover:bg-[var(--color-accent-hover)] px-5 text-sm font-bold text-white transition-all shadow-sm active:scale-95 cursor-pointer whitespace-nowrap"
                                 >
                                     <MdAdd className="text-xl" />
                                     <span>{t('admin.addCategory')}</span>
@@ -279,8 +262,8 @@ export default function CategoriesClient({ categories: initialCategories, brands
                                 onClick={() => setFilterTab("ALL")}
                                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                                     filterTab === "ALL"
-                                        ? "bg-[#072835] text-white dark:bg-white dark:text-[#072835] shadow-xs"
-                                        : "bg-white dark:bg-zinc-800 text-slate-600 dark:text-gray-300 border border-slate-200 dark:border-white/10 hover:border-[#B8860B]"
+                                        ? "bg-[var(--color-brand)] text-white dark:bg-white dark:text-[var(--color-brand)] shadow-xs"
+                                        : "bg-white dark:bg-zinc-800 text-slate-600 dark:text-gray-300 border border-slate-200 dark:border-white/10 hover:border-[var(--color-accent)]"
                                 }`}
                             >
                                 <span>{isArabic ? 'كافة الفئات الفرعية' : 'All Subcategories'}</span>
@@ -321,9 +304,9 @@ export default function CategoriesClient({ categories: initialCategories, brands
                             {filteredCategories.length > 0 && (
                                 <button
                                     onClick={toggleSelectAll}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-bold text-slate-700 dark:text-gray-300 hover:border-[#B8860B] transition-all cursor-pointer"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-bold text-slate-700 dark:text-gray-300 hover:border-[var(--color-accent)] transition-all cursor-pointer"
                                 >
-                                    {selectedIds.size === filteredCategories.length ? <MdCheckBox className="text-base text-[#072835] dark:text-[#B8860B]" /> : <MdCheckBoxOutlineBlank className="text-base" />}
+                                    {selectedIds.size === filteredCategories.length ? <MdCheckBox className="text-base text-[var(--color-brand)] dark:text-[var(--color-accent)]" /> : <MdCheckBoxOutlineBlank className="text-base" />}
                                     <span>{selectedIds.size === filteredCategories.length ? (isArabic ? 'إلغاء تحديد الكل' : 'Deselect All') : (isArabic ? 'تحديد الكل' : 'Select All')}</span>
                                 </button>
                             )}
@@ -357,7 +340,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
                                     key={category.id} 
                                     className={`relative group flex flex-col justify-between overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border transition-all duration-300 hover:shadow-md ${
                                         isSelected
-                                            ? "border-[#072835] ring-2 ring-[#072835]/30"
+                                            ? "border-[var(--color-brand)] ring-2 ring-[var(--color-brand)]/30"
                                             : category.isFeatured 
                                             ? "border-amber-400/60 dark:border-amber-500/30 ring-1 ring-amber-400/20" 
                                             : "border-slate-200/80 dark:border-white/10"
@@ -381,8 +364,8 @@ export default function CategoriesClient({ categories: initialCategories, brands
                                             onClick={() => toggleSelect(category.id)}
                                             className={`absolute top-2.5 start-2.5 size-7 rounded-lg border flex items-center justify-center transition-all cursor-pointer shadow-xs ${
                                                 isSelected 
-                                                    ? 'bg-[#072835] border-[#072835] text-white' 
-                                                    : 'bg-white/80 dark:bg-black/40 border-white/60 text-transparent hover:border-[#072835]'
+                                                    ? 'bg-[var(--color-brand)] border-[var(--color-brand)] text-white'
+                                                    : 'bg-white/80 dark:bg-black/40 border-white/60 text-transparent hover:border-[var(--color-brand)]'
                                             }`}
                                         >
                                             <MdCheck className="text-base" />
@@ -418,11 +401,11 @@ export default function CategoriesClient({ categories: initialCategories, brands
                                             {/* Name & Brand */}
                                             <div className="flex items-start justify-between gap-2 mb-1.5">
                                                 <div className="min-w-0">
-                                                    <h3 className="text-base sm:text-lg font-extrabold text-[#072835] dark:text-white truncate">
+                                                    <h3 className="text-base sm:text-lg font-extrabold text-[var(--color-brand)] dark:text-white truncate">
                                                         {category.name}
                                                     </h3>
                                                     {category.description && (
-                                                        <p className="text-xs font-semibold text-[#B8860B] dark:text-[#E5B54A] truncate">
+                                                        <p className="text-xs font-semibold text-[var(--color-accent)] dark:text-[var(--color-accent-light)] truncate">
                                                             {category.description}
                                                         </p>
                                                     )}
@@ -479,7 +462,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
                                                     href={`/categories/${category.slug}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 dark:text-gray-400 hover:text-[#B8860B] transition-colors"
+                                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 dark:text-gray-400 hover:text-[var(--color-accent)] transition-colors"
                                                 >
                                                     <MdVisibility className="text-sm" />
                                                     <span>{isArabic ? 'معاينة' : 'Preview'}</span>
@@ -492,7 +475,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
                                                     <button 
                                                         type="button"
                                                         onClick={() => handleEdit(category)} 
-                                                        className="rounded-lg p-1.5 text-slate-600 dark:text-gray-300 hover:bg-[#B8860B]/10 hover:text-[#B8860B] transition-colors cursor-pointer" 
+                                                        className="rounded-lg p-1.5 text-slate-600 dark:text-gray-300 hover:bg-[var(--color-accent)]/10 hover:text-[var(--color-accent)] transition-colors cursor-pointer"
                                                         title={isArabic ? 'تعديل' : 'Edit'}
                                                     >
                                                         <MdEdit className="text-lg" />
@@ -521,7 +504,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
                     {filteredCategories.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-16 text-center rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200/80 dark:border-white/10 mt-6">
                             <MdCategory className="text-5xl text-slate-300 dark:text-zinc-600 mb-2" />
-                            <h3 className="text-base font-bold text-[#072835] dark:text-white">
+                            <h3 className="text-base font-bold text-[var(--color-brand)] dark:text-white">
                                 {isArabic ? 'لا توجد فئات مطابقة للبحث' : 'No categories found'}
                             </h3>
                             <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">

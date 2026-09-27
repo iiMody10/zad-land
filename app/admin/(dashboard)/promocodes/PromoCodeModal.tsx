@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createPromoCode, updatePromoCode } from "../../../../lib/admin-actions";
 import { toast } from "react-hot-toast";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdClose, MdSync } from "react-icons/md";
+import { X as MdClose } from 'lucide-react';
 
 interface PromoCodeModalProps {
     isOpen: boolean;

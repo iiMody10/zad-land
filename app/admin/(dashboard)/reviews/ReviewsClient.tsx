@@ -1,7 +1,9 @@
 "use client";
 
+import { laravelClientFetch } from "@/lib/laravel-client";
+
 import { useState, useEffect } from "react";
-import { MdCheckCircle, MdCancel, MdDelete, MdStar, MdImage, MdChevronRight, MdSearch, MdExpandMore } from "react-icons/md";
+import { CircleCheck as MdCheckCircle, CircleX as MdCancel, Trash2 as MdDelete, Star as MdStar, Image as MdImage, ChevronRight as MdChevronRight, Search as MdSearch, ChevronDown as MdExpandMore } from 'lucide-react';
 import { toast } from "react-hot-toast";
 import { useLanguage } from "@/app/context/LanguageContext";
 import AdminHeader from "../../components/AdminHeader";
@@ -31,7 +33,7 @@ export default function ReviewsClient() {
     const fetchReviews = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch("/api/admin/reviews");
+            const res = await laravelClientFetch("/api/admin/reviews");
             if (res.ok) {
                 const data = await res.json();
                 setReviews(data);
@@ -52,7 +54,7 @@ export default function ReviewsClient() {
 
     const handleToggleApproval = async (id: string, currentStatus: boolean) => {
         try {
-            const res = await fetch(`/api/admin/reviews/${id}`, {
+            const res = await laravelClientFetch(`/api/admin/reviews/${id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ isApproved: !currentStatus }),
@@ -74,7 +76,7 @@ export default function ReviewsClient() {
         if (!confirm(t("admin.confirmDeleteReview"))) return;
 
         try {
-            const res = await fetch(`/api/admin/reviews/${id}`, {
+            const res = await laravelClientFetch(`/api/admin/reviews/${id}`, {
                 method: "DELETE",
             });
 
@@ -127,22 +129,22 @@ export default function ReviewsClient() {
 
                     {/* Stats Cards (2-cols on mobile, 3-cols on sm) */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-4">
-                        <div className="bg-white dark:bg-[#0f172a] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1">
                             <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider truncate">{t('admin.totalReviews') || "Total Reviews"}</p>
                             <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">{reviews.length}</p>
                         </div>
-                        <div className="bg-white dark:bg-[#0f172a] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1">
                             <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider truncate">{t('admin.pendingReviews') || "Pending"}</p>
                             <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-amber-500">{reviews.filter(r => !r.isApproved).length}</p>
                         </div>
-                        <div className="bg-white dark:bg-[#0f172a] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1 col-span-2 sm:col-span-1">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1 col-span-2 sm:col-span-1">
                             <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider truncate">{t('admin.approvedReviews') || "Approved"}</p>
-                            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[#2E7D32] dark:text-[#4ade80]">{reviews.filter(r => r.isApproved).length}</p>
+                            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[var(--color-brand-hover)] dark:text-[var(--color-brand-light)]">{reviews.filter(r => r.isApproved).length}</p>
                         </div>
                     </div>
 
                     {/* Filters & Table Container */}
-                    <div className="bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 rounded-2xl shadow-xs overflow-hidden">
+                    <div className="bg-white dark:bg-[var(--color-surface-dark)] border border-slate-200/80 dark:border-white/10 rounded-2xl shadow-xs overflow-hidden">
                         {/* Toolbar */}
                         <div className="p-5 border-b border-slate-200/80 dark:border-white/10 flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
                             <div className="relative w-full sm:w-80">
@@ -150,7 +152,7 @@ export default function ReviewsClient() {
                                     <MdSearch className="text-slate-400 text-[20px]" />
                                 </span>
                                 <input
-                                    className={`block w-full ${dir === 'rtl' ? 'pe-10 ps-3' : 'ps-10 pe-3'} py-2.5 border border-slate-200/80 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-gray-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-[#072835] focus:border-[#072835] transition-all outline-none`}
+                                    className={`block w-full ${dir === 'rtl' ? 'pe-10 ps-3' : 'ps-10 pe-3'} py-2.5 border border-slate-200/80 dark:border-white/10 rounded-xl bg-slate-50 dark:bg-gray-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 focus:ring-1 focus:ring-[var(--color-brand)] focus:border-[var(--color-brand)] transition-all outline-none`}
                                     placeholder={t('admin.searchPlaceholder') || "Search..."}
                                     type="text"
                                     value={searchQuery}
@@ -160,7 +162,7 @@ export default function ReviewsClient() {
                             
                             <div className="relative w-full sm:w-48">
                                 <select
-                                    className={`appearance-none w-full ${dir === 'rtl' ? 'pe-3 ps-10' : 'ps-3 pe-10'} py-2.5 bg-slate-50 dark:bg-gray-800 border border-slate-200/80 dark:border-white/10 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-1 focus:ring-[#072835] focus:border-[#072835] cursor-pointer outline-none`}
+                                    className={`appearance-none w-full ${dir === 'rtl' ? 'pe-3 ps-10' : 'ps-3 pe-10'} py-2.5 bg-slate-50 dark:bg-gray-800 border border-slate-200/80 dark:border-white/10 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:ring-1 focus:ring-[var(--color-brand)] focus:border-[var(--color-brand)] cursor-pointer outline-none`}
                                     value={statusFilter}
                                     onChange={(e) => setStatusFilter(e.target.value)}
                                 >
@@ -177,7 +179,7 @@ export default function ReviewsClient() {
                         <div className="overflow-x-auto">
                             {isLoading ? (
                                 <div className="flex items-center justify-center py-12">
-                                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#072835] border-t-transparent" />
+                                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--color-brand)] border-t-transparent" />
                                 </div>
                             ) : filteredReviews.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 text-center text-slate-400">

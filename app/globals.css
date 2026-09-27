@@ -11,24 +11,42 @@
 @variant ltr (&:where([dir="ltr"], [dir="ltr"] *));
 @variant rtl (&:where([dir="rtl"], [dir="rtl"] *));
 
+:root {
+  --site-header-sticky-offset: 173px;
+  --font-figtree: "Figtree";
+  --font-alexandria: "Alexandria";
+}
+
 @theme {
-  --color-primary: #B8860B;
+  /* Zad Land palette: deep green for structure, restrained gold for emphasis. */
+  --color-brand: #173b31;
+  --color-brand-hover: #245b43;
+  --color-brand-strong: #102c25;
+  --color-brand-soft: #eaf1ea;
+  --color-brand-light: #a9d7b1;
+  --color-accent: #93650a;
+  --color-accent-hover: #765108;
+  --color-accent-light: #e5b54a;
+  --color-canvas: #faf9f5;
+  --color-line: #dce4db;
+  --color-ink: #20352a;
+  --color-primary: var(--color-brand);
   --color-background-light: #ffffff;
-  --color-background-dark: #1A1A14;
+  --color-background-dark: #16231d;
   --color-surface-light: #ffffff;
-  --color-surface-dark: #2A2A1E;
-  --color-text-main-light: #1A1A14;
-  --color-text-main-dark: #F5F0E0;
-  --color-text-muted-light: #7A7A60;
-  --color-text-muted-dark: #C4B89A;
+  --color-surface-dark: #202c24;
+  --color-text-main-light: var(--color-ink);
+  --color-text-main-dark: #f3f5ef;
+  --color-text-muted-light: #64756a;
+  --color-text-muted-dark: #b8c8ba;
 
 
   /* Semantic Colors */
   --color-text-main: var(--text-main);
   --color-text-sub: var(--text-sub);
 
-  --font-display: var(--font-figtree), var(--font-noto-sans-arabic), sans-serif;
-  --font-sans: var(--font-figtree), var(--font-noto-sans-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-figtree), var(--font-alexandria), sans-serif;
+  --font-sans: var(--font-figtree), var(--font-alexandria), ui-sans-serif, system-ui, sans-serif;
 
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
@@ -49,6 +67,13 @@
 */
 @layer base {
 
+  /* Let Lucide icons follow the surrounding text size unless a width/height utility overrides it. */
+  .lucide {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+  }
+
   *,
   ::after,
   ::before,
@@ -60,13 +85,13 @@
 
 @layer base {
   :root {
-    --text-main: #1A1A14;
-    --text-sub: #7A7A60;
+    --text-main: var(--color-ink);
+    --text-sub: var(--color-text-muted-light);
   }
 
   .dark {
-    --text-main: #F5F0E0;
-    --text-sub: #C4B89A;
+    --text-main: var(--color-text-main-dark);
+    --text-sub: var(--color-text-muted-dark);
   }
 }
 
@@ -152,6 +177,24 @@
   .group:hover .group-hover-underline-animated:dir(rtl) {
     background-position: 100% 100%;
   }
+
+  /* Keep ordinary text links consistent while preserving button and card links. */
+  a:not([class*="bg-"]):not([class*="border-"]):not([class*="rounded-"]):not([class*="flex"]) {
+    transition: color 160ms ease, text-decoration-color 160ms ease;
+  }
+
+  a:not([class*="bg-"]):not([class*="border-"]):not([class*="rounded-"]):not([class*="flex"]):hover,
+  a:not([class*="bg-"]):not([class*="border-"]):not([class*="rounded-"]):not([class*="flex"]):focus-visible {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+    text-decoration-color: currentColor;
+    text-underline-offset: 3px;
+  }
+
+  .dark a:not([class*="bg-"]):not([class*="border-"]):not([class*="rounded-"]):not([class*="flex"]):hover,
+  .dark a:not([class*="bg-"]):not([class*="border-"]):not([class*="rounded-"]):not([class*="flex"]):focus-visible {
+    color: var(--color-accent-light);
+  }
 }
 
 @layer base {
@@ -219,16 +262,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--color-canvas);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d1d1;
+  background: var(--color-line);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #B8860B;
+  background: var(--color-accent);
 }
 
 /* Premium Curved Sliding Fill Hover Effect */
@@ -247,7 +290,7 @@
   left: -20%;
   width: 140%;
   height: 140%;
-  background-color: #B8860B;
+  background-color: var(--color-accent);
   border-radius: 50%;
   transform: translate(-105%, -50%);
   transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
@@ -256,7 +299,7 @@
 
 .btn-curved-fill:hover {
   color: #ffffff !important;
-  border-color: #B8860B !important;
+  border-color: var(--color-accent) !important;
 }
 
 .btn-curved-fill:hover::before {
@@ -296,15 +339,15 @@
 
 /* Dark Mode Compatibility */
 .dark .btn-curved-fill::before {
-  background-color: #B8860B !important;
+  background-color: var(--color-accent) !important;
 }
 .dark .btn-curved-fill:hover {
   color: #ffffff !important;
-  border-color: #B8860B !important;
+  border-color: var(--color-accent) !important;
 }
 
 .dark .btn-curved-fill:disabled {
-  background-color: #2A2A1E !important;
+  background-color: var(--color-surface-dark) !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: rgba(255, 255, 255, 0.3) !important;
   opacity: 0.4 !important;

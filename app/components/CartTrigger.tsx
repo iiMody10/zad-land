@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { MdShoppingBag } from 'react-icons/md';
+import { ShoppingBag as MdShoppingBag } from 'lucide-react';
 import CartBadge from './CartBadge';
 import { useCart } from '@/app/context/CartContext';
 

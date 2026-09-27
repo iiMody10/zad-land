@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MdClose, MdSearch, MdImage } from "react-icons/md";
+import { X as MdClose, Search as MdSearch, Image as MdImage } from 'lucide-react';
 import { getRelatedProducts, getRelatedCategories, getRelatedBrands } from "../actions/related";
 import { useLanguage } from "@/app/context/LanguageContext";
 

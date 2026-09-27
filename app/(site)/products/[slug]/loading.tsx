@@ -43,10 +43,10 @@ export default function ProductLoadingSkeleton() {
                         <div className="w-2/3 h-7 sm:h-8 bg-gray-200 dark:bg-zinc-800 rounded-lg animate-pulse" />
                     </div>
 
-                    {/* Rating / Stock Badge */}
-                    <div className="flex items-center gap-3 mt-1">
-                        <div className="w-28 h-4 bg-gray-100 dark:bg-zinc-800 rounded animate-pulse" />
-                        <div className="w-20 h-5 bg-green-100 dark:bg-green-950/40 rounded-full animate-pulse" />
+                    {/* Brand and category badges */}
+                    <div className="flex items-center gap-2 mt-1">
+                        <div className="w-24 h-7 bg-gray-100 dark:bg-zinc-800 rounded-full animate-pulse" />
+                        <div className="w-20 h-7 bg-gray-100 dark:bg-zinc-800 rounded-full animate-pulse" />
                     </div>
 
                     {/* Price Block */}
@@ -55,7 +55,7 @@ export default function ProductLoadingSkeleton() {
                     </div>
 
                     {/* Add to Cart Button */}
-                    <div className="w-full h-13 bg-[#072835]/15 dark:bg-white/10 rounded-full animate-pulse mt-3" />
+                    <div className="w-full h-13 bg-[var(--color-brand)]/15 dark:bg-white/10 rounded-full animate-pulse mt-3" />
 
                     {/* Accordion Placeholders */}
                     <div className="flex flex-col gap-2.5 mt-4 pt-4 border-t border-gray-100 dark:border-white/10">

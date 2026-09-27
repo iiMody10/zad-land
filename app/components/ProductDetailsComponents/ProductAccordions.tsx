@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdAdd, MdRemove } from "react-icons/md";
+import { Plus as MdAdd, Minus as MdRemove } from 'lucide-react';
 
 const AccordionItem = ({ title, content, isOpen, onClick, isRTL }: { title: string, content: React.ReactNode, isOpen: boolean, onClick: () => void, isRTL: boolean }) => {
     return (

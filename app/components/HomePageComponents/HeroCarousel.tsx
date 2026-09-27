@@ -119,12 +119,12 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                                     className={`object-cover ${isHeroBg ? 'object-[72%_center]' : 'object-center'}`}
                                 />
 
-                                {/* Gradient Scrim for Contrast - Reduced width localized strictly behind text */}
+                                {/* Brand-toned scrim keeps every line readable across changing imagery. */}
                                 <div
                                     className={`absolute inset-y-0 pointer-events-none transition-all duration-300 ${
                                         isArabic
-                                            ? 'right-0 w-[55%] sm:w-[50%] max-w-[280px] bg-gradient-to-l from-black/75 via-black/35 to-transparent'
-                                            : 'left-0 w-[55%] sm:w-[50%] max-w-[280px] bg-gradient-to-r from-black/75 via-black/35 to-transparent'
+                                            ? 'right-0 w-[85%] sm:w-[78%] max-w-[350px] bg-gradient-to-l from-[var(--color-brand)]/95 via-[var(--color-brand)]/65 to-transparent'
+                                            : 'left-0 w-[85%] sm:w-[78%] max-w-[350px] bg-gradient-to-r from-[var(--color-brand)]/95 via-[var(--color-brand)]/65 to-transparent'
                                     }`}
                                 />
 
@@ -140,7 +140,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                                     {/* Show Wholesale Badge only on non-hero-bg slides */}
                                     {!isHeroBg && (
                                         <div className="mb-2.5">
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] sm:text-xs font-black tracking-wider bg-[#B8860B] text-white shadow-xs">
+                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] sm:text-xs font-black tracking-wider bg-[var(--color-accent)] text-white shadow-xs">
                                                 {getBannerBadge(banner)}
                                             </span>
                                         </div>
@@ -153,13 +153,13 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                                                 <>
                                                     <span className="block">نصل بالعلامات</span>
                                                     <span className="block">العالمية</span>
-                                                    <span className="block text-[#E5B54A]">إلى كل سوق</span>
+                                                    <span className="block text-[var(--color-accent-light)]">إلى كل سوق</span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <span className="block">Connecting Global</span>
                                                     <span className="block">Brands to</span>
-                                                    <span className="block text-[#E5B54A]">Every Market</span>
+                                                    <span className="block text-[var(--color-accent-light)]">Every Market</span>
                                                 </>
                                             )}
                                         </h1>
@@ -177,7 +177,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                                     {/* CTA Button */}
                                     <Link
                                         href={banner.link || "/products"}
-                                        className="inline-flex items-center gap-2.5 mt-3.5 sm:mt-4 px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-[#C59B27] via-[#B8860B] to-[#9E7309] hover:brightness-110 text-white text-[13.5px] sm:text-[15px] font-black shadow-[0_5px_15px_rgba(0,0,0,0.45)] transition-all active:scale-95 border border-white/30 group/btn"
+                                        className="inline-flex items-center gap-2.5 mt-3.5 sm:mt-4 px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-[13.5px] sm:text-[15px] font-black shadow-[0_5px_15px_rgba(0,0,0,0.45)] transition-colors active:scale-95 border border-white/30 group/btn"
                                     >
                                         <span>{getBannerButtonText(banner)}</span>
                                         <span className="text-base sm:text-lg font-black leading-none transition-transform duration-200 group-hover/btn:translate-x-0.5 rtl:group-hover/btn:-translate-x-0.5">
@@ -198,7 +198,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
 
             {/* Desktop View (>= md): Interactive Swiper Hero */}
             <div className="hidden md:block w-full">
-                <div className="relative h-[420px] w-full overflow-hidden bg-[#FAF6EC] shadow-xs dark:bg-[#1a1a1a] md:h-[460px] lg:h-[520px] xl:h-[560px] 2xl:h-[600px]">
+                <div className="relative h-[420px] w-full overflow-hidden bg-[var(--color-canvas)] shadow-xs dark:bg-[#1a1a1a] md:h-[460px] lg:h-[520px] xl:h-[560px] 2xl:h-[600px]">
                     <Swiper
                         modules={[Autoplay, Navigation, Pagination]}
                         spaceBetween={0}
@@ -242,7 +242,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                                     />
 
                                     {/* Darkened copy area while keeping the artwork visible edge-to-edge */}
-                                    <div className="pointer-events-none absolute inset-y-0 right-0 w-[58%] bg-gradient-to-l from-[#002d24]/90 via-[#002d24]/55 to-transparent" />
+                                    <div className="pointer-events-none absolute inset-y-0 right-0 w-[58%] bg-gradient-to-l from-[var(--color-brand)]/90 via-[var(--color-brand)]/55 to-transparent" />
 
                                     {/* Desktop content layered over the image */}
                                     <div
@@ -251,7 +251,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                                     >
                                         <div className="animate-fadeInUp flex w-full max-w-xl flex-col items-start">
                                             <div className="mb-4">
-                                                <span className="inline-flex rounded-full bg-[#F4D36A] px-4 py-1 text-xs font-bold tracking-wider text-[#072835] shadow-sm">
+                                                <span className="inline-flex rounded-full bg-[var(--color-accent-light)] px-4 py-1 text-xs font-bold tracking-wider text-[var(--color-brand)] shadow-sm">
                                                     {getBannerBadge(banner)}
                                                 </span>
                                             </div>
@@ -266,7 +266,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
 
                                             <Link
                                                 href={banner.link || "/products"}
-                                                className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#C59B27] via-[#B8860B] to-[#9E7309] px-8 py-3 text-base font-extrabold text-white shadow-[0_5px_15px_rgba(0,0,0,0.4)] transition-all hover:brightness-110 active:scale-95"
+                                                className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-[var(--color-accent)] px-8 py-3 text-base font-extrabold text-white shadow-[0_5px_15px_rgba(0,0,0,0.4)] transition-colors hover:bg-[var(--color-accent-hover)] active:scale-95"
                                             >
                                                 <span>{getBannerButtonText(banner)}</span>
                                                 <span className="text-lg font-black leading-none">{isArabic ? '‹' : '›'}</span>
@@ -322,7 +322,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                     bottom: 0;
                     left: 0;
                     width: var(--autoplay-progress, 0%);
-                    background: #B8860B;
+                    background: var(--color-accent);
                     border-radius: 99px;
                 }
                 [dir="rtl"] .hero-carousel .swiper-pagination-bullet-active::after {
@@ -340,7 +340,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                 }
                 .hero-carousel .mobile-hero-pagination .swiper-pagination-bullet-active {
                     width: 20px;
-                    background: #B8860B !important;
+                    background: var(--color-accent) !important;
                     border-radius: 99px;
                 }
             `}</style>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { MdChevronLeft, MdChevronRight } from 'react-icons/md';
+import { ChevronLeft as MdChevronLeft, ChevronRight as MdChevronRight } from 'lucide-react';
 
 interface ScrollButtonsProps {
     scrollRef: React.RefObject<HTMLDivElement | null>;

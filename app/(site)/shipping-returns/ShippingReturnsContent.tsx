@@ -2,8 +2,7 @@
 
 import React from "react";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdLocalShipping, MdAssignmentReturn, MdVerifiedUser, MdCheckCircle, MdLock } from "react-icons/md";
-import { Settings } from "@prisma/client";
+import { Truck as MdLocalShipping, RotateCcw as MdAssignmentReturn, ShieldCheck as MdVerifiedUser, CircleCheck as MdCheckCircle, LockKeyhole as MdLock } from 'lucide-react';
 import ResilientImage from "@/app/components/ResilientImage";
 
 interface ShippingReturnsContentProps {
@@ -19,7 +18,7 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
     };
 
     // Helper to get content from siteSettings or fallback to translation
-    const getContent = (fieldEn: keyof Settings, fieldAr: keyof Settings, translationKey: string) => {
+    const getContent = (fieldEn: string, fieldAr: string, translationKey: string) => {
         if (!siteSettings) return t(translationKey);
         
         const value = language === 'ar' ? siteSettings[fieldAr] : siteSettings[fieldEn];

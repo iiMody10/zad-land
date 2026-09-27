@@ -8,23 +8,35 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#B8860B',
+        brand: {
+          DEFAULT: '#173b31',
+          hover: '#245b43',
+          strong: '#102c25',
+          soft: '#eaf1ea',
+          light: '#a9d7b1',
+        },
+        accent: {
+          DEFAULT: '#93650a',
+          hover: '#765108',
+          light: '#e5b54a',
+        },
+        primary: '#173b31',
         background: {
           light: '#ffffff',
-          dark: '#1A1A14',
+          dark: '#16231d',
         },
         surface: {
           light: '#ffffff',
-          dark: '#2A2A1E',
+          dark: '#202c24',
         },
         text: {
           main: {
-            light: '#1A1A14',
-            dark: '#F5F0E0',
+            light: '#20352a',
+            dark: '#f3f5ef',
           },
           muted: {
-            light: '#7A7A60',
-            dark: '#C4B89A',
+            light: '#64756a',
+            dark: '#b8c8ba',
           },
         },
       },

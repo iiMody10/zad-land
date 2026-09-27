@@ -1,57 +1,27 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { laravelJson } from "@/lib/laravel-server";
 
 export async function getRelatedProducts(type: "brandId" | "mainCategoryId" | "categoryId", id: string, query: string) {
     try {
-        const products = await prisma.product.findMany({
-            where: {
-                [type]: id,
-                name: { contains: query, mode: "insensitive" }
-            },
-            select: { id: true, name: true, images: true, price: true, stock: true },
-            take: 50,
-            orderBy: { name: 'asc' }
-        });
-        return { success: true, data: products };
-    } catch (error) {
-        console.error("Error fetching related products:", error);
-        return { success: false, error: "Failed to fetch products" };
-    }
+        const products = await laravelJson<Record<string, any>[]>("/api/admin/products", []);
+        const matches = products.filter((product) => product[type] === id && String(product.name || "").toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+        return { success: true, data: matches.slice(0, 50).map(({ id: productId, name, images, price, stock }) => ({ id: productId, name, images, price, stock })) };
+    } catch { return { success: false, error: "Failed to fetch products" }; }
 }
 
 export async function getRelatedCategories(type: "brandId" | "mainCategoryId", id: string, query: string) {
     try {
-        const categories = await prisma.category.findMany({
-            where: {
-                [type]: id,
-                name: { contains: query, mode: "insensitive" }
-            },
-            select: { id: true, name: true, image: true },
-            take: 50,
-            orderBy: { name: 'asc' }
-        });
-        return { success: true, data: categories };
-    } catch (error) {
-        console.error("Error fetching related categories:", error);
-        return { success: false, error: "Failed to fetch categories" };
-    }
+        const categories = await laravelJson<Record<string, any>[]>("/api/admin/categories", []);
+        const matches = categories.filter((category) => category[type] === id && String(category.name || "").toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+        return { success: true, data: matches.slice(0, 50).map(({ id: categoryId, name, image }) => ({ id: categoryId, name, image })) };
+    } catch { return { success: false, error: "Failed to fetch categories" }; }
 }
 
 export async function getRelatedBrands(id: string, query: string) {
     try {
-        const brands = await prisma.brand.findMany({
-            where: {
-                mainCategoryId: id,
-                name: { contains: query, mode: "insensitive" }
-            },
-            select: { id: true, name: true, image: true },
-            take: 50,
-            orderBy: { name: 'asc' }
-        });
-        return { success: true, data: brands };
-    } catch (error) {
-        console.error("Error fetching related brands:", error);
-        return { success: false, error: "Failed to fetch brands" };
-    }
+        const brands = await laravelJson<Record<string, any>[]>("/api/admin/brands", []);
+        const matches = brands.filter((brand) => brand.mainCategoryId === id && String(brand.name || "").toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+        return { success: true, data: matches.slice(0, 50).map(({ id: brandId, name, image }) => ({ id: brandId, name, image })) };
+    } catch { return { success: false, error: "Failed to fetch brands" }; }
 }

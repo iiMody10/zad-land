@@ -210,7 +210,7 @@
     },
     "orderComplete": {
         "thankYou": "Thank You!",
-        "orderConfirmed": "Your order has been confirmed",
+        "orderConfirmed": "Your order was received. Our team will contact you to confirm it.",
         "orderNumber": "Order Number",
         "orderDetails": "Order Details",
         "items": "Items",

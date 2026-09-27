@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import ResilientImage from '@/app/components/ResilientImage';
-import { useCurrency } from '@/app/context/CurrencyContext';
+import PriceText from '@/app/components/PriceText';
 import { useLanguage } from '@/app/context/LanguageContext';
 import { useCart } from '@/app/context/CartContext';
-import { MdClose } from 'react-icons/md';
+import { X as MdClose } from 'lucide-react';
+import { formatItemsPerPackage, formatPackaging, formatPackageQuantity } from '@/lib/packaging';
 
 interface Product {
     id: string;
@@ -17,11 +18,14 @@ interface Product {
     description: string | null;
     descriptionAr?: string | null;
     descriptionEn?: string | null;
-    price: string | number;
+    price: string | number | null;
     discountPrice?: string | number | null;
     images: string;
     categoryId?: string;
     stock?: number;
+    minOrder?: number;
+    packaging?: string | null;
+    itemsPerPackage?: string | null;
     options?: string | null;
     brand?: {
         name: string;
@@ -36,9 +40,8 @@ interface QuickViewModalProps {
 
 const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
     const { language, dir } = useLanguage();
-    const { formatPrice } = useCurrency();
     const { addItem } = useCart();
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState(product.minOrder || 1);
 
     const parsedOptions = product.options 
         ? product.options.split(',').map(o => o.trim()).filter(Boolean)
@@ -60,6 +63,7 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
     const primaryImage = images[0] || '';
 
     const handleAddToCart = () => {
+        if (product.price == null || product.stock === 0) return;
         addItem({
             id: product.id,
             name: displayName,
@@ -67,6 +71,10 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
             image: primaryImage,
             slug: product.slug,
             quantity: quantity,
+            minOrder: product.minOrder,
+            stock: product.stock,
+            packaging: product.packaging,
+            itemsPerPackage: product.itemsPerPackage,
             description: displayDesc || undefined,
             selectedOption: selectedOption || undefined,
         });
@@ -115,8 +123,8 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
                                         onClick={() => setSelectedOption(opt)}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                                             selectedOption === opt
-                                                ? 'bg-[#B8860B] text-white'
-                                                : 'bg-gray-100 dark:bg-zinc-800 text-zinc-700 dark:text-gray-300 hover:bg-[#B8860B]/10 hover:text-[#B8860B]'
+                                                ? 'bg-[var(--color-accent)] text-white'
+                                                : 'bg-gray-100 dark:bg-zinc-800 text-zinc-700 dark:text-gray-300 hover:bg-[var(--color-accent)]/10 hover:text-[var(--color-accent)]'
                                         }`}
                                     >
                                         {opt}
@@ -128,40 +136,47 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
 
                     {/* Wholesale Packaging Badge */}
                     {product.stock && product.stock > 0 ? (
-                        <div className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-gray-300 font-semibold mb-3 bg-[#FAF6EC] dark:bg-zinc-800 px-3 py-1.5 rounded-lg border border-[#B8860B]/20">
-                            <span>{language === 'ar' ? `العبوة: ${product.stock} قطعة في الكرتونة` : `Packaging: ${product.stock} pcs / carton`}</span>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-gray-300 font-semibold mb-3 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3 py-1.5 rounded-lg border border-[var(--color-accent)]/20">
+                            <span>{formatPackageQuantity(product.stock, product.packaging, language)} {language === 'ar' ? 'متاح' : 'available'}</span>
                         </div>
                     ) : null}
 
+                    <p className="mb-3 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        {formatPackaging(product.packaging, language)}
+                        {product.itemsPerPackage ? ` · ${formatItemsPerPackage(product.itemsPerPackage, product.packaging, language)}` : ''}
+                        {` · ${language === 'ar' ? 'الحد الأدنى' : 'Minimum'} ${formatPackageQuantity(product.minOrder || 1, product.packaging, language)}`}
+                    </p>
+
                     <div className="text-2xl font-extrabold text-zinc-900 dark:text-white mb-6">
-                        {product.discountPrice && Number(product.discountPrice) < Number(product.price) ? (
+                        {product.price != null && product.discountPrice && Number(product.discountPrice) < Number(product.price) ? (
                             <div className="flex items-center gap-3">
-                                <span className="text-[#2E7D32] dark:text-[#4ade80]">{formatPrice(Number(product.discountPrice))}</span>
-                                <span className="text-base text-gray-400 line-through font-normal">{formatPrice(Number(product.price))}</span>
+                                <PriceText amount={product.discountPrice} className="text-[var(--color-brand-hover)] dark:text-[var(--color-brand-light)]" />
+                                <PriceText amount={product.price} className="text-base font-normal text-gray-400 line-through" />
                             </div>
                         ) : (
-                            <span>{formatPrice(Number(product.price))}</span>
+                            <PriceText amount={product.price} />
                         )}
                     </div>
 
                     <div className="flex items-center gap-4 mb-4">
-                        <button 
+                        {product.price == null ? <Link href="/account/login" onClick={onClose} className="flex-1 rounded-xl bg-[var(--color-brand-hover)] py-3 text-center text-sm font-bold text-white">{language === 'ar' ? 'دخول التاجر لعرض السعر' : 'Merchant sign in for price'}</Link> : <button
                             onClick={handleAddToCart}
-                            className="flex-1 bg-[#2E7D32] hover:bg-[#256628] text-white py-3 rounded-xl font-bold transition-all text-sm cursor-pointer"
+                            disabled={product.stock !== undefined && product.stock < (product.minOrder || 1)}
+                            className="flex-1 bg-[var(--color-brand-hover)] hover:bg-[var(--color-brand-hover)] text-white py-3 rounded-xl font-bold transition-all text-sm cursor-pointer"
                         >
-                            {language === 'ar' ? 'إضافة للسلة' : 'Add to Cart'}
-                        </button>
+                            {product.stock !== undefined && product.stock < (product.minOrder || 1) ? (language === 'ar' ? 'غير متوفر' : 'Unavailable') : language === 'ar' ? 'إضافة للسلة' : 'Add to Cart'}
+                        </button>}
                         
                         <div className="flex items-center justify-between border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 w-28 bg-gray-50 dark:bg-zinc-800">
-                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-500 hover:text-[#B8860B] font-bold cursor-pointer">-</button>
+                            <button onClick={() => setQuantity(Math.max(product.minOrder || 1, quantity - 1))} className="text-gray-500 hover:text-[var(--color-accent)] font-bold cursor-pointer">-</button>
                             <span className="font-bold text-zinc-900 dark:text-white select-none">{quantity}</span>
-                            <button onClick={() => setQuantity(quantity + 1)} className="text-gray-500 hover:text-[#B8860B] font-bold cursor-pointer">+</button>
+                            <button onClick={() => setQuantity((current) => product.stock === undefined ? current + 1 : Math.min(product.stock, current + 1))} className="text-gray-500 hover:text-[var(--color-accent)] font-bold cursor-pointer">+</button>
                         </div>
                     </div>
 
                     <Link 
                         href={`/products/${product.slug}`}
-                        className="text-xs font-bold text-gray-500 hover:text-[#B8860B] flex items-center gap-1 transition-colors mt-2"
+                        className="text-xs font-bold text-gray-500 hover:text-[var(--color-accent)] flex items-center gap-1 transition-colors mt-2"
                         onClick={onClose}
                     >
                         {language === 'ar' ? 'عرض كل التفاصيل' : 'View full details'} →

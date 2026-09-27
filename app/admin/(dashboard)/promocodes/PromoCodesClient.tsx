@@ -6,9 +6,9 @@ import { useState } from "react";
 import PromoCodeModal from "./PromoCodeModal";
 import { deletePromoCode, togglePromoCodeStatus } from "../../../../lib/admin-actions";
 import { toast } from "react-hot-toast";
-import { useSession } from "next-auth/react";
+import { useAdminSession } from "../../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { MdSearch, MdAdd, MdSync, MdToggleOn, MdToggleOff, MdEdit, MdDelete } from "react-icons/md";
+import { Search as MdSearch, Plus as MdAdd, RefreshCw as MdSync, ToggleRight as MdToggleOn, ToggleLeft as MdToggleOff, Pencil as MdEdit, Trash2 as MdDelete } from 'lucide-react';
 
 interface PromoCode {
     id: string;
@@ -23,7 +23,7 @@ interface PromoCode {
 }
 
 export default function PromoCodesClient({ promoCodes }: { promoCodes: PromoCode[] }) {
-    const { data: session } = useSession() || {};
+    const { data: session } = useAdminSession();
     const { t, dir } = useLanguage();
     const canManage = session?.user?.role === 'SUPER_ADMIN' || session?.user?.canManagePromoCodes;
     const canDelete = session?.user?.role === 'SUPER_ADMIN' || session?.user?.canDeletePromoCodes;
@@ -111,7 +111,7 @@ export default function PromoCodesClient({ promoCodes }: { promoCodes: PromoCode
                             {canManage && (
                                 <button
                                     onClick={handleAdd}
-                                    className="w-full md:w-auto bg-[#072835] hover:bg-[#0c4054] text-white px-6 py-3 rounded-xl font-bold transition-all shadow-xs flex items-center justify-center gap-2"
+                                    className="w-full md:w-auto bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white px-6 py-3 rounded-xl font-bold transition-all shadow-xs flex items-center justify-center gap-2"
                                 >
                                     <MdAdd className="text-[20px]" />
                                     {t('admin.addPromoCode')}
@@ -128,15 +128,15 @@ export default function PromoCodesClient({ promoCodes }: { promoCodes: PromoCode
 
                     {/* Stats Summary (2-cols on mobile, 3-cols on md) */}
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4 mb-6">
-                        <div className="bg-white dark:bg-[#0f172a] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1">
                             <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider truncate">{t('admin.totalSales')}</p>
                             <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                                 ${promoCodes.reduce((sum, pc) => sum + pc.totalSales, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </p>
                         </div>
-                        <div className="bg-white dark:bg-[#0f172a] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1">
+                        <div className="bg-white dark:bg-[var(--color-surface-dark)] p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs transition-all duration-300 hover:shadow-md flex flex-col gap-1">
                             <p className="text-slate-500 dark:text-slate-400 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider truncate">{t('admin.activeCodes')}</p>
-                            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[#2E7D32] dark:text-[#4ade80]">
+                            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[var(--color-brand-hover)] dark:text-[var(--color-brand-light)]">
                                 {promoCodes.filter(pc => pc.isActive).length}
                             </p>
                         </div>

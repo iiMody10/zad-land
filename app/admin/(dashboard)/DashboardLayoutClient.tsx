@@ -1,8 +1,8 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
 import AdminSidebar from "../components/AdminSidebar";
 import { AdminSidebarProvider, useAdminSidebar } from "../context/AdminSidebarContext";
+import { AdminSessionProvider, type AdminSessionUser } from "../context/AdminSessionContext";
 
 function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     const { isOpen, closeSidebar } = useAdminSidebar();
@@ -24,13 +24,13 @@ export default function DashboardLayoutClient({
     session,
 }: {
     children: React.ReactNode;
-    session?: any;
+    session: { user: AdminSessionUser };
 }) {
     return (
-        <SessionProvider session={session}>
+        <AdminSessionProvider user={session.user}>
             <AdminSidebarProvider>
                 <DashboardLayoutInner>{children}</DashboardLayoutInner>
             </AdminSidebarProvider>
-        </SessionProvider>
+        </AdminSessionProvider>
     );
 }
