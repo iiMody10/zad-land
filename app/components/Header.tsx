@@ -11,9 +11,7 @@ import HeaderSearch from './HeaderSearch';
 import LanguageToggle from './LanguageToggle';
 import MobileMenu from './MobileMenu';
 import MegaMenu, { type NavMainCategory } from './HeaderComponents/MegaMenu';
-import BrandMegaMenu from './HeaderComponents/BrandMegaMenu';
 import TopBar from './HeaderComponents/TopBar';
-import type { HeaderNavItem } from '@/lib/header-navigation';
 
 interface HeaderCategory {
     id: string;
@@ -27,13 +25,12 @@ interface HeaderCategory {
 
 interface HeaderProps {
     initialCategories?: HeaderCategory[];
-    initialQuickNavItems?: HeaderNavItem[];
     initialNavData?: NavMainCategory[];
     dir: 'ltr' | 'rtl';
     language: 'en' | 'ar';
 }
 
-const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavData = [] }: HeaderProps) => {
+const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) => {
     const { language, dir } = useLanguage();
     const pathname = usePathname();
     const { totalItems, openDrawer } = useCart();
@@ -42,18 +39,15 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
-    const [activeBrandMenu, setActiveBrandMenu] = useState<string | null>(null);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
     const [visibleCount, setVisibleCount] = useState(4);
-    const [visibleCategoryCount, setVisibleCategoryCount] = useState(2);
     const isArabic = language === 'ar';
 
     useEffect(() => {
         const updateVisibleCount = () => {
             const width = window.innerWidth;
             setVisibleCount(width >= 1440 ? 4 : width >= 1200 ? 3 : 2);
-            setVisibleCategoryCount(width >= 1440 ? 3 : width >= 1200 ? 2 : 1);
         };
         updateVisibleCount();
         window.addEventListener('resize', updateVisibleCount);
@@ -88,7 +82,6 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
             setIsHeaderCompact(compact);
             if (compact) {
                 setActiveMegaMenu(null);
-                setActiveBrandMenu(null);
                 setIsMoreOpen(false);
             }
         };
@@ -145,7 +138,6 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
         const closeOnEscape = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 setActiveMegaMenu(null);
-                setActiveBrandMenu(null);
                 setIsMoreOpen(false);
                 setIsMobileMenuOpen(false);
                 setIsMobileSearchOpen(false);
@@ -163,14 +155,10 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
     }, [isMobileSearchOpen]);
 
     const activeNavData = initialNavData.find((item) => item.slug === activeMegaMenu);
-    const activeBrandData = initialQuickNavItems.find((item) => item.id === activeBrandMenu);
     const visibleNavItems = initialNavData.slice(0, visibleCount);
     const overflowNavItems = initialNavData.slice(visibleCount);
-    const visibleQuickNavItems = initialQuickNavItems.slice(0, visibleCategoryCount);
-    const overflowQuickNavItems = initialQuickNavItems.slice(visibleCategoryCount);
     const closeDesktopMenus = () => {
         setActiveMegaMenu(null);
-        setActiveBrandMenu(null);
         setIsMoreOpen(false);
     };
 
@@ -310,64 +298,18 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                     </Link>
 
                     <div className="flex min-w-0 flex-1 items-center gap-0.5">
-                        {visibleQuickNavItems.map((item) => {
-                            const nameParts = item.name.split('-').map((part) => part.trim());
-                            const name = item.nameEn || nameParts.find((part) => isArabic
-                                ? /[\u0600-\u06FF]/.test(part)
-                                : !/[\u0600-\u06FF]/.test(part)) || item.name;
-                            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                            const isBrandMenuOpen = activeBrandMenu === item.id;
-                            return (
-                                <div
-                                    key={`quick-${item.type}-${item.id}`}
-                                    className="relative flex shrink-0 items-center"
-                                    onMouseEnter={() => {
-                                        setActiveMegaMenu(null);
-                                        setIsMoreOpen(false);
-                                        setActiveBrandMenu(item.categories.length ? item.id : null);
-                                    }}
-                                    onFocusCapture={() => {
-                                        if (item.categories.length) setActiveBrandMenu(item.id);
-                                    }}
-                                >
-                                    <Link
-                                        href={item.href}
-                                        onClick={closeDesktopMenus}
-                                        aria-current={isActive ? 'page' : undefined}
-                                        title={name}
-                                        className={`flex h-10 max-w-[132px] items-center truncate rounded-s-[7px] px-3 text-[13px] font-semibold transition-colors xl:text-sm ${item.categories.length ? '' : 'rounded-e-[7px]'} ${isActive ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10'}`}
-                                    >
-                                        {name}
-                                    </Link>
-                                    {item.categories.length > 0 && (
-                                        <button
-                                            type="button"
-                                            aria-label={isArabic ? `عرض أقسام ${name}` : `Show ${name} categories`}
-                                            aria-expanded={isBrandMenuOpen}
-                                            aria-controls={`brand-nav-${item.id}`}
-                                            onClick={() => {
-                                                setActiveMegaMenu(null);
-                                                setIsMoreOpen(false);
-                                                setActiveBrandMenu((active) => active === item.id ? null : item.id);
-                                            }}
-                                            className={`flex h-10 w-7 items-center justify-center rounded-e-[7px] transition-colors ${isActive || isBrandMenuOpen ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[#5b6c60] hover:bg-[var(--color-brand-soft)] dark:text-gray-300 dark:hover:bg-white/10'}`}
-                                        >
-                                            <MdKeyboardArrowDown className={`text-lg transition-transform ${isBrandMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
-                                        </button>
-                                    )}
-                                </div>
-                            );
-                        })}
                         {visibleNavItems.map((item) => {
                             const name = isArabic ? item.name : item.nameEn || item.name;
                             const isOpen = activeMegaMenu === item.slug;
+                            const isActive = pathname === `/department/${item.slug}` || pathname.startsWith(`/department/${item.slug}/`);
                             return (
-                                <div key={item.id} className="flex shrink-0 items-center" onMouseEnter={() => { setActiveBrandMenu(null); setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}>
+                                <div key={item.id} className="flex shrink-0 items-center" onMouseEnter={() => { setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}>
                                     <Link
                                         href={`/department/${item.slug}`}
-                                        onFocus={() => { setActiveBrandMenu(null); setActiveMegaMenu(item.slug); }}
+                                        onFocus={() => setActiveMegaMenu(item.slug)}
                                         onClick={closeDesktopMenus}
-                                        className={`flex h-10 items-center rounded-s-[7px] ps-3 pe-1 text-[13px] font-semibold transition-colors xl:text-sm ${isOpen ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10'}`}
+                                        aria-current={isActive ? 'page' : undefined}
+                                        className={`flex h-10 items-center rounded-s-[7px] ps-3 pe-1 text-[13px] font-semibold transition-colors xl:text-sm ${isOpen || isActive ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10'}`}
                                     >
                                         {name}
                                     </Link>
@@ -376,7 +318,7 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                                         aria-label={isArabic ? `عرض أقسام ${name}` : `Explore ${name}`}
                                         aria-expanded={isOpen}
                                         aria-controls="desktop-category-panel"
-                                        onClick={() => { setActiveBrandMenu(null); setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}
+                                        onClick={() => { setIsMoreOpen(false); setActiveMegaMenu((active) => active === item.slug ? null : item.slug); }}
                                         className={`flex h-10 w-7 items-center justify-center rounded-e-[7px] transition-colors ${isOpen ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[#5b6c60] hover:bg-[var(--color-brand-soft)] dark:text-gray-300 dark:hover:bg-white/10'}`}
                                     >
                                         <MdKeyboardArrowDown className={`text-lg transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -384,12 +326,12 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                                 </div>
                             );
                         })}
-                        {(overflowNavItems.length > 0 || overflowQuickNavItems.length > 0) && (
-                            <div className="relative shrink-0" onMouseEnter={() => { setActiveBrandMenu(null); setActiveMegaMenu(null); setIsMoreOpen(true); }}>
+                        {overflowNavItems.length > 0 && (
+                            <div className="relative shrink-0" onMouseEnter={() => { setActiveMegaMenu(null); setIsMoreOpen(true); }}>
                                 <button
                                     type="button"
                                     aria-expanded={isMoreOpen}
-                                    onClick={() => { setActiveBrandMenu(null); setActiveMegaMenu(null); setIsMoreOpen((open) => !open); }}
+                                    onClick={() => { setActiveMegaMenu(null); setIsMoreOpen((open) => !open); }}
                                     className="flex h-10 items-center gap-1 rounded-[7px] px-3 text-[13px] font-semibold text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10"
                                 >
                                     {isArabic ? 'المزيد' : 'More'}
@@ -397,21 +339,6 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                                 </button>
                                 {isMoreOpen && (
                                     <div className="absolute top-full start-0 z-50 mt-1 w-60 rounded-[10px] border border-[var(--color-line)] bg-white p-2 shadow-[0_16px_35px_rgba(17,43,31,0.13)] dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
-                                        {overflowQuickNavItems.map((item) => {
-                                            const nameParts = item.name.split('-').map((part) => part.trim());
-                                            const name = item.nameEn || nameParts.find((part) => isArabic
-                                                ? /[\u0600-\u06FF]/.test(part)
-                                                : !/[\u0600-\u06FF]/.test(part)) || item.name;
-                                            return (
-                                            <Link
-                                                key={`overflow-quick-${item.type}-${item.id}`}
-                                                href={item.href}
-                                                onClick={closeDesktopMenus}
-                                                className="block rounded-[6px] px-3 py-2.5 text-sm text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10"
-                                            >
-                                                {name}
-                                            </Link>
-                                        )})}
                                         {overflowNavItems.map((item) => (
                                             <Link
                                                 key={item.id}
@@ -434,14 +361,6 @@ const Header = ({ initialCategories = [], initialQuickNavItems = [], initialNavD
                         <Link href="/contact" onMouseEnter={closeDesktopMenus} className="rounded-[7px] px-3 py-2 text-[13px] font-semibold text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10">{isArabic ? 'تواصل' : 'Contact'}</Link>
                     </div>
                 </div>
-
-                {activeBrandData && activeBrandData.categories.length > 0 && (
-                    <BrandMegaMenu
-                        key={activeBrandData.id}
-                        data={activeBrandData}
-                        onClose={closeDesktopMenus}
-                    />
-                )}
 
                 {activeNavData && (
                     <MegaMenu

@@ -1,5 +1,6 @@
-import { getAdminBrands, getAdminCategories, getAdminSiteSettings } from "../../../../lib/admin-actions";
+import { getAdminCategories, getAdminSiteSettings } from "../../../../lib/admin-actions";
 import { getConfiguredHeaderNavItems } from "@/lib/header-navigation";
+import { getNavigationData } from "@/lib/navigation";
 import SiteContentClient from "./SiteContentClient";
 import { getLaravelAdmin } from "@/lib/laravel-server";
 import { redirect } from "next/navigation";
@@ -11,12 +12,12 @@ export default async function SiteContentPage() {
         redirect('/admin/dashboard');
     }
 
-    const [siteSettings, categoriesData, catalogBrands] = await Promise.all([
+    const [siteSettings, categoriesData, mainCategories] = await Promise.all([
         getAdminSiteSettings(),
         getAdminCategories(1, 500),
-        getAdminBrands(),
+        getNavigationData(),
     ]);
-    const headerNavItems = getConfiguredHeaderNavItems(siteSettings?.headerNavItems, catalogBrands);
+    const headerNavItems = getConfiguredHeaderNavItems(siteSettings?.headerNavItems, mainCategories);
     
     return (
         <SiteContentClient
@@ -25,7 +26,7 @@ export default async function SiteContentPage() {
                 id: category.id,
                 name: category.name,
             }))}
-            brands={catalogBrands.map((brand) => ({ id: brand.id, name: brand.name }))}
+            mainCategories={mainCategories.map((category) => ({ id: category.id, name: category.name, nameEn: category.nameEn }))}
             initialHeaderNavItems={headerNavItems}
         />
     );

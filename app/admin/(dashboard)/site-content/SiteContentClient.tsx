@@ -134,12 +134,12 @@ type TabType = "currency" | "navigation" | "footer" | "banners" | "shipping" | "
 export default function SiteContentClient({ 
     initialSettings,
     categories,
-    brands,
+    mainCategories,
     initialHeaderNavItems,
 }: { 
     initialSettings: SiteSettings | null;
     categories: FooterCategoryOption[];
-    brands: FooterCategoryOption[];
+    mainCategories: Array<FooterCategoryOption & { nameEn?: string }>;
     initialHeaderNavItems: HeaderNavItemRef[];
 }) {
     const { t, dir } = useLanguage();
@@ -466,7 +466,7 @@ export default function SiteContentClient({
                     {activeTab === "navigation" && (
                         <HeaderNavigationSection
                             items={headerNavItems}
-                            brands={brands}
+                            mainCategories={mainCategories}
                             onChange={setHeaderNavItems}
                         />
                     )}

@@ -8,15 +8,16 @@ import { useLanguage } from "@/app/context/LanguageContext";
 interface NavigationOption {
     id: string;
     name: string;
+    nameEn?: string;
 }
 
 interface HeaderNavigationSectionProps {
     items: HeaderNavItemRef[];
-    brands: NavigationOption[];
+    mainCategories: NavigationOption[];
     onChange: (items: HeaderNavItemRef[]) => void;
 }
 
-export default function HeaderNavigationSection({ items, brands, onChange }: HeaderNavigationSectionProps) {
+export default function HeaderNavigationSection({ items, mainCategories, onChange }: HeaderNavigationSectionProps) {
     const { language } = useLanguage();
     const isArabic = language === "ar";
     const [pendingValue, setPendingValue] = useState("");
@@ -24,7 +25,7 @@ export default function HeaderNavigationSection({ items, brands, onChange }: Hea
     const addItem = () => {
         const id = pendingValue;
         if (!id || items.length >= 12 || items.some((item) => item.id === id)) return;
-        onChange([...items, { type: "brand", id }]);
+        onChange([...items, { type: "mainCategory", id }]);
         setPendingValue("");
     };
 
@@ -37,7 +38,8 @@ export default function HeaderNavigationSection({ items, brands, onChange }: Hea
     };
 
     const label = (item: HeaderNavItemRef) => {
-        return brands.find((option) => option.id === item.id)?.name || item.id;
+        const option = mainCategories.find((candidate) => candidate.id === item.id);
+        return (isArabic ? option?.name : option?.nameEn || option?.name) || item.id;
     };
 
     return (
@@ -48,8 +50,8 @@ export default function HeaderNavigationSection({ items, brands, onChange }: Hea
                 </h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                     {isArabic
-                        ? "اختر العلامات التجارية التي تظهر في الشريط أسفل الترويسة ورتبها كما تريد. تُجلب الخيارات من الكتالوج."
-                        : "Choose and order the brands shown in the lower header bar. Options come from the backend catalog."}
+                        ? "اختر الأقسام الرئيسية التي تظهر في الشريط أسفل الترويسة ورتبها كما تريد. تعرض كل قائمة العلامات والفئات والمنتجات من هذا القسم."
+                        : "Choose and order the main categories shown in the lower header bar. Each menu shows its brands, categories, and featured products."}
                 </p>
             </div>
 
@@ -59,11 +61,11 @@ export default function HeaderNavigationSection({ items, brands, onChange }: Hea
                     onChange={(event) => setPendingValue(event.target.value)}
                     className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:border-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white"
                 >
-                    <option value="">{isArabic ? "اختر علامة تجارية" : "Select a brand"}</option>
-                    {brands.length > 0 && (
-                        <optgroup label={isArabic ? "العلامات التجارية" : "Brands"}>
-                            {brands.map((option) => (
-                                <option key={`brand-${option.id}`} value={option.id}>{option.name}</option>
+                    <option value="">{isArabic ? "اختر قسماً رئيسياً" : "Select a main category"}</option>
+                    {mainCategories.length > 0 && (
+                        <optgroup label={isArabic ? "الأقسام الرئيسية" : "Main categories"}>
+                            {mainCategories.map((option) => (
+                                <option key={`main-category-${option.id}`} value={option.id}>{isArabic ? option.name : option.nameEn || option.name}</option>
                             ))}
                         </optgroup>
                     )}
@@ -85,7 +87,7 @@ export default function HeaderNavigationSection({ items, brands, onChange }: Hea
                         <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
                             {label(item)}
                             <span className="ms-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-                                {isArabic ? "علامة تجارية" : "Brand"}
+                                {isArabic ? "قسم رئيسي" : "Main category"}
                             </span>
                         </span>
                         <button type="button" onClick={() => moveItem(index, -1)} disabled={index === 0} aria-label={isArabic ? "تحريك لأعلى" : "Move up"} className="rounded-lg p-2 text-slate-600 hover:bg-white disabled:opacity-30 dark:text-slate-300 dark:hover:bg-white/10">
