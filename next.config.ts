@@ -1,7 +1,26 @@
 import type { NextConfig } from "next";
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import { execFileSync } from 'node:child_process';
+
+function getDeploymentId(): string | undefined {
+  const configuredId = process.env.NEXT_DEPLOYMENT_ID;
+  if (configuredId) return configuredId;
+
+  try {
+    // Use the same identifier during `next build` and `next start`. A new Git
+    // commit gets a new asset namespace and lets Next detect stale clients.
+    return execFileSync('git', ['rev-parse', '--short=12', 'HEAD'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    // Local source archives may not include Git metadata.
+    return undefined;
+  }
+}
 
 const nextConfig: NextConfig = {
+  deploymentId: getDeploymentId(),
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
