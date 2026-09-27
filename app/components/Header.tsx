@@ -182,8 +182,8 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
             <div
                 aria-hidden={isHeaderCompact}
                 inert={isHeaderCompact}
-                className="hidden overflow-hidden transition-[height,opacity,transform] duration-300 ease-out motion-reduce:transition-none lg:block"
-                style={{ height: isHeaderCompact ? 0 : 30, opacity: isHeaderCompact ? 0 : 1, transform: isHeaderCompact ? 'translateY(-8px)' : 'translateY(0)' }}
+                className="hidden overflow-hidden transition-[height,transform] duration-300 ease-out motion-reduce:transition-none lg:block"
+                style={{ height: isHeaderCompact ? 0 : 30, transform: isHeaderCompact ? 'translateY(-8px)' : 'translateY(0)' }}
             >
                 <TopBar />
             </div>
@@ -295,8 +295,8 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
                 aria-label={isArabic ? 'الأقسام الرئيسية' : 'Main navigation'}
                 aria-hidden={isHeaderCompact}
                 inert={isHeaderCompact}
-                className="relative hidden border-t border-[var(--color-line)] bg-[var(--color-canvas)] transition-[height,opacity,transform] duration-300 ease-out motion-reduce:transition-none dark:border-white/10 dark:bg-[var(--color-surface-dark)] lg:block"
-                style={{ height: isHeaderCompact ? 0 : 50, overflow: isHeaderCompact || !desktopNavOverflowVisible ? 'hidden' : 'visible', opacity: isHeaderCompact ? 0 : 1, transform: isHeaderCompact ? 'translateY(-8px)' : 'translateY(0)', borderColor: isHeaderCompact ? 'transparent' : undefined }}
+                className="relative hidden border-t border-[var(--color-line)] bg-[var(--color-canvas)] transition-[height,transform] duration-300 ease-out motion-reduce:transition-none dark:border-white/10 dark:bg-[var(--color-surface-dark)] lg:block"
+                style={{ height: isHeaderCompact ? 0 : 50, overflow: isHeaderCompact || !desktopNavOverflowVisible ? 'hidden' : 'visible', transform: isHeaderCompact ? 'translateY(-8px)' : 'translateY(0)', borderColor: isHeaderCompact ? 'transparent' : undefined }}
                 onMouseLeave={closeDesktopMenus}
                 onBlur={(event) => {
                     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeDesktopMenus();
