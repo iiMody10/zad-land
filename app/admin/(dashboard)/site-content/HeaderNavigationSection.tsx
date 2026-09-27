@@ -12,25 +12,19 @@ interface NavigationOption {
 
 interface HeaderNavigationSectionProps {
     items: HeaderNavItemRef[];
-    categories: NavigationOption[];
     brands: NavigationOption[];
     onChange: (items: HeaderNavItemRef[]) => void;
 }
 
-export default function HeaderNavigationSection({ items, categories, brands, onChange }: HeaderNavigationSectionProps) {
+export default function HeaderNavigationSection({ items, brands, onChange }: HeaderNavigationSectionProps) {
     const { language } = useLanguage();
     const isArabic = language === "ar";
     const [pendingValue, setPendingValue] = useState("");
-    const options = [
-        ...categories.map((item) => ({ ...item, type: "category" as const })),
-        ...brands.map((item) => ({ ...item, type: "brand" as const })),
-    ];
 
     const addItem = () => {
-        const [type, id] = pendingValue.split("::");
-        if ((type !== "category" && type !== "brand") || !id || items.length >= 12) return;
-        if (items.some((item) => item.type === type && item.id === id)) return;
-        onChange([...items, { type, id }]);
+        const id = pendingValue;
+        if (!id || items.length >= 12 || items.some((item) => item.id === id)) return;
+        onChange([...items, { type: "brand", id }]);
         setPendingValue("");
     };
 
@@ -43,8 +37,7 @@ export default function HeaderNavigationSection({ items, categories, brands, onC
     };
 
     const label = (item: HeaderNavItemRef) => {
-        const source = item.type === "category" ? categories : brands;
-        return source.find((option) => option.id === item.id)?.name || item.id;
+        return brands.find((option) => option.id === item.id)?.name || item.id;
     };
 
     return (
@@ -55,8 +48,8 @@ export default function HeaderNavigationSection({ items, categories, brands, onC
                 </h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                     {isArabic
-                        ? "اختر الفئات والعلامات التجارية التي تظهر في الشريط أسفل الترويسة، ورتبها كما تريد. تُجلب الخيارات من الكتالوج."
-                        : "Choose and order the catalog categories and brands shown in the lower header bar. Options come from the backend catalog."}
+                        ? "اختر العلامات التجارية التي تظهر في الشريط أسفل الترويسة ورتبها كما تريد. تُجلب الخيارات من الكتالوج."
+                        : "Choose and order the brands shown in the lower header bar. Options come from the backend catalog."}
                 </p>
             </div>
 
@@ -66,18 +59,11 @@ export default function HeaderNavigationSection({ items, categories, brands, onC
                     onChange={(event) => setPendingValue(event.target.value)}
                     className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:border-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white"
                 >
-                    <option value="">{isArabic ? "اختر فئة أو علامة تجارية" : "Select a category or brand"}</option>
-                    {categories.length > 0 && (
-                        <optgroup label={isArabic ? "الفئات" : "Categories"}>
-                            {options.filter((option) => option.type === "category").map((option) => (
-                                <option key={`category-${option.id}`} value={`category::${option.id}`}>{option.name}</option>
-                            ))}
-                        </optgroup>
-                    )}
+                    <option value="">{isArabic ? "اختر علامة تجارية" : "Select a brand"}</option>
                     {brands.length > 0 && (
                         <optgroup label={isArabic ? "العلامات التجارية" : "Brands"}>
-                            {options.filter((option) => option.type === "brand").map((option) => (
-                                <option key={`brand-${option.id}`} value={`brand::${option.id}`}>{option.name}</option>
+                            {brands.map((option) => (
+                                <option key={`brand-${option.id}`} value={option.id}>{option.name}</option>
                             ))}
                         </optgroup>
                     )}
@@ -99,7 +85,7 @@ export default function HeaderNavigationSection({ items, categories, brands, onC
                         <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
                             {label(item)}
                             <span className="ms-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-                                {item.type === "category" ? (isArabic ? "فئة" : "Category") : (isArabic ? "علامة تجارية" : "Brand")}
+                                {isArabic ? "علامة تجارية" : "Brand"}
                             </span>
                         </span>
                         <button type="button" onClick={() => moveItem(index, -1)} disabled={index === 0} aria-label={isArabic ? "تحريك لأعلى" : "Move up"} className="rounded-lg p-2 text-slate-600 hover:bg-white disabled:opacity-30 dark:text-slate-300 dark:hover:bg-white/10">

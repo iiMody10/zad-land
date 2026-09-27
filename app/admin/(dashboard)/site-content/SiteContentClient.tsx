@@ -466,7 +466,6 @@ export default function SiteContentClient({
                     {activeTab === "navigation" && (
                         <HeaderNavigationSection
                             items={headerNavItems}
-                            categories={categories}
                             brands={brands}
                             onChange={setHeaderNavItems}
                         />

@@ -1,7 +1,7 @@
-import type { CatalogBrand, CatalogCategory } from "@/lib/catalog";
+import type { CatalogBrand } from "@/lib/catalog";
 
 export type HeaderNavItemRef = {
-    type: "category" | "brand";
+    type: "brand";
     id: string;
 };
 
@@ -13,18 +13,12 @@ export type HeaderNavItem = HeaderNavItemRef & {
 };
 
 export function getDefaultHeaderNavItems(
-    categories: Array<Pick<CatalogCategory, "id" | "isFeatured">>,
     brands: Array<Pick<CatalogBrand, "id" | "isFeatured">>,
 ): HeaderNavItemRef[] {
-    const featuredCategories = categories.filter((item) => item.isFeatured);
     const featuredBrands = brands.filter((item) => item.isFeatured);
-    const categoryChoices = (featuredCategories.length ? featuredCategories : categories).slice(0, 2);
-    const brandChoices = (featuredBrands.length ? featuredBrands : brands).slice(0, 2);
+    const brandChoices = (featuredBrands.length ? featuredBrands : brands).slice(0, 4);
 
-    return [
-        ...categoryChoices.map(({ id }) => ({ type: "category" as const, id })),
-        ...brandChoices.map(({ id }) => ({ type: "brand" as const, id })),
-    ];
+    return brandChoices.map(({ id }) => ({ type: "brand", id }));
 }
 
 export function parseHeaderNavItems(value: unknown): HeaderNavItemRef[] {
@@ -37,7 +31,7 @@ export function parseHeaderNavItems(value: unknown): HeaderNavItemRef[] {
         return parsed.filter((item): item is HeaderNavItemRef =>
             Boolean(item)
             && typeof item === "object"
-            && ((item as HeaderNavItemRef).type === "category" || (item as HeaderNavItemRef).type === "brand")
+            && (item as HeaderNavItemRef).type === "brand"
             && typeof (item as HeaderNavItemRef).id === "string"
             && (item as HeaderNavItemRef).id.length > 0,
         ).slice(0, 12);
@@ -46,22 +40,40 @@ export function parseHeaderNavItems(value: unknown): HeaderNavItemRef[] {
     }
 }
 
+/**
+ * Old settings may contain category links. Replace those legacy links with
+ * the brand defaults, while preserving an intentionally empty navigation.
+ */
+export function getConfiguredHeaderNavItems(
+    value: unknown,
+    brands: Array<Pick<CatalogBrand, "id" | "isFeatured">>,
+): HeaderNavItemRef[] {
+    if (value == null) return getDefaultHeaderNavItems(brands);
+
+    const configured = parseHeaderNavItems(value);
+    if (configured.length > 0) return configured;
+
+    if (typeof value === "string") {
+        try {
+            const parsed: unknown = JSON.parse(value);
+            if (Array.isArray(parsed) && parsed.some((item) =>
+                Boolean(item) && typeof item === "object" && (item as { type?: unknown }).type === "category",
+            )) {
+                return getDefaultHeaderNavItems(brands);
+            }
+        } catch {
+            // Leave invalid or deliberately empty settings empty.
+        }
+    }
+
+    return [];
+}
+
 export function resolveHeaderNavItems(
     refs: HeaderNavItemRef[],
-    categories: CatalogCategory[],
     brands: CatalogBrand[],
 ): HeaderNavItem[] {
     return refs.flatMap((ref) => {
-        if (ref.type === "category") {
-            const category = categories.find((candidate) => candidate.id === ref.id);
-            return category ? [{
-                ...ref,
-                name: category.name,
-                slug: category.slug,
-                href: `/categories/${category.slug}`,
-            }] : [];
-        }
-
         const brand = brands.find((candidate) => candidate.id === ref.id);
         return brand ? [{
             ...ref,

@@ -4,41 +4,28 @@ import FooterInfoBar from "../components/FooterInfoBar";
 import AnnouncementBar from "../components/AnnouncementBar";
 import BottomNav from "../components/BottomNav";
 import { getI18n } from "@/lib/i18n";
-import { getCatalogBrands, getCatalogCategories } from "@/lib/catalog";
+import { getCatalogBrands } from "@/lib/catalog";
 import { getNavigationData } from "@/lib/navigation";
 import { getSiteSettings } from "@/lib/admin-actions";
-import { getDefaultHeaderNavItems, parseHeaderNavItems, resolveHeaderNavItems } from "@/lib/header-navigation";
+import { getConfiguredHeaderNavItems, resolveHeaderNavItems } from "@/lib/header-navigation";
 
 import React, { Suspense } from "react";
 import NavigationProgressBar from "../components/NavigationProgressBar";
-
-async function getCategories() {
-    try {
-        return await getCatalogCategories();
-    } catch (error) {
-        console.error("Failed to fetch categories for header:", error);
-        return [];
-    }
-}
 
 export default async function SiteLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const [categories, brands, navData, siteSettings, { t, dir, language }] = await Promise.all([
-        getCategories(),
+    const [brands, navData, siteSettings, { t, dir, language }] = await Promise.all([
         getCatalogBrands(),
         getNavigationData(),
         getSiteSettings(),
         getI18n(),
     ]);
-    const configuredItems = siteSettings?.headerNavItems == null
-        ? getDefaultHeaderNavItems(categories, brands)
-        : parseHeaderNavItems(siteSettings.headerNavItems);
+    const configuredItems = getConfiguredHeaderNavItems(siteSettings?.headerNavItems, brands);
     const headerNavItems = resolveHeaderNavItems(
         configuredItems,
-        categories,
         brands,
     );
 
