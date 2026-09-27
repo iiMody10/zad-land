@@ -2,7 +2,8 @@
 
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Trash2 as MdDelete, SquareCheck as MdCheckBox, Square as MdCheckBoxOutlineBlank, Search as MdSearch, Plus as MdAdd, Check as MdCheck, Image as MdImage, Star as MdStar, Star as MdStarBorder, Pencil as MdEdit, RefreshCw as MdSync, Eye as MdVisibility, ShoppingBag as MdShoppingBag, Store as MdStorefront, Shapes as MdCategory } from 'lucide-react';
 import CategoryModal from "./CategoryModal";
 import { deleteCategory, toggleCategoryFeatured, bulkDeleteCategories } from "../../../../lib/admin-actions";
@@ -39,6 +40,7 @@ interface Brand {
 }
 
 export default function CategoriesClient({ categories: initialCategories, brands }: { categories: Category[], brands: Brand[] }) {
+    const router = useRouter();
     const { data: session } = useAdminSession();
     const { t, dir, language } = useLanguage();
     const isArabic = language === 'ar';
@@ -53,6 +55,8 @@ export default function CategoriesClient({ categories: initialCategories, brands
     const [selectedBrand, setSelectedBrand] = useState("ALL");
     const [filterTab, setFilterTab] = useState<"ALL" | "FEATURED">("ALL");
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+
+    useEffect(() => setCategories(initialCategories), [initialCategories]);
 
     const [relatedModalInfo, setRelatedModalInfo] = useState<{
         isOpen: boolean;
@@ -315,7 +319,10 @@ export default function CategoriesClient({ categories: initialCategories, brands
 
                     <CategoryModal
                         isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
+                        onClose={() => {
+                            setIsModalOpen(false);
+                            router.refresh();
+                        }}
                         category={selectedCategory}
                         brands={brands}
                     />

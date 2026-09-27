@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import AdminHeader from "../../components/AdminHeader";
@@ -90,6 +91,7 @@ export default function ProductsClient({
     brands: Brand[],
     mainCategories?: MainCategory[]
 }) {
+    const router = useRouter();
     const { data: session } = useAdminSession();
     const { t, dir, language } = useLanguage();
     const isArabic = language === 'ar';
@@ -294,6 +296,7 @@ export default function ProductsClient({
                 const result = await deleteProduct(id);
                 if (result.success) {
                     toast.success(t('admin.productDeleted'));
+                    router.refresh();
                 } else {
                     toast.error(t(`admin.${result.error}`) || t('admin.deleteProductError'));
                 }
@@ -314,6 +317,7 @@ export default function ProductsClient({
             if (result.success) {
                 toast.success(`Removed trending status from ${ids.length} products`);
                 setSelectedIds(new Set());
+                router.refresh();
             } else {
                 toast.error(result.error || "Failed to update products");
             }
@@ -334,6 +338,7 @@ export default function ProductsClient({
             if (result.success) {
                 toast.success(`Removed sale from ${ids.length} products`);
                 setSelectedIds(new Set());
+                router.refresh();
             } else {
                 toast.error(result.error || "Failed to update products");
             }
@@ -367,6 +372,7 @@ export default function ProductsClient({
                     toast.success(t('admin.bulkDeleteProductsSuccess').replace('{count}', result.count?.toString() || '0'));
                 }
                 setSelectedIds(new Set());
+                router.refresh();
             } else {
                 toast.error(t(`admin.${result.error}`) || t('admin.bulkDeleteProductsError'));
             }
@@ -384,6 +390,7 @@ export default function ProductsClient({
             const result = await toggleProductTrending(id, !currentStatus);
             if (result.success) {
                 toast.success(`Product ${!currentStatus ? 'marked as trending' : 'removed from trending'} successfully`);
+                router.refresh();
             } else {
                 toast.error(result.error || "Failed to update status");
             }
@@ -651,6 +658,7 @@ export default function ProductsClient({
                         onClose={() => {
                             setIsAddModalOpen(false);
                             setSelectedProduct(null);
+                            router.refresh();
                         }}
                         categories={categories}
                         brands={brands}

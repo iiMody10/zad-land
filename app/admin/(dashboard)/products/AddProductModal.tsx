@@ -178,7 +178,7 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const primaryName = formData.nameEn || formData.name || formData.nameAr;
-        if (!primaryName || !formData.brandId || !formData.categoryId || !formData.price || !formData.images) {
+        if (!primaryName || !formData.brandId || !formData.categoryId || !formData.price.trim() || !formData.images) {
             toast.error(t("admin.addProductModal.fillRequiredFields") || "Please fill all required fields");
             return;
         }

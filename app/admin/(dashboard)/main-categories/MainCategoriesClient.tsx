@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import MainCategoryModal from "./MainCategoryModal";
@@ -29,6 +30,7 @@ interface MainCategory {
 }
 
 export default function MainCategoriesClient({ mainCategories: initialMainCategories }: { mainCategories: MainCategory[] }) {
+    const router = useRouter();
     const { openSidebar } = useAdminSidebar();
     const { data: session } = useAdminSession();
     const { t, dir, language } = useLanguage();
@@ -41,6 +43,8 @@ export default function MainCategoriesClient({ mainCategories: initialMainCatego
     const [searchQuery, setSearchQuery] = useState("");
     const [filterTab, setFilterTab] = useState<"ALL" | "FEATURED" | "ACTIVE" | "INACTIVE">("ALL");
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+
+    useEffect(() => setMainCategories(initialMainCategories), [initialMainCategories]);
 
     const [relatedModalInfo, setRelatedModalInfo] = useState<{
         isOpen: boolean;
@@ -251,7 +255,10 @@ export default function MainCategoriesClient({ mainCategories: initialMainCatego
 
                     <MainCategoryModal
                         isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
+                        onClose={() => {
+                            setIsModalOpen(false);
+                            router.refresh();
+                        }}
                         mainCategory={selected}
                     />
 

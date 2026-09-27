@@ -143,6 +143,40 @@ class OrderApiTest extends TestCase
         ])->assertCreated()->assertJsonPath('slug', 'new-product')->assertJsonPath('price', '12.50');
     }
 
+    public function test_admin_can_patch_product_flags_without_resending_relationship_ids(): void
+    {
+        $admin = User::create(['username' => 'catalog-patch-admin', 'password' => Hash::make('secret123'), 'role' => 'SUPER_ADMIN']);
+        $product = $this->product();
+
+        $this->actingAs($admin, 'web')->patchJson('/api/admin/products/'.$product->id, ['isTrending' => true])
+            ->assertOk()->assertJsonPath('isTrending', true);
+
+        $this->assertTrue($product->fresh()->is_trending);
+    }
+
+    public function test_category_names_are_unique_per_brand_and_in_use_categories_cannot_be_deleted(): void
+    {
+        $admin = User::create(['username' => 'category-admin', 'password' => Hash::make('secret123'), 'role' => 'SUPER_ADMIN']);
+        $firstBrand = Brand::create(['name' => 'Brand One', 'slug' => 'brand-one', 'group' => 'MAIN', 'is_active' => true]);
+        $secondBrand = Brand::create(['name' => 'Brand Two', 'slug' => 'brand-two', 'group' => 'MAIN', 'is_active' => true]);
+        $category = Category::create(['name' => 'Beverages', 'slug' => 'brand-one-beverages', 'brand_id' => $firstBrand->id]);
+
+        $this->actingAs($admin, 'web')->postJson('/api/admin/categories', [
+            'name' => 'Beverages', 'brandId' => $secondBrand->id,
+        ])->assertCreated();
+
+        $this->postJson('/api/admin/categories', [
+            'name' => 'Beverages', 'brandId' => $firstBrand->id,
+        ])->assertUnprocessable();
+
+        $product = Product::create([
+            'name' => 'Category linked product', 'slug' => 'category-linked-product', 'images' => '[]',
+            'price' => '2.00', 'stock' => 5, 'min_order' => 1, 'category_id' => $category->id, 'brand_id' => $firstBrand->id,
+        ]);
+        $this->deleteJson('/api/admin/categories/'.$category->id)->assertConflict();
+        $this->assertDatabaseHas('products', ['id' => $product->id, 'category_id' => $category->id]);
+    }
+
     public function test_super_admin_can_import_workbook_product_rows_into_mysql(): void
     {
         $admin = User::create(['username' => 'catalog-admin', 'password' => Hash::make('secret123'), 'role' => 'SUPER_ADMIN']);

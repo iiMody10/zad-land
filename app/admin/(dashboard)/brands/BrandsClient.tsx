@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import BrandModal from "./BrandModal";
@@ -32,6 +33,7 @@ interface Brand {
 }
 
 export default function BrandsClient({ brands: initialBrands }: { brands: Brand[] }) {
+    const router = useRouter();
     const { openSidebar } = useAdminSidebar();
     const { data: session } = useAdminSession();
     const { t, language } = useLanguage();
@@ -45,6 +47,8 @@ export default function BrandsClient({ brands: initialBrands }: { brands: Brand[
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<"ALL" | "FEATURED" | "ACTIVE" | "DRAFT">("ALL");
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+
+    useEffect(() => setBrands(initialBrands), [initialBrands]);
 
     const [relatedModalInfo, setRelatedModalInfo] = useState<{
         isOpen: boolean;
@@ -254,7 +258,10 @@ export default function BrandsClient({ brands: initialBrands }: { brands: Brand[
 
                     <BrandModal
                         isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
+                        onClose={() => {
+                            setIsModalOpen(false);
+                            router.refresh();
+                        }}
                         brand={selectedBrand}
                     />
 

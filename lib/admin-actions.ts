@@ -195,7 +195,17 @@ export async function deleteMainCategory(id: string) { return mutation(`/admin/m
 export async function toggleMainCategoryFeatured(id: string, isFeatured: boolean) { return mutation(`/admin/main-categories/${encodeURIComponent(id)}`, "PATCH", { isFeatured }); }
 export async function toggleMainCategoryActive(id: string, isActive: boolean) { return mutation(`/admin/main-categories/${encodeURIComponent(id)}`, "PATCH", { isActive }); }
 
-export async function getAdminProducts() { return request<any[]>("/admin/products"); }
+export async function getAdminProducts(): Promise<any[]> {
+    const products = await request<any[]>("/admin/products");
+    return products.map((product) => ({
+        ...product,
+        price: Number(product.price ?? 0),
+        discountPrice: product.discountPrice == null ? null : Number(product.discountPrice),
+        discountValue: product.discountValue == null ? null : Number(product.discountValue),
+        stock: Number(product.stock ?? 0),
+        minOrder: Number(product.minOrder ?? 1),
+    }));
+}
 export async function getAdminCategories(page = 1, limit = 500) {
     const categories = await request<any[]>(`/admin/categories?page=${page}&limit=${limit}`);
     return { categories: categories.slice((page - 1) * limit, page * limit), pagination: { total: categories.length, pages: Math.ceil(categories.length / limit), page, limit } };

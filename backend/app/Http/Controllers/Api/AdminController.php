@@ -107,11 +107,11 @@ class AdminController extends Controller
         abort_unless(isset(self::RESOURCES[$resource]), 404);
         [$class, $table, $fields] = self::RESOURCES[$resource];
         $input = $this->allowedInput($request, $fields);
-        $this->validateResource($request, $resource, $table, $fields, $input);
         if ($resource === 'categories' && empty($input['brand_id'])) {
             $brand = Brand::firstOrCreate(['slug' => 'zad-land'], ['name' => 'Zad Land', 'group' => 'MAIN', 'is_active' => true, 'is_featured' => true]);
             $input['brand_id'] = $brand->id;
         }
+        $this->validateResource($request, $resource, $table, $fields, $input);
         if (in_array('slug', $fields, true) && empty($input['slug'])) {
             $input['slug'] = $this->uniqueSlug($table, $resource === 'main-categories' ? (($input['description'] ?? '') ?: ($input['name'] ?? '')) : ($input['name'] ?? ''));
         }
@@ -197,7 +197,7 @@ class AdminController extends Controller
         return ($base !== '' ? $base : $prefix).'-'.$suffix;
     }
 
-    public function update(Request $request, string $resource, string $id)
+    public function update(Request $request, string $id, string $resource)
     {
         abort_unless(isset(self::RESOURCES[$resource]), 404);
         [$class, $table, $fields] = self::RESOURCES[$resource];
@@ -226,7 +226,7 @@ class AdminController extends Controller
         return response()->json(ApiJson::camel($record->fresh()));
     }
 
-    public function destroy(string $resource, string $id)
+    public function destroy(string $id, string $resource)
     {
         abort_unless(isset(self::RESOURCES[$resource]), 404);
         [$class] = self::RESOURCES[$resource];
@@ -539,7 +539,12 @@ class AdminController extends Controller
             'banners' => ['image'], 'promo-codes' => ['code', 'discount_percentage'], default => [],
         };
         foreach ($required as $field) {
-            $rules[Str::camel($field)] = [$id ? 'sometimes' : 'required', 'string', 'max:'.($field === 'images' ? 10000 : 2000)];
+            $maxLength = match ($field) {
+                'images' => 10000,
+                'name' => in_array($resource, ['products', 'categories'], true) ? 191 : 767,
+                default => 2000,
+            };
+            $rules[Str::camel($field)] = [$id ? 'sometimes' : 'required', 'string', 'max:'.$maxLength];
         }
         foreach (['price', 'discount_price', 'discount_value'] as $field) {
             if (in_array($field, $fields, true)) {
@@ -560,14 +565,25 @@ class AdminController extends Controller
             $rules['slug'] = ['sometimes', 'string', 'max:767'];
         }
         if (in_array('brand_id', $fields, true)) {
-            $rules['brandId'] = ['sometimes', 'string', 'max:191', 'exists:brands,id'];
+            $rules['brandId'] = [$resource === 'products' && ! $id ? 'required' : 'sometimes', 'string', 'max:191', 'exists:brands,id'];
         }
         if (in_array('category_id', $fields, true)) {
-            $rules['categoryId'] = ['required', 'string', 'max:191', 'exists:categories,id'];
+            $rules['categoryId'] = [$resource === 'products' && ! $id ? 'required' : 'sometimes', 'string', 'max:191', 'exists:categories,id'];
+        }
+        if (in_array('main_category_id', $fields, true)) {
+            $rules['mainCategoryId'] = ['sometimes', 'nullable', 'string', 'max:191', 'exists:main_categories,id'];
         }
         foreach (['slug' => 'slug', 'name' => 'name', 'code' => 'code'] as $field => $column) {
             if (in_array($column, $fields, true)) {
-                $rules[Str::camel($field)][] = Rule::unique($table, $column)->ignore($id);
+                $uniqueRule = Rule::unique($table, $column)->ignore($id);
+                if ($resource === 'categories' && $field === 'name') {
+                    $brandId = $input['brand_id'] ?? ($id ? Category::whereKey($id)->value('brand_id') : null);
+                    if ($brandId === null) {
+                        continue;
+                    }
+                    $uniqueRule->where('brand_id', $brandId);
+                }
+                $rules[Str::camel($field)][] = $uniqueRule;
             }
         }
         if ($resource === 'promo-codes') {
