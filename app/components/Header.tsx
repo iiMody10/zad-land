@@ -39,21 +39,9 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
-    const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
     const [desktopNavOverflowVisible, setDesktopNavOverflowVisible] = useState(true);
-    const [visibleCount, setVisibleCount] = useState(4);
     const isArabic = language === 'ar';
-
-    useEffect(() => {
-        const updateVisibleCount = () => {
-            const width = window.innerWidth;
-            setVisibleCount(width >= 1440 ? 4 : width >= 1200 ? 3 : 2);
-        };
-        updateVisibleCount();
-        window.addEventListener('resize', updateVisibleCount);
-        return () => window.removeEventListener('resize', updateVisibleCount);
-    }, []);
 
     useEffect(() => {
         if (!headerRef.current) return;
@@ -96,7 +84,6 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
             }
             if (compact) {
                 setActiveMegaMenu(null);
-                setIsMoreOpen(false);
             }
         };
         const updateHeaderFromWheel = () => {
@@ -153,7 +140,6 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
         const closeOnEscape = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 setActiveMegaMenu(null);
-                setIsMoreOpen(false);
                 setIsMobileMenuOpen(false);
                 setIsMobileSearchOpen(false);
             }
@@ -170,11 +156,8 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
     }, [isMobileSearchOpen]);
 
     const activeNavData = initialNavData.find((item) => item.slug === activeMegaMenu);
-    const visibleNavItems = initialNavData.slice(0, visibleCount);
-    const overflowNavItems = initialNavData.slice(visibleCount);
     const closeDesktopMenus = () => {
         setActiveMegaMenu(null);
-        setIsMoreOpen(false);
     };
 
     return (
@@ -312,13 +295,14 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
                         {isArabic ? 'جميع المنتجات' : 'Shop all'}
                     </Link>
 
-                    <div className="flex min-w-0 flex-1 items-center gap-0.5">
-                        {visibleNavItems.map((item) => {
+                    <div className="flex min-w-0 flex-1 justify-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                      <div className="flex w-max min-w-full items-center justify-center gap-0.5">
+                        {initialNavData.map((item) => {
                             const name = isArabic ? item.name : item.nameEn || item.name;
                             const isOpen = activeMegaMenu === item.slug;
                             const isActive = pathname === `/department/${item.slug}` || pathname.startsWith(`/department/${item.slug}/`);
                             return (
-                                <div key={item.id} className="flex shrink-0 items-center" onMouseEnter={() => { setIsMoreOpen(false); setActiveMegaMenu(item.slug); }}>
+                                <div key={item.id} className="flex shrink-0 items-center" onMouseEnter={() => setActiveMegaMenu(item.slug)}>
                                     <Link
                                         href={`/department/${item.slug}`}
                                         onFocus={() => setActiveMegaMenu(item.slug)}
@@ -333,7 +317,7 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
                                         aria-label={isArabic ? `عرض أقسام ${name}` : `Explore ${name}`}
                                         aria-expanded={isOpen}
                                         aria-controls="desktop-category-panel"
-                                        onClick={() => { setIsMoreOpen(false); setActiveMegaMenu((active) => active === item.slug ? null : item.slug); }}
+                                        onClick={() => setActiveMegaMenu((active) => active === item.slug ? null : item.slug)}
                                         className={`flex h-10 w-7 items-center justify-center rounded-e-[7px] transition-colors ${isOpen ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[#5b6c60] hover:bg-[var(--color-brand-soft)] dark:text-gray-300 dark:hover:bg-white/10'}`}
                                     >
                                         <MdKeyboardArrowDown className={`text-lg transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -341,33 +325,7 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
                                 </div>
                             );
                         })}
-                        {overflowNavItems.length > 0 && (
-                            <div className="relative shrink-0" onMouseEnter={() => { setActiveMegaMenu(null); setIsMoreOpen(true); }}>
-                                <button
-                                    type="button"
-                                    aria-expanded={isMoreOpen}
-                                    onClick={() => { setActiveMegaMenu(null); setIsMoreOpen((open) => !open); }}
-                                    className="flex h-10 items-center gap-1 rounded-[7px] px-3 text-[13px] font-semibold text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10"
-                                >
-                                    {isArabic ? 'المزيد' : 'More'}
-                                    <MdKeyboardArrowDown className={`text-lg transition-transform ${isMoreOpen ? 'rotate-180' : ''}`} />
-                                </button>
-                                {isMoreOpen && (
-                                    <div className="absolute top-full start-0 z-50 mt-1 w-60 rounded-[10px] border border-[var(--color-line)] bg-white p-2 shadow-[0_16px_35px_rgba(17,43,31,0.13)] dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
-                                        {overflowNavItems.map((item) => (
-                                            <Link
-                                                key={item.id}
-                                                href={`/department/${item.slug}`}
-                                                onClick={closeDesktopMenus}
-                                                className="block rounded-[6px] px-3 py-2.5 text-sm text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-white dark:hover:bg-white/10"
-                                            >
-                                                {isArabic ? item.name : item.nameEn || item.name}
-                                            </Link>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                      </div>
                     </div>
 
                     <div className="flex shrink-0 items-center gap-1 border-s border-[var(--color-line)] ps-3 dark:border-white/15">
@@ -382,7 +340,6 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
                         key={activeNavData.id}
                         data={activeNavData}
                         onClose={closeDesktopMenus}
-                        onMouseEnter={() => setIsMoreOpen(false)}
                     />
                 )}
             </nav>

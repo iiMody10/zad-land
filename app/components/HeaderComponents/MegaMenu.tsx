@@ -55,7 +55,6 @@ export interface NavMainCategory {
 interface MegaMenuProps {
     data: NavMainCategory;
     onClose: () => void;
-    onMouseEnter?: () => void;
     onMouseLeave?: () => void;
 }
 
@@ -73,7 +72,7 @@ const localizedBrandName = (name: string, isArabic: boolean) => {
     return parts.find((part) => isArabic ? /[\u0600-\u06FF]/.test(part) : !/[\u0600-\u06FF]/.test(part)) || name;
 };
 
-export default function MegaMenu({ data, onClose, onMouseEnter, onMouseLeave }: MegaMenuProps) {
+export default function MegaMenu({ data, onClose, onMouseLeave }: MegaMenuProps) {
     const { language } = useLanguage();
     const isArabic = language === 'ar';
     const title = isArabic ? data.name : data.nameEn || data.name;
@@ -84,7 +83,6 @@ export default function MegaMenu({ data, onClose, onMouseEnter, onMouseLeave }: 
         <div
             id="desktop-category-panel"
             className="absolute inset-x-0 top-full z-40 border-t border-[var(--color-line)] bg-white shadow-[0_22px_35px_rgba(15,40,29,0.14)] dark:border-white/10 dark:bg-[var(--color-background-dark)]"
-            onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
             <div className="container-custom grid max-h-[min(66vh,500px)] grid-cols-12 gap-6 overflow-y-auto py-6 xl:gap-8">
