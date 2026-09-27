@@ -964,11 +964,11 @@ export default function ProductsClient({
                                                 <td className="p-3 sm:p-5 text-xs sm:text-sm font-bold text-text-main dark:text-white">
                                                     {product.discountPrice ? (
                                                         <div className="flex flex-col">
-                                                            <span className="text-primary">${product.discountPrice.toFixed(2)}</span>
-                                                            <span className="text-[10px] text-text-sub line-through decoration-red-400/50">${product.price.toFixed(2)}</span>
+                                                            <span className="text-primary">${Number(product.discountPrice).toFixed(2)}</span>
+                                                            <span className="text-[10px] text-text-sub line-through decoration-red-400/50">${Number(product.price).toFixed(2)}</span>
                                                         </div>
                                                     ) : (
-                                                        <span>${product.price.toFixed(2)}</span>
+                                                        <span>${Number(product.price).toFixed(2)}</span>
                                                     )}
                                                 </td>
                                                 <td className="p-3 sm:p-5">

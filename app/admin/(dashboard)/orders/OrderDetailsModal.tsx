@@ -93,7 +93,7 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                         </div>
                         <div className={`space-y-1 ${dir === 'rtl' ? 'text-start' : 'text-end'}`}>
                             <p className="text-[10px] font-bold uppercase tracking-wider text-text-sub dark:text-gray-500">{t('admin.totalAmount')}</p>
-                            <p className="text-2xl font-black text-primary" dir="ltr">${order.totalAmount.toFixed(2)}</p>
+                            <p className="text-2xl font-black text-primary" dir="ltr">${Number(order.totalAmount).toFixed(2)}</p>
                         </div>
                     </div>
 
