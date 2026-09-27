@@ -9,6 +9,7 @@ import { toast } from "react-hot-toast";
 import { useLanguage } from "@/app/context/LanguageContext";
 import FooterContentSection from "./FooterContentSection";
 import HeaderNavigationSection from "./HeaderNavigationSection";
+import AboutContentSection, { type AboutSettingsForm } from "./AboutContentSection";
 import type { HeaderNavItemRef } from "@/lib/header-navigation";
 
 interface FooterCategoryOption {
@@ -116,6 +117,39 @@ interface SiteSettings {
     aboutValue3TitleAr: string | null;
     aboutValue3Desc: string | null;
     aboutValue3DescAr: string | null;
+    aboutPageEnabled: boolean;
+    aboutHeroEnabled: boolean;
+    aboutHeroEyebrow: string | null;
+    aboutHeroEyebrowAr: string | null;
+    aboutHeroImageAlt: string | null;
+    aboutHeroImageAltAr: string | null;
+    aboutHeroPrimaryCtaLabel: string | null;
+    aboutHeroPrimaryCtaLabelAr: string | null;
+    aboutHeroPrimaryCtaUrl: string | null;
+    aboutHeroSecondaryCtaLabel: string | null;
+    aboutHeroSecondaryCtaLabelAr: string | null;
+    aboutHeroSecondaryCtaUrl: string | null;
+    aboutNarrativeEnabled: boolean;
+    aboutNarrativeImageAlt: string | null;
+    aboutNarrativeImageAltAr: string | null;
+    aboutValuesEnabled: boolean;
+    aboutValuesEyebrow: string | null;
+    aboutValuesEyebrowAr: string | null;
+    aboutValue1Enabled: boolean;
+    aboutValue2Enabled: boolean;
+    aboutValue3Enabled: boolean;
+    aboutCtaEnabled: boolean;
+    aboutCtaEyebrow: string | null;
+    aboutCtaEyebrowAr: string | null;
+    aboutCtaTitle: string | null;
+    aboutCtaTitleAr: string | null;
+    aboutCtaButtonLabel: string | null;
+    aboutCtaButtonLabelAr: string | null;
+    aboutCtaUrl: string | null;
+    aboutSeoTitle: string | null;
+    aboutSeoTitleAr: string | null;
+    aboutSeoDescription: string | null;
+    aboutSeoDescriptionAr: string | null;
     exchangeRate: number | null;
     middleBanner1Image: string | null;
     middleBanner1Link: string | null;
@@ -208,24 +242,28 @@ export default function SiteContentClient({
         footerCategory4Id: initialSettings?.footerCategory4Id || "",
     });
 
-    // Site Settings State - About Us
-    const [aboutHeroTitle, setAboutHeroTitle] = useState(initialSettings?.aboutHeroTitle || "");
-    const [aboutHeroTitleAr, setAboutHeroTitleAr] = useState(initialSettings?.aboutHeroTitleAr || "");
-    const [aboutHeroSubtitle, setAboutHeroSubtitle] = useState(initialSettings?.aboutHeroSubtitle || "");
-    const [aboutHeroSubtitleAr, setAboutHeroSubtitleAr] = useState(initialSettings?.aboutHeroSubtitleAr || "");
-    const [aboutHeroImage, setAboutHeroImage] = useState(initialSettings?.aboutHeroImage || "");
-    
-    const [aboutNarrativeTitle, setAboutNarrativeTitle] = useState(initialSettings?.aboutNarrativeTitle || "");
-    const [aboutNarrativeTitleAr, setAboutNarrativeTitleAr] = useState(initialSettings?.aboutNarrativeTitleAr || "");
-    const [aboutNarrativeFounded, setAboutNarrativeFounded] = useState(initialSettings?.aboutNarrativeFounded || "Founded in 2024");
-    const [aboutNarrativeFoundedAr, setAboutNarrativeFoundedAr] = useState(initialSettings?.aboutNarrativeFoundedAr || "تأسست في 2024");
-    const [aboutNarrativeDesc1, setAboutNarrativeDesc1] = useState(initialSettings?.aboutNarrativeDesc1 || "");
-    const [aboutNarrativeDesc1Ar, setAboutNarrativeDesc1Ar] = useState(initialSettings?.aboutNarrativeDesc1Ar || "");
-    const [aboutNarrativeDesc2, setAboutNarrativeDesc2] = useState(initialSettings?.aboutNarrativeDesc2 || "");
-    const [aboutNarrativeDesc2Ar, setAboutNarrativeDesc2Ar] = useState(initialSettings?.aboutNarrativeDesc2Ar || "");
-    const [aboutNarrativeQuote, setAboutNarrativeQuote] = useState(initialSettings?.aboutNarrativeQuote || "");
-    const [aboutNarrativeQuoteAr, setAboutNarrativeQuoteAr] = useState(initialSettings?.aboutNarrativeQuoteAr || "");
-    const [aboutNarrativeImage, setAboutNarrativeImage] = useState(initialSettings?.aboutNarrativeImage || "");
+    // Every text, image URL, link, SEO field and visibility switch for About Us.
+    const [aboutContent, setAboutContent] = useState<AboutSettingsForm>(() => {
+        const textKeys = [
+            'aboutHeroEyebrow', 'aboutHeroEyebrowAr', 'aboutHeroTitle', 'aboutHeroTitleAr', 'aboutHeroSubtitle', 'aboutHeroSubtitleAr',
+            'aboutHeroImage', 'aboutHeroImageAlt', 'aboutHeroImageAltAr', 'aboutHeroPrimaryCtaLabel', 'aboutHeroPrimaryCtaLabelAr',
+            'aboutHeroPrimaryCtaUrl', 'aboutHeroSecondaryCtaLabel', 'aboutHeroSecondaryCtaLabelAr', 'aboutHeroSecondaryCtaUrl',
+            'aboutNarrativeTitle', 'aboutNarrativeTitleAr', 'aboutNarrativeFounded', 'aboutNarrativeFoundedAr', 'aboutNarrativeDesc1',
+            'aboutNarrativeDesc1Ar', 'aboutNarrativeDesc2', 'aboutNarrativeDesc2Ar', 'aboutNarrativeQuote', 'aboutNarrativeQuoteAr',
+            'aboutNarrativeImage', 'aboutNarrativeImageAlt', 'aboutNarrativeImageAltAr', 'aboutValuesEyebrow', 'aboutValuesEyebrowAr',
+            'aboutValuesTitle', 'aboutValuesTitleAr', 'aboutValuesDesc', 'aboutValuesDescAr', 'aboutValue1Title', 'aboutValue1TitleAr',
+            'aboutValue1Desc', 'aboutValue1DescAr', 'aboutValue2Title', 'aboutValue2TitleAr', 'aboutValue2Desc', 'aboutValue2DescAr',
+            'aboutValue3Title', 'aboutValue3TitleAr', 'aboutValue3Desc', 'aboutValue3DescAr', 'aboutCtaEyebrow', 'aboutCtaEyebrowAr',
+            'aboutCtaTitle', 'aboutCtaTitleAr', 'aboutCtaButtonLabel', 'aboutCtaButtonLabelAr', 'aboutCtaUrl', 'aboutSeoTitle',
+            'aboutSeoTitleAr', 'aboutSeoDescription', 'aboutSeoDescriptionAr',
+        ] as const;
+        const result: AboutSettingsForm = {};
+        for (const key of textKeys) result[key] = initialSettings?.[key] || '';
+        for (const key of ['aboutPageEnabled', 'aboutHeroEnabled', 'aboutNarrativeEnabled', 'aboutValuesEnabled', 'aboutCtaEnabled', 'aboutValue1Enabled', 'aboutValue2Enabled', 'aboutValue3Enabled'] as const) {
+            result[key] = initialSettings?.[key] !== false;
+        }
+        return result;
+    });
 
     // Site Settings State - Shipping & Returns
     const [shippingTitle, setShippingTitle] = useState(initialSettings?.shippingTitle || "");
@@ -337,22 +375,7 @@ export default function SiteContentClient({
                 hygieneTitleAr,
                 hygieneDescAr,
                 shippingReturnsImage,
-                aboutHeroTitle,
-                aboutHeroTitleAr,
-                aboutHeroSubtitle,
-                aboutHeroSubtitleAr,
-                aboutHeroImage,
-                aboutNarrativeTitle,
-                aboutNarrativeTitleAr,
-                aboutNarrativeFounded,
-                aboutNarrativeFoundedAr,
-                aboutNarrativeDesc1,
-                aboutNarrativeDesc1Ar,
-                aboutNarrativeDesc2,
-                aboutNarrativeDesc2Ar,
-                aboutNarrativeQuote,
-                aboutNarrativeQuoteAr,
-                aboutNarrativeImage,
+                ...aboutContent,
                 middleBanner1Image,
                 middleBanner1Link,
                 middleBanner2Image,
@@ -818,107 +841,13 @@ export default function SiteContentClient({
                         </div>
                     )}
 
-                    {/* TAB 5: ABOUT US STORY */}
+                    {/* ABOUT US */}
                     {activeTab === "about" && (
-                        <div className="space-y-8 animate-in fade-in-50 duration-200">
-                            {/* Hero Header */}
-                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
-                                <div className="mb-6">
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                                        {t('admin.aboutHero') || "About Us Hero Header"}
-                                    </h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                        {t('admin.aboutHeroDesc') || "Top banner text and background photo for the /about-us page."}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-6">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('admin.imageUrl')}</label>
-                                        <input type="text" value={aboutHeroImage} onChange={(e) => setAboutHeroImage(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" placeholder="https://..." />
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-3">
-                                            <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇬🇧 English</span>
-                                            <input type="text" value={aboutHeroTitle} onChange={(e) => setAboutHeroTitle(e.target.value)} placeholder="Hero Title (e.g. Our Story)" className="w-full px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                            <input type="text" value={aboutHeroSubtitle} onChange={(e) => setAboutHeroSubtitle(e.target.value)} placeholder="Hero Subtitle" className="w-full px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                        </div>
-                                        <div className="space-y-3" dir="rtl">
-                                            <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇸🇦 العربية</span>
-                                            <input type="text" value={aboutHeroTitleAr} onChange={(e) => setAboutHeroTitleAr(e.target.value)} placeholder="عنوان البانر (مثال: قصتنا)" className="w-full px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                            <input type="text" value={aboutHeroSubtitleAr} onChange={(e) => setAboutHeroSubtitleAr(e.target.value)} placeholder="العنوان الفرعي" className="w-full px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Narrative */}
-                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
-                                <div className="mb-6">
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                                        {t('admin.aboutNarrative') || "Company Story & Narrative"}
-                                    </h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                        {t('admin.aboutNarrativeDesc') || "Detailed mission paragraphs, founding badge, and brand motto."}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-4">
-                                            <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇬🇧 English</span>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">Badge Text</label>
-                                                <input type="text" value={aboutNarrativeFounded} onChange={(e) => setAboutNarrativeFounded(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">Section Title</label>
-                                                <input type="text" value={aboutNarrativeTitle} onChange={(e) => setAboutNarrativeTitle(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">Paragraph 1</label>
-                                                <textarea rows={3} value={aboutNarrativeDesc1} onChange={(e) => setAboutNarrativeDesc1(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">Paragraph 2</label>
-                                                <textarea rows={3} value={aboutNarrativeDesc2} onChange={(e) => setAboutNarrativeDesc2(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">Brand Quote / Motto</label>
-                                                <input type="text" value={aboutNarrativeQuote} onChange={(e) => setAboutNarrativeQuote(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-4" dir="rtl">
-                                            <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇸🇦 العربية</span>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">نص الشارة</label>
-                                                <input type="text" value={aboutNarrativeFoundedAr} onChange={(e) => setAboutNarrativeFoundedAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">عنوان القسم</label>
-                                                <input type="text" value={aboutNarrativeTitleAr} onChange={(e) => setAboutNarrativeTitleAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">الفقرة الأولى</label>
-                                                <textarea rows={3} value={aboutNarrativeDesc1Ar} onChange={(e) => setAboutNarrativeDesc1Ar(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">الفقرة الثانية</label>
-                                                <textarea rows={3} value={aboutNarrativeDesc2Ar} onChange={(e) => setAboutNarrativeDesc2Ar(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-slate-500 uppercase">الاقتباس أو الشعار</label>
-                                                <input type="text" value={aboutNarrativeQuoteAr} onChange={(e) => setAboutNarrativeQuoteAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                        <AboutContentSection
+                            value={aboutContent}
+                            onChange={(key, next) => setAboutContent((current) => ({ ...current, [key]: next }))}
+                        />
+                    )}                </div>
             </div>
         </div>
     );

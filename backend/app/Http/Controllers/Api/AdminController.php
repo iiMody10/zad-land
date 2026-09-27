@@ -368,6 +368,14 @@ class AdminController extends Controller
                     'featured_collection_enabled',
                     'featured_collection_new_arrivals_enabled',
                     'featured_collection_best_sellers_enabled',
+                    'about_page_enabled',
+                    'about_hero_enabled',
+                    'about_narrative_enabled',
+                    'about_values_enabled',
+                    'about_cta_enabled',
+                    'about_value1_enabled',
+                    'about_value2_enabled',
+                    'about_value3_enabled',
                 ], true)) {
                     $rules[$key] = ['required', 'boolean'];
                 } elseif ($column === 'featured_collection_all_products_url') {

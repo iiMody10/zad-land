@@ -23,6 +23,14 @@ class Settings extends Model
             'featured_collection_enabled' => 'boolean',
             'featured_collection_new_arrivals_enabled' => 'boolean',
             'featured_collection_best_sellers_enabled' => 'boolean',
+            'about_page_enabled' => 'boolean',
+            'about_hero_enabled' => 'boolean',
+            'about_narrative_enabled' => 'boolean',
+            'about_values_enabled' => 'boolean',
+            'about_cta_enabled' => 'boolean',
+            'about_value1_enabled' => 'boolean',
+            'about_value2_enabled' => 'boolean',
+            'about_value3_enabled' => 'boolean',
             'updated_at' => 'datetime',
         ];
     }

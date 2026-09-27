@@ -76,7 +76,7 @@ async function request<T = any>(path: string, method = "GET", body?: unknown): P
 
 function invalidateAdminData() {
     for (const path of [
-        "/", "/products", "/brands", "/categories", "/admin",
+        "/", "/products", "/brands", "/categories", "/about-us", "/admin",
         "/admin/banners", "/admin/site-content", "/admin/settings", "/admin/users",
         "/admin/customers", "/admin/brands", "/admin/categories", "/admin/main-categories",
         "/admin/products", "/admin/orders", "/admin/promocodes", "/admin/reviews",
