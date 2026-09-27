@@ -41,6 +41,7 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
     const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
     const [isMoreOpen, setIsMoreOpen] = useState(false);
     const [isHeaderCompact, setIsHeaderCompact] = useState(false);
+    const [desktopNavOverflowVisible, setDesktopNavOverflowVisible] = useState(true);
     const [visibleCount, setVisibleCount] = useState(4);
     const isArabic = language === 'ar';
 
@@ -76,10 +77,23 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
         let compactState = desktop.matches && window.scrollY > 64;
         let wheelStartY: number | null = null;
         let wheelTimer: number | undefined;
+        let navOverflowTimer: number | undefined;
         const setCompact = (compact: boolean) => {
             if (compactState === compact) return;
             compactState = compact;
             setIsHeaderCompact(compact);
+            if (navOverflowTimer !== undefined) window.clearTimeout(navOverflowTimer);
+            if (compact) {
+                setDesktopNavOverflowVisible(false);
+            } else {
+                // Keep the nav row clipped while its height animates open. Its
+                // links otherwise overflow the short row over the page content.
+                setDesktopNavOverflowVisible(false);
+                navOverflowTimer = window.setTimeout(() => {
+                    navOverflowTimer = undefined;
+                    setDesktopNavOverflowVisible(true);
+                }, 320);
+            }
             if (compact) {
                 setActiveMegaMenu(null);
                 setIsMoreOpen(false);
@@ -131,6 +145,7 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
             window.removeEventListener('resize', resetForViewport);
             window.cancelAnimationFrame(initialFrame);
             if (wheelTimer !== undefined) window.clearTimeout(wheelTimer);
+            if (navOverflowTimer !== undefined) window.clearTimeout(navOverflowTimer);
         };
     }, []);
 
@@ -281,7 +296,7 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
                 aria-hidden={isHeaderCompact}
                 inert={isHeaderCompact}
                 className="relative hidden border-t border-[var(--color-line)] bg-[var(--color-canvas)] transition-[height,opacity,transform] duration-300 ease-out motion-reduce:transition-none dark:border-white/10 dark:bg-[var(--color-surface-dark)] lg:block"
-                style={{ height: isHeaderCompact ? 0 : 50, overflow: isHeaderCompact ? 'hidden' : 'visible', opacity: isHeaderCompact ? 0 : 1, transform: isHeaderCompact ? 'translateY(-8px)' : 'translateY(0)', borderColor: isHeaderCompact ? 'transparent' : undefined }}
+                style={{ height: isHeaderCompact ? 0 : 50, overflow: isHeaderCompact || !desktopNavOverflowVisible ? 'hidden' : 'visible', opacity: isHeaderCompact ? 0 : 1, transform: isHeaderCompact ? 'translateY(-8px)' : 'translateY(0)', borderColor: isHeaderCompact ? 'transparent' : undefined }}
                 onMouseLeave={closeDesktopMenus}
                 onBlur={(event) => {
                     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeDesktopMenus();
