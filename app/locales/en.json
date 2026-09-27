@@ -381,7 +381,7 @@
         "outOfStockCount": "{count} out of stock",
         "inStockCount": "{count} in healthy stock",
         "salesVelocity": "Sales Velocity & Trend",
-        "salesVelocityDesc": "Daily revenue and order volume for the past 14 days.",
+        "salesVelocityDesc": "Revenue and completed orders per day for the past 14 days.",
         "revenueView": "Revenue ($)",
         "ordersView": "Orders Count",
         "peakDay": "Peak Day",

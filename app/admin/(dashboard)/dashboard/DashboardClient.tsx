@@ -27,8 +27,9 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
 
     // Calculate total orders for pipeline percentage
     const totalOrdersCount = stats.totalOrders || 1;
-    const fulfillmentRate = stats.totalOrders > 0 
-        ? Math.round((stats.pipeline.delivered / stats.totalOrders) * 100) 
+    const fulfillableOrders = Math.max(0, stats.totalOrders - stats.pipeline.cancelled);
+    const fulfillmentRate = fulfillableOrders > 0
+        ? Math.round((stats.pipeline.delivered / fulfillableOrders) * 100)
         : 0;
 
     // Peak trend day calculation
@@ -302,7 +303,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                     )}
                                 </span>
                                 <Link 
-                                    href="/admin/products"
+                                    href="/admin/categories"
                                     className="font-bold text-slate-700 dark:text-slate-300 hover:underline shrink-0"
                                 >
                                     {stats.totalCategories} {t('admin.categories')}
@@ -823,11 +824,11 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
 
                                                 <div className="flex items-center gap-2 shrink-0">
                                                     <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
-                                                        p.stock === 0 
+                                                        p.stock <= 0
                                                             ? 'bg-rose-600 text-white' 
                                                             : 'bg-amber-500 text-white'
                                                     }`}>
-                                                        {p.stock === 0 ? t('admin.outOfStock') : `${p.stock} ${t('admin.unitsLeft')}`}
+                                                        {p.stock <= 0 ? t('admin.outOfStock') : `${p.stock} ${t('admin.unitsLeft')}`}
                                                     </span>
                                                 </div>
                                             </div>

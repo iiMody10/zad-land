@@ -1,10 +1,15 @@
 import { getDashboardStats } from "../../../../lib/admin-actions";
 import DashboardClient from "./DashboardClient";
+import DashboardUnavailable from "./DashboardUnavailable";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-    const stats = await getDashboardStats();
+    try {
+        const stats = await getDashboardStats();
+        return <DashboardClient stats={stats} />;
+    } catch {
+        return <DashboardUnavailable />;
+    }
 
-    return <DashboardClient stats={stats} />;
 }

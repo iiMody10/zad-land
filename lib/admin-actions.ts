@@ -178,13 +178,7 @@ export async function getHomeCollectionSections(): Promise<HomeCollectionSection
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-    const fallback: DashboardStats = {
-        totalRevenue: 0, totalOrders: 0, totalProducts: 0, totalCategories: 0, averageOrderValue: 0, deliveredOrdersCount: 0,
-        pipeline: { pending: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0 },
-        inventory: { totalProducts: 0, lowStockCount: 0, outOfStockCount: 0, inStockCount: 0 },
-        lowStockProducts: [], topProducts: [], salesTrend: [], topCities: [], recentOrders: [],
-    };
-    return laravelJson<DashboardStats>("/api/admin/dashboard", fallback);
+    return laravelJson<DashboardStats>("/api/admin/dashboard");
 }
 
 export async function getAdminBrands() { return request<any[]>("/admin/brands"); }

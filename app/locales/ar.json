@@ -390,7 +390,7 @@
         "outOfStockCount": "{count} نفد من المخزون",
         "inStockCount": "{count} متوفر بكثرة",
         "salesVelocity": "حركة ونمو المبيعات",
-        "salesVelocityDesc": "الإيرادات وحجم الطلبات اليومية خلال آخر 14 يومًا.",
+        "salesVelocityDesc": "الإيرادات والطلبات المكتملة يوميًا خلال آخر 14 يومًا.",
         "revenueView": "الإيرادات ($)",
         "ordersView": "عدد الطلبات",
         "peakDay": "يوم الذروة",

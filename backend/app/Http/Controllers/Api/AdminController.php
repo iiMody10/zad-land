@@ -464,10 +464,10 @@ class AdminController extends Controller
         $delivered = Order::where('status', 'DELIVERED');
         $statuses = collect(['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'])
             ->mapWithKeys(fn (string $status) => [strtolower($status) => Order::where('status', $status)->count()]);
-        $lowStock = Product::with('category:id,name')->where('stock', '>', 0)->where('stock', '<=', 5)->orderBy('stock')->take(10)->get();
-        $sales = Order::where('status', 'DELIVERED')->where('created_at', '>=', now()->subDays(29)->startOfDay())
+        $lowStock = Product::with('category:id,name')->where('stock', '<=', 5)->orderBy('stock')->take(10)->get();
+        $sales = Order::where('status', 'DELIVERED')->where('created_at', '>=', now()->subDays(13)->startOfDay())
             ->selectRaw('DATE(created_at) as day, SUM(total_amount) as revenue, COUNT(*) as orders')->groupByRaw('DATE(created_at)')->orderBy('day')->get()->keyBy('day');
-        $trend = collect(range(29, 0))->map(function (int $daysAgo) use ($sales): array {
+        $trend = collect(range(13, 0))->map(function (int $daysAgo) use ($sales): array {
             $date = now()->subDays($daysAgo)->startOfDay();
             $row = $sales->get($date->toDateString());
 
