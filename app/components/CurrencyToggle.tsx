@@ -27,6 +27,7 @@ const CurrencyToggle = () => {
     return (
         <div className="relative inline-block text-left" ref={dropdownRef}>
             <button
+                type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold text-zinc-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                 aria-haspopup="true"
@@ -42,6 +43,7 @@ const CurrencyToggle = () => {
                 <div className="absolute end-0 mt-2 w-32 rounded-xl shadow-xl border border-gray-100 bg-white dark:bg-zinc-900 dark:border-white/10 z-50 p-1.5 origin-top-right transition-all">
                     <div className="flex flex-col gap-0.5" role="menu" aria-orientation="vertical">
                         <button
+                            type="button"
                             onClick={() => {
                                 setCurrency('USD');
                                 setIsOpen(false);
@@ -57,6 +59,7 @@ const CurrencyToggle = () => {
                             )}
                         </button>
                         <button
+                            type="button"
                             onClick={() => {
                                 setCurrency('SYP');
                                 setIsOpen(false);

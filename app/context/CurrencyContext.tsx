@@ -1,9 +1,51 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useSyncExternalStore } from 'react';
 import { useLanguage } from './LanguageContext';
 
 type Currency = 'USD' | 'SYP';
+const CURRENCY_PREFERENCE_VERSION = '2';
+const CURRENCY_CHANGE_EVENT = 'zadland:currency-change';
+let volatileCurrency: Currency = 'SYP';
+
+function getCurrencySnapshot(): Currency {
+    try {
+        if (localStorage.getItem('currency-preference-version') !== CURRENCY_PREFERENCE_VERSION) {
+            return 'SYP';
+        }
+        const savedCurrency = localStorage.getItem('currency');
+        if (savedCurrency === 'USD' || savedCurrency === 'SYP') return savedCurrency;
+    } catch {
+        return volatileCurrency;
+    }
+    return 'SYP';
+}
+
+function subscribeToCurrency(onStoreChange: () => void) {
+    if (typeof window === 'undefined') return () => {};
+
+    window.addEventListener('storage', onStoreChange);
+    window.addEventListener(CURRENCY_CHANGE_EVENT, onStoreChange);
+    try {
+        // Old USD values were the previous default, not a deliberate preference.
+        if (localStorage.getItem('currency-preference-version') !== CURRENCY_PREFERENCE_VERSION) {
+            localStorage.setItem('currency', 'SYP');
+            localStorage.setItem('currency-preference-version', CURRENCY_PREFERENCE_VERSION);
+            volatileCurrency = 'SYP';
+        }
+    } catch {
+        // The external store uses its in-memory SYP default when storage is unavailable.
+    }
+
+    return () => {
+        window.removeEventListener('storage', onStoreChange);
+        window.removeEventListener(CURRENCY_CHANGE_EVENT, onStoreChange);
+    };
+}
+
+function getServerCurrencySnapshot(): Currency {
+    return 'SYP';
+}
 
 interface CurrencyContextType {
     currency: Currency;
@@ -15,21 +57,18 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 export function CurrencyProvider({ children, initialExchangeRate }: { children: React.ReactNode, initialExchangeRate: number }) {
-    const [currency, setCurrencyState] = useState<Currency>('USD');
-    const [mounted, setMounted] = useState(false);
+    const currency = useSyncExternalStore(subscribeToCurrency, getCurrencySnapshot, getServerCurrencySnapshot);
     const { language } = useLanguage();
 
-    useEffect(() => {
-        const savedCurrency = localStorage.getItem('currency') as Currency;
-        if (savedCurrency && (savedCurrency === 'USD' || savedCurrency === 'SYP')) {
-            setCurrencyState(savedCurrency);
-        }
-        setMounted(true);
-    }, []);
-
     const setCurrency = (curr: Currency) => {
-        setCurrencyState(curr);
-        localStorage.setItem('currency', curr);
+        volatileCurrency = curr;
+        try {
+            localStorage.setItem('currency', curr);
+            localStorage.setItem('currency-preference-version', CURRENCY_PREFERENCE_VERSION);
+        } catch {
+            // The in-memory currency switch still works if storage is unavailable.
+        }
+        if (typeof window !== 'undefined') window.dispatchEvent(new Event(CURRENCY_CHANGE_EVENT));
     };
 
     const formatPrice = (usdPrice: number) => {
@@ -37,10 +76,6 @@ export function CurrencyProvider({ children, initialExchangeRate }: { children: 
         const symbol = language === 'ar' ? 'ل.س' : 'SYP';
         const locale = language === 'ar' ? 'ar-SY-u-nu-latn' : 'en-US';
         
-        if (!mounted) {
-            return `$${num.toFixed(2)}`;
-        }
-
         if (currency === 'USD') {
             return `$${num.toFixed(2)}`;
         } else {

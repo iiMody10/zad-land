@@ -12,7 +12,11 @@ export async function GET(req: NextRequest) {
     if (imageUrl.startsWith('/') || imageUrl.includes('/image-proxy')) return new NextResponse('Invalid image URL', { status: 400 });
 
     const localMatch = resolveLocalImage(imageUrl);
-    if (localMatch) return NextResponse.redirect(new URL(localMatch, req.url), 307);
+    // Return a relative redirect so reverse-proxy deployments preserve the public host.
+    // req.url can be the internal Next origin (for example https://localhost:3000).
+    if (localMatch?.startsWith('/') && !localMatch.startsWith('//')) {
+        return new NextResponse(null, { status: 307, headers: { Location: localMatch } });
+    }
 
     try {
         const parsedUrl = new URL(imageUrl);

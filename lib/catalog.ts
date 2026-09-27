@@ -68,8 +68,9 @@ type CatalogMainCategory = {
 const cachedBrands = unstable_cache(
     // Let failed API requests reject so Next does not cache the fallback `[]`.
     // Bump the cache key to invalidate any empty result cached by older builds.
-    async () => laravelJson<CatalogBrand[]>("/api/brands"),
-    ["laravel-catalog-brands-v2"],
+    // This is public catalog data; do not read request cookies/headers inside the cache.
+    async () => laravelJson<CatalogBrand[]>("/api/brands", undefined, { forwardSession: false }),
+    ["laravel-catalog-brands-v4"],
     { tags: ["catalog", "brands"], revalidate: 3600 },
 );
 

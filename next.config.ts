@@ -50,6 +50,11 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         { source: "/api/:path*", destination: `${laravelUrl}/api/:path*` },
         { source: "/sanctum/csrf-cookie", destination: `${laravelUrl}/sanctum/csrf-cookie` },
+      ],
+      // Let Next serve files shipped in `public/uploads` first (including the
+      // workbook's pre-optimized product images). Files not present there still
+      // fall through to Laravel, which serves newly uploaded admin media.
+      afterFiles: [
         { source: "/uploads/:path*", destination: `${laravelUrl}/uploads/:path*` },
       ],
     };

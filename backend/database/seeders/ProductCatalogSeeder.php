@@ -19,6 +19,27 @@ class ProductCatalogSeeder extends Seeder
         $mainCategories = [];
         $brands = [];
         $categories = [];
+        $brandImages = [
+            'علي كافيه' => '/brand-logos/alicafe.webp',
+            'اميركان جاردن' => '/brand-logos/american-garden.webp',
+            'امريكانا' => '/brand-logos/americana-restaurants.webp',
+            'اميركانا' => '/brand-logos/americana-restaurants.webp',
+            'بوم بوم' => '/brand-logos/boom-boom.webp',
+            'كابتن فيشر' => '/brand-logos/captain-fisher.webp',
+            'ديشكو باستا' => '/brand-logos/de-cecco.webp',
+            'غو اون' => '/brand-logos/go-on.webp',
+            'غرومت' => '/brand-logos/gourmet.webp',
+            'هايجين' => '/brand-logos/higeen.webp',
+            'ميلاف' => '/brand-logos/milaf.webp',
+            'ماستر براوني' => '/brand-logos/mr-brownie.webp',
+            'نبيل' => '/brand-logos/nabil.webp',
+            'اوتيما' => '/brand-logos/ottima.webp',
+            'بيبسي' => '/brand-logos/pepsi.webp',
+            'ريو ماري الايطالي' => '/brand-logos/rio.webp',
+            'سانتي' => '/brand-logos/sante.webp',
+            'تات' => '/brand-logos/tat.webp',
+            'اولداغ' => '/brand-logos/uludag.webp',
+        ];
 
         foreach ($products as $row) {
             $mainName = trim($row['mainCategory']);
@@ -39,6 +60,11 @@ class ProductCatalogSeeder extends Seeder
                     'is_active' => true,
                 ],
             );
+            $brandImage = $brandImages[$brandName] ?? null;
+            if ($brandImage && ! $brands[$brandKey]->image) {
+                $brands[$brandKey]->image = $brandImage;
+                $brands[$brandKey]->save();
+            }
 
             $categoryName = trim($row['category']);
             $categoryKey = $brandKey.'|'.mb_strtolower($categoryName);
