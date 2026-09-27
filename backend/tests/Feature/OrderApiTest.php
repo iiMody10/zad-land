@@ -144,6 +144,22 @@ class OrderApiTest extends TestCase
         ])->assertCreated()->assertJsonPath('slug', 'new-product')->assertJsonPath('price', '12.50');
     }
 
+    public function test_admin_can_save_separate_desktop_and_mobile_banner_images(): void
+    {
+        $admin = User::create(['username' => 'banner-admin', 'password' => Hash::make('secret123'), 'role' => 'SUPER_ADMIN']);
+
+        $created = $this->actingAs($admin, 'web')->postJson('/api/admin/banners', [
+            'title' => 'Desktop banner', 'titleAr' => 'بنر للشاشات الكبيرة',
+            'image' => '/uploads/banners/desktop.webp', 'imageMobile' => '/uploads/banners/mobile.webp',
+        ])->assertCreated()
+            ->assertJsonPath('image', '/uploads/banners/desktop.webp')
+            ->assertJsonPath('imageMobile', '/uploads/banners/mobile.webp');
+
+        $id = $created->json('id');
+        $this->patchJson('/api/admin/banners/'.$id, ['imageMobile' => null])
+            ->assertOk()->assertJsonPath('imageMobile', null);
+    }
+
     public function test_admin_can_patch_product_flags_without_resending_relationship_ids(): void
     {
         $admin = User::create(['username' => 'catalog-patch-admin', 'password' => Hash::make('secret123'), 'role' => 'SUPER_ADMIN']);

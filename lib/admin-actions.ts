@@ -20,7 +20,7 @@ interface MainCategoryInput { name: string; description?: string; image?: string
 type ProductImportRow = Record<string, string | number | boolean | null | undefined>;
 
 export interface BannerInput {
-    title: string; subtitle?: string; titleAr: string; subtitleAr?: string; image: string;
+    title: string; subtitle?: string; titleAr: string; subtitleAr?: string; image: string; imageMobile?: string | null;
     buttonText?: string; buttonTextAr?: string; link?: string; badge?: string; badgeAr?: string; isActive?: boolean;
 }
 export interface PromoCodeInput { code: string; discountPercentage: number; delegateName?: string; isActive?: boolean }

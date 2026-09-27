@@ -30,7 +30,7 @@ class AdminController extends Controller
         'main-categories' => [MainCategory::class, 'main_categories', ['name', 'slug', 'description', 'image', 'is_active', 'show_in_nav', 'nav_order', 'is_featured']],
         'categories' => [Category::class, 'categories', ['name', 'slug', 'description', 'image', 'brand_id', 'main_category_id', 'is_featured']],
         'products' => [Product::class, 'products', ['name', 'name_ar', 'name_en', 'slug', 'images', 'is_trending', 'description', 'description_ar', 'description_en', 'price', 'discount_price', 'discount_type', 'discount_value', 'stock', 'min_order', 'packaging', 'items_per_package', 'options', 'category_id', 'sku', 'brand_id', 'main_category_id']],
-        'banners' => [Banner::class, 'banners', ['title', 'subtitle', 'title_ar', 'subtitle_ar', 'image', 'button_text', 'button_text_ar', 'link', 'badge', 'badge_ar', 'is_active']],
+        'banners' => [Banner::class, 'banners', ['title', 'subtitle', 'title_ar', 'subtitle_ar', 'image', 'image_mobile', 'button_text', 'button_text_ar', 'link', 'badge', 'badge_ar', 'is_active']],
         'promo-codes' => [PromoCode::class, 'promo_codes', ['code', 'discount_percentage', 'delegate_name', 'is_active']],
     ];
 
@@ -626,6 +626,9 @@ class AdminController extends Controller
                 default => 2000,
             };
             $rules[Str::camel($field)] = [$id ? 'sometimes' : 'required', 'string', 'max:'.$maxLength];
+        }
+        if ($resource === 'banners' && in_array('image_mobile', $fields, true)) {
+            $rules['imageMobile'] = ['sometimes', 'nullable', 'string', 'max:2000'];
         }
         foreach (['price', 'discount_price', 'discount_value'] as $field) {
             if (in_array($field, $fields, true)) {

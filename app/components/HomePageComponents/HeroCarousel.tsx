@@ -19,6 +19,7 @@ interface Banner {
     titleAr: string | null;
     subtitleAr: string | null;
     image: string;
+    imageMobile?: string | null;
     buttonText: string | null;
     buttonTextAr?: string | null;
     link: string | null;
@@ -92,12 +93,13 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                     className="h-full w-full"
                 >
                     {displayBanners.map((banner, index) => {
-                        const isHeroBg = banner.image === '/images/redesign/hero-bg.png';
+                        const mobileImage = banner.imageMobile || banner.image;
+                        const isHeroBg = mobileImage === '/images/redesign/hero-bg.png';
                         return (
                             <SwiperSlide key={`mob-${banner.id}`} className="h-full w-full relative">
                                 {/* Slide Image */}
                                 <Image
-                                    src={banner.image}
+                                    src={mobileImage}
                                     alt={getBannerTitle(banner)}
                                     fill
                                     priority={index === 0}

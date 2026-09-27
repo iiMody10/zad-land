@@ -17,6 +17,7 @@ interface Banner {
     titleAr: string | null;
     subtitleAr: string | null;
     image: string;
+    imageMobile?: string | null;
     buttonText: string | null;
     buttonTextAr?: string | null;
     link: string | null;
@@ -134,6 +135,18 @@ export default function BannersClient({ banners }: { banners: Banner[] }) {
                                         src={banner.image}
                                     />
                                 </div>
+                                {banner.imageMobile && (
+                                    <div className="lg:w-1/4 aspect-video lg:aspect-auto overflow-hidden bg-slate-100 dark:bg-gray-800 relative min-h-[200px]">
+                                        <img
+                                            alt={banner.title ? `${banner.title} mobile` : "Mobile banner"}
+                                            className="w-full h-full object-contain"
+                                            src={banner.imageMobile}
+                                        />
+                                        <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-[10px] font-bold text-white">
+                                            {isArabic ? "الهاتف" : "Mobile"}
+                                        </span>
+                                    </div>
+                                )}
                                 <div className="p-6 flex-1 flex flex-col justify-between">
                                     <div className="flex flex-col gap-3">
                                         <div className="flex flex-wrap items-center gap-2">

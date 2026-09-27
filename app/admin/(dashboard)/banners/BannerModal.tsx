@@ -17,6 +17,7 @@ interface BannerModalProps {
         titleAr: string | null;
         subtitleAr: string | null;
         image: string;
+        imageMobile?: string | null;
         buttonText: string | null;
         buttonTextAr?: string | null;
         link: string | null;
@@ -42,6 +43,7 @@ export default function BannerModal({ isOpen, onClose, banner }: BannerModalProp
     const [buttonText, setButtonText] = useState("Explore Products");
     const [buttonTextAr, setButtonTextAr] = useState("تصفح المنتجات");
     const [image, setImage] = useState("");
+    const [imageMobile, setImageMobile] = useState("");
     const [link, setLink] = useState("/products");
     const [isActive, setIsActive] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,6 +55,7 @@ export default function BannerModal({ isOpen, onClose, banner }: BannerModalProp
             setTitleAr(banner.titleAr || "");
             setSubtitleAr(banner.subtitleAr || "");
             setImage(banner.image || "");
+            setImageMobile(banner.imageMobile || "");
             setBadge(banner.badge || "Certified Wholesale");
             setBadgeAr(banner.badgeAr || "توزيع جملة معتمد");
             setButtonText(banner.buttonText || "Explore Products");
@@ -65,6 +68,7 @@ export default function BannerModal({ isOpen, onClose, banner }: BannerModalProp
             setTitleAr("");
             setSubtitleAr("");
             setImage("");
+            setImageMobile("");
             setBadge("Certified Wholesale");
             setBadgeAr("توزيع جملة معتمد");
             setButtonText("Explore Products");
@@ -98,6 +102,7 @@ export default function BannerModal({ isOpen, onClose, banner }: BannerModalProp
                 buttonText: buttonText || undefined,
                 buttonTextAr: buttonTextAr || undefined,
                 image,
+                imageMobile: imageMobile || null,
                 link: link || undefined,
                 isActive,
             };
@@ -299,14 +304,22 @@ export default function BannerModal({ isOpen, onClose, banner }: BannerModalProp
                         </div>
                     ) : (
                         <div className="space-y-5">
-                            {/* Image Upload Component */}
+                            {/* Desktop image */}
                             <ImageUploadField
-                                label={isArabic ? "صورة البنر (نسبة 16:9 أو 4:3 موصى بها)" : "Banner Image (16:9 recommended)"}
+                                label={isArabic ? "صورة البنر للشاشات الكبيرة (نسبة عريضة موصى بها)" : "Desktop Banner Image (wide image recommended)"}
                                 folder="banners"
                                 value={image}
                                 onChange={(url) => setImage(url)}
                                 placeholder="https://..."
                                 required
+                            />
+
+                            <ImageUploadField
+                                label={isArabic ? "صورة البنر للهواتف (اختيارية، نسبة طولية موصى بها)" : "Mobile Banner Image (optional, portrait image recommended)"}
+                                folder="banners"
+                                value={imageMobile}
+                                onChange={setImageMobile}
+                                placeholder={isArabic ? "اتركها فارغة لاستخدام صورة الشاشات الكبيرة" : "Leave empty to reuse the desktop image"}
                             />
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
