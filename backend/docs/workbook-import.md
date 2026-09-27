@@ -12,4 +12,10 @@ The source contained 544 products. Import normalization:
 
 The product workbook does not contain merchant accounts, orders, promotions, admin users, banners, site settings, or favorites. Those records are intentionally not backfilled from Supabase in this phase.
 
+## Priced catalog and barcode images
+
+`database/seeders/data/priced-workbook-products.json` contains the 537 products from `زاد لاند نهائي كامل مسعر.xlsx`. Each row's barcode is stored in the product `sku` field and its image is set to `/uploads/products/catalog-batch/{barcode}.webp`.
+
+Import with `php artisan db:seed --class=PricedProductCatalogSeeder`. The seeder updates existing products matched by barcode or an unambiguous Arabic/English product name under the same brand, and creates products not already in the catalog. It is safe to rerun by barcode and does not delete products missing from the workbook. The workbook's `m.d` date-formatted price cells are normalized as decimal prices; blank stock is zero and fractional carton quantities are floored to whole cartons. One product without a brand is assigned to `عام`.
+
 To create the first admin after deployment, run `php artisan zadland:admin-create`; it prompts for a username and password without storing credentials in shell history.
