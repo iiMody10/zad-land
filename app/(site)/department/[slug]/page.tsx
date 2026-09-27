@@ -57,7 +57,9 @@ export default async function DepartmentPage(props: {
     const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
     const department = await getDepartment(params.slug);
 
-    if (!department || !department.isActive) {
+    // The endpoint is already scoped to active categories. The explicit false
+    // check also keeps older cached API responses without isActive usable.
+    if (!department || department.isActive === false) {
         notFound();
     }
 

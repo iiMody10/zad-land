@@ -130,7 +130,7 @@ class CatalogController extends Controller
 
     public function mainCategories()
     {
-        return response()->json(ApiJson::camel(MainCategory::where('is_active', true)->orderBy('name')->get(['id', 'name', 'slug', 'description', 'image'])))
+        return response()->json(ApiJson::camel(MainCategory::where('is_active', true)->orderBy('name')->get(['id', 'name', 'slug', 'description', 'image', 'is_active'])))
             ->header('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
     }
 
