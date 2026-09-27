@@ -134,7 +134,7 @@ export default function MegaMenu({ data, onClose, onMouseEnter, onMouseLeave }: 
 
                 <div className="col-span-2 min-w-0">
                     <h3 className="mb-3 border-b border-[var(--color-line)] pb-3 text-[12px] font-bold text-[#66786b] dark:border-white/10 dark:text-gray-400">
-                        {isArabic ? 'العلامات' : 'Brands'}
+                        {isArabic ? 'شركاؤنا' : 'Our partners'}
                     </h3>
                     <ul className="space-y-0.5">
                         {data.brands.slice(0, 8).map((brand) => (

@@ -28,7 +28,7 @@ const BottomNav = () => {
         },
         {
             href: '/brands',
-            label: isArabic ? 'العلامات' : 'Brands',
+            label: isArabic ? 'شركاؤنا' : 'Our partners',
             icon: LuHandshake,
             active: pathname.startsWith('/brands'),
         },
