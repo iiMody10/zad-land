@@ -255,6 +255,7 @@ export default function ProductsClient({
     const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentItems = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+    const allFilteredProductsSelected = filteredProducts.length > 0 && filteredProducts.every(product => selectedIds.has(product.id));
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -269,13 +270,13 @@ export default function ProductsClient({
     };
 
     const toggleSelectAll = () => {
-        const allOnPageSelected = currentItems.length > 0 && currentItems.every(p => selectedIds.has(p.id));
+        const allResultsSelected = filteredProducts.length > 0 && filteredProducts.every(product => selectedIds.has(product.id));
         const newSelected = new Set(selectedIds);
 
-        if (allOnPageSelected) {
-            currentItems.forEach(p => newSelected.delete(p.id));
+        if (allResultsSelected) {
+            filteredProducts.forEach(product => newSelected.delete(product.id));
         } else {
-            currentItems.forEach(p => newSelected.add(p.id));
+            filteredProducts.forEach(product => newSelected.add(product.id));
         }
         setSelectedIds(newSelected);
     };
@@ -851,7 +852,14 @@ export default function ProductsClient({
                                             <input
                                                 className="rounded border-gray-300 text-primary focus:ring-primary size-3 sm:size-4 cursor-pointer"
                                                 type="checkbox"
-                                                checked={currentItems.length > 0 && currentItems.every(p => selectedIds.has(p.id))}
+                                                checked={allFilteredProductsSelected}
+                                                disabled={filteredProducts.length === 0}
+                                                aria-label={isArabic
+                                                    ? `تحديد جميع المنتجات (${filteredProducts.length})`
+                                                    : `Select all ${filteredProducts.length} products`}
+                                                title={isArabic
+                                                    ? `تحديد جميع المنتجات (${filteredProducts.length})`
+                                                    : `Select all ${filteredProducts.length} products`}
                                                 onChange={toggleSelectAll}
                                             />
                                         </th>
