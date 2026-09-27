@@ -36,39 +36,63 @@ interface TabData {
     key: string;
     labelKey: string;
     products: Product[];
+    labelEnglish: string | null;
+    labelArabic: string | null;
+    enabled: boolean;
 }
 
 interface FeaturedCollectionProps {
     newArrivals: Product[];
-    bundles: Product[];
     bestSellers: Product[];
+    settings?: Record<string, unknown> | null;
 }
 
-const CARD_WIDTH = 320;
-const CARD_GAP = 20;
-
-const FeaturedCollection = ({ newArrivals, bundles, bestSellers }: FeaturedCollectionProps) => {
+const FeaturedCollection = ({ newArrivals, bestSellers, settings }: FeaturedCollectionProps) => {
     const { t, dir } = useLanguage();
     const [activeTab, setActiveTab] = useState(0);
 
     const { railRef, progressBarRef, canScrollForward, canScrollBackward, scrollForward, scrollBackward } = useProductRail(dir);
 
     const tabs: TabData[] = useMemo(() => [
-        { key: 'new-arrivals', labelKey: 'home.featuredTabNewArrivals', products: newArrivals },
-        { key: 'best-sellers', labelKey: 'home.featuredTabBestSellers', products: bestSellers },
-    ], [newArrivals, bestSellers]);
+        {
+            key: 'new-arrivals', labelKey: 'home.featuredTabNewArrivals', products: newArrivals,
+            labelEnglish: typeof settings?.featuredCollectionNewArrivalsLabel === 'string' ? settings.featuredCollectionNewArrivalsLabel : null,
+            labelArabic: typeof settings?.featuredCollectionNewArrivalsLabelAr === 'string' ? settings.featuredCollectionNewArrivalsLabelAr : null,
+            enabled: settings?.featuredCollectionNewArrivalsEnabled !== false,
+        },
+        {
+            key: 'best-sellers', labelKey: 'home.featuredTabBestSellers', products: bestSellers,
+            labelEnglish: typeof settings?.featuredCollectionBestSellersLabel === 'string' ? settings.featuredCollectionBestSellersLabel : null,
+            labelArabic: typeof settings?.featuredCollectionBestSellersLabelAr === 'string' ? settings.featuredCollectionBestSellersLabelAr : null,
+            enabled: settings?.featuredCollectionBestSellersEnabled !== false,
+        },
+    ].filter((tab) => tab.enabled && tab.products.length > 0), [newArrivals, bestSellers, settings]);
 
-    const activeProducts = tabs[activeTab]?.products || [];
+    const activeIndex = Math.min(activeTab, Math.max(0, tabs.length - 1));
+    const activeItem = tabs[activeIndex];
+    const activeProducts = activeItem?.products || [];
 
     React.useEffect(() => {
+        if (activeTab !== activeIndex) setActiveTab(activeIndex);
         if (railRef.current) {
             railRef.current.scrollTo({ left: 0, behavior: 'auto' });
         }
-    }, [activeTab]);
+    }, [activeTab, activeIndex, railRef]);
 
-    if (!newArrivals.length && !bundles.length && !bestSellers.length) {
+    if (settings?.featuredCollectionEnabled === false || tabs.length === 0) {
         return null;
     }
+
+    const isArabic = dir === 'rtl';
+    const settingText = (englishKey: string, arabicKey: string, fallback: string) => {
+        const value = settings?.[isArabic ? arabicKey : englishKey];
+        return typeof value === 'string' && value.trim() ? value : fallback;
+    };
+    const title = settingText('featuredCollectionTitle', 'featuredCollectionTitleAr', t('home.featuredCollection'));
+    const allProductsLabel = settingText('featuredCollectionAllProductsLabel', 'featuredCollectionAllProductsLabelAr', t('products.allProducts'));
+    const allProductsHref = typeof settings?.featuredCollectionAllProductsUrl === 'string' && settings.featuredCollectionAllProductsUrl.trim()
+        ? settings.featuredCollectionAllProductsUrl.trim()
+        : activeItem?.key === 'best-sellers' ? '/products?isTrending=true' : '/products?sort=newest';
 
     return (
         <section className="container-custom">
@@ -82,7 +106,7 @@ const FeaturedCollection = ({ newArrivals, bundles, bestSellers }: FeaturedColle
                         <path d="M12 11V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
                     <h2 id="featured-collection-title" className="whitespace-nowrap px-1 text-base font-extrabold tracking-tight text-[var(--color-brand)] sm:text-2xl md:text-[28px] dark:text-white">
-                        {t('home.featuredCollection')}
+                        {title}
                     </h2>
                     <svg className="h-4 w-4 shrink-0 scale-x-[-1] sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M12 2C11.5 4 10.5 6 9 7.5C10.5 9 11.5 11 12 13C12.5 11 13.5 9 15 7.5C13.5 6 12.5 4 12 2Z" opacity="0.9" />
@@ -107,19 +131,19 @@ const FeaturedCollection = ({ newArrivals, bundles, bestSellers }: FeaturedColle
                                         : 'border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-medium'
                                         }`}
                                 >
-                                    {t(tab.labelKey)}
+                                    {(isArabic ? tab.labelArabic : tab.labelEnglish) || t(tab.labelKey)}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <Link
-                        href="/products"
+                    {activeProducts.length > 0 && <Link
+                        href={allProductsHref}
                         className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full border border-[var(--color-accent)]/30 bg-[var(--color-canvas)] px-4 py-2 text-xs font-bold text-[var(--color-brand)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] dark:bg-white/5 dark:text-[var(--color-accent-light)]"
                     >
-                        <span>{t('products.allProducts')}</span>
+                        <span>{allProductsLabel}</span>
                         <MdChevronRight className={`text-base ${dir === 'rtl' ? 'rotate-180' : ''}`} />
-                    </Link>
+                    </Link>}
                 </div>
             </div>
 
@@ -137,8 +161,8 @@ const FeaturedCollection = ({ newArrivals, bundles, bestSellers }: FeaturedColle
                                 <ProductCard
                                     product={product}
                                     variant="compact"
-                                    showBadge={activeTab === 0}
-                                    badge={activeTab === 0 ? t('home.newArrival') : undefined}
+                                    showBadge={activeItem?.key === 'new-arrivals'}
+                                    badge={activeItem?.key === 'new-arrivals' ? t('home.newArrival') : undefined}
                                 />
                             </div>
                         ))}

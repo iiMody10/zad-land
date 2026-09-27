@@ -5,7 +5,6 @@ import {
     getHomeRailBrands,
     getHomeRailCategories,
     getBestSellerProducts,
-    getOnSaleProducts,
     getNewArrivalProducts,
     getSiteSettings,
     getTrendingWeeklyProducts,
@@ -32,7 +31,6 @@ export default async function Home() {
         mainCategories,
         featuredBestSellers,
         featuredNewArrivals,
-        featuredBundles,
         settings,
         trendingWeekly,
         featuredCategories,
@@ -43,7 +41,6 @@ export default async function Home() {
         loadHomeSection("main categories", getHomeRailCategories, []),
         loadHomeSection("best sellers", getBestSellerProducts, []),
         loadHomeSection("new arrivals", getNewArrivalProducts, []),
-        loadHomeSection("sale products", getOnSaleProducts, []),
         loadHomeSection("site settings", getSiteSettings, null),
         loadHomeSection("weekly trends", getTrendingWeeklyProducts, []),
         loadHomeSection("featured categories", getFeaturedCategories, []),
@@ -63,7 +60,6 @@ export default async function Home() {
                     railBrands={railBrands}
                     mainCategories={mainCategories}
                     featuredNewArrivals={featuredNewArrivals}
-                    featuredBundles={featuredBundles}
                     featuredBestSellers={featuredBestSellers}
                     settings={settings}
                     trendingWeekly={trendingWeekly}

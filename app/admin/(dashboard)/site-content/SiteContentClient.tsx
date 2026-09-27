@@ -127,9 +127,21 @@ interface SiteSettings {
     middleBanner2SubtitleAr: string | null;
     middleBanner2ButtonText: string | null;
     middleBanner2ButtonTextAr: string | null;
+    featuredCollectionEnabled: boolean;
+    featuredCollectionNewArrivalsEnabled: boolean;
+    featuredCollectionBestSellersEnabled: boolean;
+    featuredCollectionTitle: string | null;
+    featuredCollectionTitleAr: string | null;
+    featuredCollectionNewArrivalsLabel: string | null;
+    featuredCollectionNewArrivalsLabelAr: string | null;
+    featuredCollectionBestSellersLabel: string | null;
+    featuredCollectionBestSellersLabelAr: string | null;
+    featuredCollectionAllProductsLabel: string | null;
+    featuredCollectionAllProductsLabelAr: string | null;
+    featuredCollectionAllProductsUrl: string | null;
 }
 
-type TabType = "currency" | "navigation" | "footer" | "banners" | "shipping" | "about";
+type TabType = "currency" | "navigation" | "footer" | "banners" | "shipping" | "about" | "featured";
 
 export default function SiteContentClient({ 
     initialSettings,
@@ -262,6 +274,21 @@ export default function SiteContentClient({
     const [middleBanner2ButtonText, setMiddleBanner2ButtonText] = useState(initialSettings?.middleBanner2ButtonText || "");
     const [middleBanner2ButtonTextAr, setMiddleBanner2ButtonTextAr] = useState(initialSettings?.middleBanner2ButtonTextAr || "");
 
+    const [featuredCollection, setFeaturedCollection] = useState({
+        featuredCollectionEnabled: initialSettings?.featuredCollectionEnabled !== false,
+        featuredCollectionNewArrivalsEnabled: initialSettings?.featuredCollectionNewArrivalsEnabled !== false,
+        featuredCollectionBestSellersEnabled: initialSettings?.featuredCollectionBestSellersEnabled !== false,
+        featuredCollectionTitle: initialSettings?.featuredCollectionTitle || "",
+        featuredCollectionTitleAr: initialSettings?.featuredCollectionTitleAr || "",
+        featuredCollectionNewArrivalsLabel: initialSettings?.featuredCollectionNewArrivalsLabel || "",
+        featuredCollectionNewArrivalsLabelAr: initialSettings?.featuredCollectionNewArrivalsLabelAr || "",
+        featuredCollectionBestSellersLabel: initialSettings?.featuredCollectionBestSellersLabel || "",
+        featuredCollectionBestSellersLabelAr: initialSettings?.featuredCollectionBestSellersLabelAr || "",
+        featuredCollectionAllProductsLabel: initialSettings?.featuredCollectionAllProductsLabel || "",
+        featuredCollectionAllProductsLabelAr: initialSettings?.featuredCollectionAllProductsLabelAr || "",
+        featuredCollectionAllProductsUrl: initialSettings?.featuredCollectionAllProductsUrl || "",
+    });
+
     const handleFooterFieldChange = (field: string, value: string) => {
         setFooterContent((current) => ({
             ...current,
@@ -336,6 +363,7 @@ export default function SiteContentClient({
                 middleBanner2SubtitleAr,
                 middleBanner2ButtonText,
                 middleBanner2ButtonTextAr,
+                ...featuredCollection,
             });
 
             if (result.success) {
@@ -356,6 +384,7 @@ export default function SiteContentClient({
         { id: "navigation", label: t('admin.tabNavigation') || "Header Navigation", icon: <ListOrdered className="text-lg" /> },
         { id: "footer", label: t('admin.tabFooter') || "Footer & Social", icon: <MdStorefront className="text-lg" /> },
         { id: "banners", label: t('admin.tabBanners') || "Promo Banners", icon: <MdViewCarousel className="text-lg" /> },
+        { id: "featured", label: t('admin.tabFeaturedCollection') || "Featured Collection", icon: <MdViewCarousel className="text-lg" /> },
         { id: "shipping", label: t('admin.tabShipping') || "Shipping & Policy", icon: <MdLocalShipping className="text-lg" /> },
         { id: "about", label: t('admin.tabAbout') || "About Us Story", icon: <MdInfoOutline className="text-lg" /> },
     ];
@@ -481,6 +510,88 @@ export default function SiteContentClient({
                                 t={t}
                             />
                         </div>
+                    )}
+
+                    {activeTab === "featured" && (
+                        <section className="space-y-6 animate-in fade-in-50 duration-200">
+                            <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)] md:p-8">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                    {t('admin.featuredCollectionSettingsTitle')}
+                                </h3>
+                                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                    {t('admin.featuredCollectionSettingsDesc')}
+                                </p>
+
+                                <div className="mt-6 flex flex-wrap gap-3">
+                                    {([
+                                        ['featuredCollectionEnabled', 'admin.featuredCollectionEnabled'],
+                                        ['featuredCollectionNewArrivalsEnabled', 'admin.featuredCollectionNewArrivalsEnabled'],
+                                        ['featuredCollectionBestSellersEnabled', 'admin.featuredCollectionBestSellersEnabled'],
+                                    ] as const).map(([key, labelKey]) => (
+                                        <label key={key} className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:text-slate-200">
+                                            <input
+                                                type="checkbox"
+                                                checked={featuredCollection[key]}
+                                                onChange={(event) => setFeaturedCollection((current) => ({ ...current, [key]: event.target.checked }))}
+                                                className="size-4 accent-[var(--color-brand)]"
+                                            />
+                                            {t(labelKey)}
+                                        </label>
+                                    ))}
+                                </div>
+
+                                <div className="mt-7 grid gap-6 lg:grid-cols-2">
+                                    <div className="space-y-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-900/40">
+                                        <h4 className="font-bold text-slate-800 dark:text-white">English</h4>
+                                        <label className="block text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                            {t('admin.featuredCollectionTitleLabel')}
+                                            <input value={featuredCollection.featuredCollectionTitle} onChange={(event) => setFeaturedCollection((current) => ({ ...current, featuredCollectionTitle: event.target.value }))} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" />
+                                        </label>
+                                        <label className="block text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                            {t('admin.featuredCollectionNewArrivalsLabel')}
+                                            <input value={featuredCollection.featuredCollectionNewArrivalsLabel} onChange={(event) => setFeaturedCollection((current) => ({ ...current, featuredCollectionNewArrivalsLabel: event.target.value }))} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" />
+                                        </label>
+                                        <label className="block text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                            {t('admin.featuredCollectionBestSellersLabel')}
+                                            <input value={featuredCollection.featuredCollectionBestSellersLabel} onChange={(event) => setFeaturedCollection((current) => ({ ...current, featuredCollectionBestSellersLabel: event.target.value }))} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" />
+                                        </label>
+                                        <label className="block text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                            {t('admin.featuredCollectionAllProductsLabel')}
+                                            <input value={featuredCollection.featuredCollectionAllProductsLabel} onChange={(event) => setFeaturedCollection((current) => ({ ...current, featuredCollectionAllProductsLabel: event.target.value }))} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" />
+                                        </label>
+                                    </div>
+
+                                    <div className="space-y-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-900/40" dir="rtl">
+                                        <h4 className="font-bold text-slate-800 dark:text-white">العربية</h4>
+                                        <label className="block text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                            {t('admin.featuredCollectionTitleLabel')}
+                                            <input value={featuredCollection.featuredCollectionTitleAr} onChange={(event) => setFeaturedCollection((current) => ({ ...current, featuredCollectionTitleAr: event.target.value }))} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" />
+                                        </label>
+                                        <label className="block text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                            {t('admin.featuredCollectionNewArrivalsLabel')}
+                                            <input value={featuredCollection.featuredCollectionNewArrivalsLabelAr} onChange={(event) => setFeaturedCollection((current) => ({ ...current, featuredCollectionNewArrivalsLabelAr: event.target.value }))} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" />
+                                        </label>
+                                        <label className="block text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                            {t('admin.featuredCollectionBestSellersLabel')}
+                                            <input value={featuredCollection.featuredCollectionBestSellersLabelAr} onChange={(event) => setFeaturedCollection((current) => ({ ...current, featuredCollectionBestSellersLabelAr: event.target.value }))} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" />
+                                        </label>
+                                        <label className="block text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                            {t('admin.featuredCollectionAllProductsLabel')}
+                                            <input value={featuredCollection.featuredCollectionAllProductsLabelAr} onChange={(event) => setFeaturedCollection((current) => ({ ...current, featuredCollectionAllProductsLabelAr: event.target.value }))} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" />
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <label className="mt-6 block max-w-2xl text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                    {t('admin.featuredCollectionAllProductsUrl')}
+                                    <input value={featuredCollection.featuredCollectionAllProductsUrl} onChange={(event) => setFeaturedCollection((current) => ({ ...current, featuredCollectionAllProductsUrl: event.target.value }))} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" placeholder="/products" dir="ltr" />
+                                </label>
+                            </div>
+
+                            <p className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-200">
+                                {t('admin.featuredCollectionProductManagementNote')}
+                            </p>
+                        </section>
                     )}
 
                     {/* TAB 3: PROMO & MIDDLE BANNERS */}

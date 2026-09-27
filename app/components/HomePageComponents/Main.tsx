@@ -72,7 +72,6 @@ interface MainProps {
     railBrands: RailBrand[];
     mainCategories: HomeMainCategory[];
     featuredNewArrivals: Product[];
-    featuredBundles: Product[];
     featuredBestSellers: Product[];
     trendingWeekly: Product[];
     featuredCategories: FeaturedCategory[];
@@ -85,7 +84,6 @@ const Main = async ({
     railBrands,
     mainCategories,
     featuredNewArrivals,
-    featuredBundles,
     featuredBestSellers,
     trendingWeekly,
     featuredCategories,
@@ -114,8 +112,8 @@ const Main = async ({
             <ScrollReveal>
                 <FeaturedCollection
                     newArrivals={featuredNewArrivals}
-                    bundles={featuredBundles}
                     bestSellers={featuredBestSellers}
+                    settings={settings}
                 />
             </ScrollReveal>
 

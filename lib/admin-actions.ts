@@ -170,10 +170,7 @@ export async function getHomeRailCategories(): Promise<HomeMainCategory[]> {
 
 export async function getOnSaleProducts() { return publicProducts("page=1&limit=12&onSale=true"); }
 export async function getNewArrivalProducts(): Promise<any[]> { return publicProducts("page=1&limit=12&sort=newest"); }
-export async function getBestSellerProducts(): Promise<any[]> {
-    const trending = await publicProducts("page=1&limit=12&isTrending=true");
-    return trending.length ? trending : getNewArrivalProducts();
-}
+export async function getBestSellerProducts(): Promise<any[]> { return publicProducts("page=1&limit=12&isTrending=true"); }
 export async function getTrendingWeeklyProducts(): Promise<any[]> {
     const trending = await laravelJson<any[]>("/api/products/trending", [], { forwardSession: false });
     return trending.length ? trending : getBestSellerProducts();

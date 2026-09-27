@@ -18,6 +18,12 @@ class Settings extends Model
 
     protected function casts(): array
     {
-        return ['exchange_rate' => 'decimal:2', 'updated_at' => 'datetime'];
+        return [
+            'exchange_rate' => 'decimal:2',
+            'featured_collection_enabled' => 'boolean',
+            'featured_collection_new_arrivals_enabled' => 'boolean',
+            'featured_collection_best_sellers_enabled' => 'boolean',
+            'updated_at' => 'datetime',
+        ];
     }
 }

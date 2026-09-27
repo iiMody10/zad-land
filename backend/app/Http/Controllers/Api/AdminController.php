@@ -364,6 +364,14 @@ class AdminController extends Controller
             if (in_array($column, $columns, true)) {
                 if ($column === 'exchange_rate') {
                     $rules[$key] = ['nullable', 'numeric', 'gt:0', 'max:99999999.99'];
+                } elseif (in_array($column, [
+                    'featured_collection_enabled',
+                    'featured_collection_new_arrivals_enabled',
+                    'featured_collection_best_sellers_enabled',
+                ], true)) {
+                    $rules[$key] = ['required', 'boolean'];
+                } elseif ($column === 'featured_collection_all_products_url') {
+                    $rules[$key] = ['nullable', 'string', 'max:2000'];
                 } elseif ($column === 'header_nav_items') {
                     $rules[$key] = ['nullable', 'string', 'max:20000', function ($attribute, $value, $fail) {
                         if ($value === null || $value === '') {
