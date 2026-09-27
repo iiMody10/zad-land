@@ -46,7 +46,7 @@ const PromoBanner = ({ settings, dir = 'rtl', language = 'ar' }: PromoBannerProp
                     <div className="inline-flex items-center gap-1 sm:gap-2 text-[8.5px] sm:text-[11px] md:text-xs lg:text-sm font-extrabold text-white/95 group-hover:text-white transition-colors">
                         <span>{isArabic ? 'تسوق حسب الفئات' : 'Shop by Categories'}</span>
                         <span className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 rounded-full bg-[var(--color-accent)] group-hover:bg-[var(--color-accent-hover)] text-white flex items-center justify-center text-[10px] sm:text-xs transition-colors shadow-xs">
-                            <span className="leading-none">{isArabic ? '‹' : '›'}</span>
+                            <span className="leading-none">{isArabic ? '›' : '‹'}</span>
                         </span>
                     </div>
                 </div>

@@ -169,8 +169,8 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                                         className="inline-flex items-center gap-2.5 mt-3.5 sm:mt-4 px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-[13.5px] sm:text-[15px] font-black shadow-[0_5px_15px_rgba(0,0,0,0.45)] transition-colors active:scale-95 border border-white/30 group/btn"
                                     >
                                         <span>{getBannerButtonText(banner)}</span>
-                                        <span className="text-base sm:text-lg font-black leading-none transition-transform duration-200 group-hover/btn:translate-x-0.5 rtl:group-hover/btn:-translate-x-0.5">
-                                            {isArabic ? '‹' : '›'}
+                                        <span className="text-base sm:text-lg font-black leading-none transition-transform duration-200 group-hover/btn:-translate-x-0.5 rtl:group-hover/btn:translate-x-0.5">
+                                            {isArabic ? '›' : '‹'}
                                         </span>
                                     </Link>
                                 </div>
