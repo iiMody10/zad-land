@@ -25,7 +25,7 @@ interface Brand {
         id: string;
         name: string;
     } | null;
-    _count: {
+    _count?: {
         products: number;
         categories: number;
     };
@@ -372,7 +372,7 @@ export default function BrandsClient({ brands: initialBrands }: { brands: Brand[
                                                     title={isArabic ? 'عرض منتجات الماركة' : 'View brand products'}
                                                 >
                                                     <MdShoppingBag className="text-xs" />
-                                                    <span>{brand._count.products} {isArabic ? 'منتج' : 'Products'}</span>
+                                                    <span>{brand._count?.products ?? 0} {isArabic ? 'منتج' : 'Products'}</span>
                                                 </button>
 
                                                 <button 
@@ -382,7 +382,7 @@ export default function BrandsClient({ brands: initialBrands }: { brands: Brand[
                                                     title={isArabic ? 'عرض فئات الماركة' : 'View brand categories'}
                                                 >
                                                     <MdCategory className="text-xs" />
-                                                    <span>{brand._count.categories} {isArabic ? 'فئة' : 'Categories'}</span>
+                                                    <span>{brand._count?.categories ?? 0} {isArabic ? 'فئة' : 'Categories'}</span>
                                                 </button>
                                             </div>
                                         </div>

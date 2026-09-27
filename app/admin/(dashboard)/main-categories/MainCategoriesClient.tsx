@@ -21,7 +21,7 @@ interface MainCategory {
     isFeatured: boolean;
     showInNav: boolean;
     navOrder: number;
-    _count: {
+    _count?: {
         brands: number;
         categories: number;
         products: number;
@@ -366,7 +366,7 @@ export default function MainCategoriesClient({ mainCategories: initialMainCatego
                                                     title={isArabic ? 'عرض المنتجات المرتبطة' : 'View products'}
                                                 >
                                                     <MdShoppingBag className="text-xs" />
-                                                    <span>{mc._count.products} {isArabic ? 'منتج' : 'Products'}</span>
+                                                    <span>{mc._count?.products ?? 0} {isArabic ? 'منتج' : 'Products'}</span>
                                                 </button>
 
                                                 <button 
@@ -376,7 +376,7 @@ export default function MainCategoriesClient({ mainCategories: initialMainCatego
                                                     title={isArabic ? 'عرض الفئات الفرعية' : 'View subcategories'}
                                                 >
                                                     <MdCategory className="text-xs" />
-                                                    <span>{mc._count.categories} {isArabic ? 'فئة فرعية' : 'Categories'}</span>
+                                                    <span>{mc._count?.categories ?? 0} {isArabic ? 'فئة فرعية' : 'Categories'}</span>
                                                 </button>
 
                                                 <button 
@@ -386,7 +386,7 @@ export default function MainCategoriesClient({ mainCategories: initialMainCatego
                                                     title={isArabic ? 'عرض الشركات الموزعة' : 'View brands'}
                                                 >
                                                     <MdBrandingWatermark className="text-xs" />
-                                                    <span>{mc._count.brands} {isArabic ? 'ماركات' : 'Brands'}</span>
+                                                    <span>{mc._count?.brands ?? 0} {isArabic ? 'ماركات' : 'Brands'}</span>
                                                 </button>
                                             </div>
                                         </div>

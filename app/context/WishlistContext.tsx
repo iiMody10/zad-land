@@ -3,7 +3,7 @@
 import { laravelClientFetch } from "@/lib/laravel-client";
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 type WishlistContextValue = {
@@ -20,6 +20,7 @@ const WishlistContext = createContext<WishlistContextValue | null>(null);
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
+    const pathname = usePathname();
     const [ids, setIds] = useState<Set<string>>(new Set());
     const [ready, setReady] = useState(false);
     const [signedIn, setSignedIn] = useState(false);
@@ -37,7 +38,15 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
-    useEffect(() => { void refresh().catch(() => setReady(true)); }, [refresh]);
+    useEffect(() => {
+        if (pathname?.startsWith("/admin")) {
+            setSignedIn(false);
+            setIds(new Set());
+            setReady(true);
+            return;
+        }
+        void refresh().catch(() => setReady(true));
+    }, [pathname, refresh]);
 
     const reset = useCallback(() => { setSignedIn(false); setIds(new Set()); setRevision(0); }, []);
 

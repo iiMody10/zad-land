@@ -25,7 +25,7 @@ interface Category {
         group: string;
     } | null;
     isFeatured: boolean;
-    _count: {
+    _count?: {
         products: number;
     };
 }
@@ -442,7 +442,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
                                                     title={isArabic ? 'عرض المنتجات المرتبطة' : 'View products'}
                                                 >
                                                     <MdShoppingBag className="text-xs" />
-                                                    <span>{category._count.products} {isArabic ? 'منتج' : 'Products'}</span>
+                                                    <span>{category._count?.products ?? 0} {isArabic ? 'منتج' : 'Products'}</span>
                                                 </button>
 
                                                 {category.brand?.name && (

@@ -78,12 +78,28 @@ class AdminController extends Controller
         if ($resource === 'products') {
             $query->with(['brand', 'category', 'mainCategory']);
         } elseif ($resource === 'categories') {
-            $query->with(['brand', 'mainCategory']);
+            $query->with(['brand', 'mainCategory'])->withCount('products');
         } elseif ($resource === 'brands') {
-            $query->with('mainCategory');
+            $query->with('mainCategory')->withCount(['products', 'categories']);
+        } elseif ($resource === 'main-categories') {
+            $query->withCount(['products', 'categories', 'brands']);
         }
 
-        return response()->json(ApiJson::camel($query->orderByDesc('created_at')->get()));
+        $records = $query->orderByDesc('created_at')->get();
+        if (in_array($resource, ['brands', 'categories', 'main-categories'], true)) {
+            return response()->json($records->map(function ($record) use ($resource): array {
+                $data = ApiJson::camel($record);
+                $data['_count'] = match ($resource) {
+                    'brands' => ['products' => (int) $record->products_count, 'categories' => (int) $record->categories_count],
+                    'categories' => ['products' => (int) $record->products_count],
+                    'main-categories' => ['products' => (int) $record->products_count, 'categories' => (int) $record->categories_count, 'brands' => (int) $record->brands_count],
+                };
+
+                return $data;
+            })->values());
+        }
+
+        return response()->json(ApiJson::camel($records));
     }
 
     public function store(Request $request, string $resource)
