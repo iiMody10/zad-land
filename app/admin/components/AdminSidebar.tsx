@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { LayoutDashboard as MdDashboard, ShoppingBag as MdShoppingBag, Store as MdStorefront, Shapes as MdCategory, GalleryHorizontalEnd as MdViewCarousel, Package as MdInventory2, Tag as MdLocalOffer, FilePenLine as MdEditNote, Users as MdGroup, Settings as MdSettings, X as MdClose, LogOut as MdLogout, GitBranch as MdAccountTree, Star as MdStar } from 'lucide-react';
+import { LayoutDashboard as MdDashboard, ShoppingBag as MdShoppingBag, Store as MdStorefront, Shapes as MdCategory, GalleryHorizontalEnd as MdViewCarousel, Package as MdInventory2, Tag as MdLocalOffer, FilePenLine as MdEditNote, Users as MdGroup, Settings as MdSettings, X as MdClose, LogOut as MdLogout, GitBranch as MdAccountTree } from 'lucide-react';
 import { usePathname } from "next/navigation";
 import { signOutAdmin, useAdminSession } from "../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
@@ -18,8 +18,7 @@ type PermissionKey =
     | "canManageCategories"
     | "canManageBanners"
     | "canManageOrders"
-    | "canManagePromoCodes"
-    | "canManageReviews";
+    | "canManagePromoCodes";
 
 interface NavItem {
     href: string;
@@ -63,8 +62,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             items: [
                 { href: "/admin/orders", icon: MdInventory2, label: t('admin.orders'), permission: "canManageOrders" },
                 { href: "/admin/customers", icon: MdGroup, label: isArabic ? "حسابات التجار" : "Merchants", superAdminOnly: true },
-                { href: "/admin/promocodes", icon: MdLocalOffer, label: t('admin.promoCodes'), permission: "canManagePromoCodes" },
-                { href: "/admin/reviews", icon: MdStar, label: t('admin.reviews'), permission: "canManageReviews" }
+                { href: "/admin/promocodes", icon: MdLocalOffer, label: t('admin.promoCodes'), permission: "canManagePromoCodes" }
             ]
         },
         {

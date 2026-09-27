@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\PromoCode;
 use App\Models\User;
@@ -175,6 +176,42 @@ class OrderApiTest extends TestCase
         ]);
         $this->deleteJson('/api/admin/categories/'.$category->id)->assertConflict();
         $this->assertDatabaseHas('products', ['id' => $product->id, 'category_id' => $category->id]);
+    }
+
+    public function test_admin_orders_endpoint_reports_pagination_and_returns_requested_page(): void
+    {
+        $admin = User::create(['username' => 'orders-page-admin', 'password' => Hash::make('secret123'), 'role' => 'SUPER_ADMIN']);
+        foreach (range(1, 3) as $number) {
+            Order::create([
+                'shop_name' => 'Shop '.$number, 'total_amount' => '10.00', 'status' => 'PENDING',
+                'city' => 'Homs', 'street_address' => 'Street '.$number, 'Name' => 'Owner '.$number, 'phone' => '09'.$number,
+            ]);
+        }
+
+        $this->actingAs($admin, 'web')->getJson('/api/admin/orders?page=2&limit=2')
+            ->assertOk()->assertJsonPath('pagination.total', 3)->assertJsonPath('pagination.pages', 2)
+            ->assertJsonCount(1, 'orders');
+    }
+
+    public function test_admin_customers_endpoint_returns_order_counts_and_approval_updates_status(): void
+    {
+        $admin = User::create(['username' => 'merchant-list-admin', 'password' => Hash::make('secret123'), 'role' => 'SUPER_ADMIN']);
+        $merchant = Customer::create([
+            'shop_name' => 'Test shop', 'owner_name' => 'Shop owner', 'phone' => '963900000001', 'city' => 'Homs',
+            'address' => 'Market road', 'password' => Hash::make('secret123'), 'is_active' => false,
+        ]);
+        Order::create([
+            'customer_id' => $merchant->id, 'shop_name' => 'Test shop', 'total_amount' => '10.00', 'status' => 'PENDING',
+            'city' => 'Homs', 'street_address' => 'Market road', 'Name' => 'Shop owner', 'phone' => $merchant->phone,
+        ]);
+
+        $this->actingAs($admin, 'web')->getJson('/api/admin/customers')
+            ->assertOk()->assertJsonPath('0.shopName', 'Test shop')->assertJsonPath('0._count.orders', 1)
+            ->assertJsonPath('0.isActive', false);
+
+        $this->patchJson('/api/admin/customers', ['id' => $merchant->id, 'isActive' => true])
+            ->assertOk()->assertJsonPath('customer.isActive', true);
+        $this->assertTrue($merchant->fresh()->is_active);
     }
 
     public function test_super_admin_can_import_workbook_product_rows_into_mysql(): void

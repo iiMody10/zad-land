@@ -210,7 +210,18 @@ export async function getAdminCategories(page = 1, limit = 500) {
     const categories = await request<any[]>(`/admin/categories?page=${page}&limit=${limit}`);
     return { categories: categories.slice((page - 1) * limit, page * limit), pagination: { total: categories.length, pages: Math.ceil(categories.length / limit), page, limit } };
 }
-export async function getAdminOrders(page = 1, limit = 50) { return request<{ orders: any[]; pagination: any }>(`/admin/orders?page=${page}&limit=${limit}`); }
+export async function getAdminOrders(page = 1, limit = 200) {
+    const firstPage = await request<{ orders: any[]; pagination: { total: number; pages: number; page: number; limit: number } }>(`/admin/orders?page=${page}&limit=${limit}`);
+    const orders = [...firstPage.orders];
+    const pageCount = Math.max(firstPage.pagination.pages, Math.ceil(firstPage.pagination.total / limit));
+
+    for (let currentPage = page + 1; currentPage <= pageCount && currentPage <= 10000; currentPage++) {
+        const result = await request<{ orders: any[] }>(`/admin/orders?page=${currentPage}&limit=${limit}`);
+        orders.push(...result.orders);
+    }
+
+    return { ...firstPage, orders };
+}
 export async function createProduct(data: ProductInput) { return mutation("/admin/products", "POST", data); }
 export async function updateProduct(id: string, data: ProductInput & { isTrending?: boolean }) { return mutation(`/admin/products/${encodeURIComponent(id)}`, "PATCH", data); }
 export async function deleteProduct(id: string) { return mutation(`/admin/products/${encodeURIComponent(id)}`, "DELETE"); }

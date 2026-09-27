@@ -128,6 +128,8 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
             const result = await updateOrderStatus(id, newStatus as OrderStatus);
             if (!result.success) {
                 alert(result.error || "Failed to update status");
+            } else {
+                router.refresh();
             }
         } catch (error) {
             console.error("Error updating status:", error);
