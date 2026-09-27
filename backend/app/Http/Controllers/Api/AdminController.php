@@ -401,17 +401,27 @@ class AdminController extends Controller
                         $seen = [];
                         foreach ($items as $item) {
                             if (! is_array($item)
-                                || ! in_array($item['type'] ?? null, ['category', 'brand'], true)
+                                || ! in_array($item['type'] ?? null, ['mainCategory', 'category', 'brand'], true)
                                 || ! is_string($item['id'] ?? null)
                                 || $item['id'] === ''
                                 || strlen($item['id']) > 191) {
-                                $fail('Each header navigation link must select a valid category or brand.');
+                                $fail('Each header navigation link must select a valid main category, category, or brand.');
+                                return;
+                            }
+
+                            $exists = match ($item['type']) {
+                                'mainCategory' => MainCategory::whereKey($item['id'])->exists(),
+                                'category' => Category::whereKey($item['id'])->exists(),
+                                'brand' => Brand::whereKey($item['id'])->exists(),
+                            };
+                            if (! $exists) {
+                                $fail('Each header navigation link must reference an existing main category, category, or brand.');
                                 return;
                             }
 
                             $key = $item['type'].':'.$item['id'];
                             if (isset($seen[$key])) {
-                                $fail('A category or brand can only appear once in the header navigation.');
+                                $fail('A main category, category, or brand can only appear once in the header navigation.');
                                 return;
                             }
                             $seen[$key] = true;
