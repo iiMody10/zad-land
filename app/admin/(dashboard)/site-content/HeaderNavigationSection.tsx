@@ -57,6 +57,7 @@ export default function HeaderNavigationSection({ items, mainCategories, onChang
 
             <div className="flex flex-col gap-3 sm:flex-row">
                 <select
+                    dir={isArabic ? "rtl" : "ltr"}
                     value={pendingValue}
                     onChange={(event) => setPendingValue(event.target.value)}
                     className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 outline-none focus:border-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white"
@@ -84,9 +85,9 @@ export default function HeaderNavigationSection({ items, mainCategories, onChang
             <ol className="mt-5 space-y-2">
                 {items.map((item, index) => (
                     <li key={`${item.type}-${item.id}`} className="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-2.5 dark:border-white/10 dark:bg-gray-800/60">
-                        <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-                            {label(item)}
-                            <span className="ms-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <span className="flex min-w-0 flex-1 items-center gap-2 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
+                            <bdi dir={isArabic ? "rtl" : "ltr"} className="truncate">{label(item)}</bdi>
+                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                                 {isArabic ? "قسم رئيسي" : "Main category"}
                             </span>
                         </span>

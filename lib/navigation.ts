@@ -1,4 +1,3 @@
-import { unstable_cache } from "next/cache";
 import { laravelJson } from "@/lib/laravel-server";
 import { canViewWholesalePrices, projectProductsPrices } from "./price-visibility";
 
@@ -15,13 +14,13 @@ export interface NavMainCategory {
     brands: NavBrand[]; categories: NavCategory[]; topProducts: NavTopProduct[]; trendingProducts: NavTrendingProduct[];
 }
 
-const cachedNavigation = unstable_cache(
-    async () => laravelJson<NavMainCategory[]>("/api/navigation", []),
-    ["laravel-navigation-data-v2"],
-    { tags: ["navigation"], revalidate: 3600 },
-);
-
 export async function getNavigationData() {
-    const [data, allowed] = await Promise.all([cachedNavigation(), canViewWholesalePrices()]);
+    // Navigation settings and main-category assignments are admin-editable.
+    // Fetch the no-store Laravel response directly so stale Next data cannot
+    // leave the header empty after changes or an earlier failed request.
+    const [data, allowed] = await Promise.all([
+        laravelJson<NavMainCategory[]>("/api/navigation", []),
+        canViewWholesalePrices(),
+    ]);
     return data.map((category) => ({ ...category, trendingProducts: projectProductsPrices(category.trendingProducts, allowed) }));
 }
