@@ -36,6 +36,12 @@ const Footer = async ({ t, language }: FooterProps) => {
     const brandDescription = getLocalizedValue(language, settings?.footerBrandDescription, settings?.footerBrandDescriptionAr) || t('footer.brandDescription');
     const copyright = getLocalizedValue(language, settings?.footerCopyright, settings?.footerCopyrightAr) || t('footer.copyright');
     const shopTitle = getLocalizedValue(language, settings?.footerShopTitle, settings?.footerShopTitleAr) || t('footer.shop');
+    const contactTitle = getLocalizedValue(language, settings?.footerContactTitle, settings?.footerContactTitleAr) || (language === 'ar' ? 'معلومات التواصل' : 'Contact Information');
+    const contactAddress = getLocalizedValue(language, settings?.footerAddress, settings?.footerAddressAr);
+    const contactPhone = settings?.footerPhone || '';
+    const contactEmail = settings?.footerEmail || '';
+    const whatsappLabel = getLocalizedValue(language, settings?.footerWhatsappLabel, settings?.footerWhatsappLabelAr);
+    const phoneHref = contactPhone.replace(/[^\d+]/g, '');
 
     const socialLinks = [
         {
@@ -175,24 +181,24 @@ const Footer = async ({ t, language }: FooterProps) => {
 
                         {/* Contact */}
                         <div className="text-center lg:border-e lg:border-[var(--color-accent)]/25 lg:px-6">
-                            <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{isArabic ? 'معلومات التواصل' : 'Contact Information'}</h5>
+                            <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{contactTitle}</h5>
                             <div className="flex flex-col items-center gap-3 text-xs text-[var(--color-text-main-dark)]/90 sm:text-sm">
-                                <div className="flex items-center gap-2">
+                                {contactAddress && <div className="flex items-center gap-2">
                                     <LuMapPin className="shrink-0 text-[var(--color-accent-light)]" />
-                                    <span>{isArabic ? 'حمص، سوريا' : 'Homs, Syria'}</span>
-                                </div>
-                                <a className="flex items-center gap-2 transition-colors hover:text-[var(--color-accent-light)]" href="tel:+963933254796">
+                                    <span>{contactAddress}</span>
+                                </div>}
+                                {contactPhone && <a className="flex items-center gap-2 transition-colors hover:text-[var(--color-accent-light)]" href={`tel:${phoneHref}`}>
                                     <LuPhone className="shrink-0 text-[var(--color-accent-light)]" />
-                                    <span dir="ltr">+963 933 254 796</span>
-                                </a>
-                                <a className="flex items-center gap-2 transition-colors hover:text-[var(--color-accent-light)]" href="mailto:info@zadland.com">
+                                    <span dir="ltr">{contactPhone}</span>
+                                </a>}
+                                {contactEmail && <a className="flex items-center gap-2 transition-colors hover:text-[var(--color-accent-light)]" href={`mailto:${contactEmail}`}>
                                     <LuMail className="shrink-0 text-[var(--color-accent-light)]" />
-                                    <span>info@zadland.com</span>
-                                </a>
-                                <a className="mt-1 inline-flex items-center gap-1.5 font-bold text-[var(--color-accent-light)] transition-colors hover:text-white" href="https://wa.me/963933254796" target="_blank" rel="noopener noreferrer">
+                                    <span>{contactEmail}</span>
+                                </a>}
+                                {settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#' && whatsappLabel && <a className="mt-1 inline-flex items-center gap-1.5 font-bold text-[var(--color-accent-light)] transition-colors hover:text-white" href={settings.footerWhatsappUrl} target="_blank" rel="noopener noreferrer">
                                     <PlatformIcon platform="whatsapp" className="size-4" />
-                                    <span>{isArabic ? 'تواصل معنا عبر واتساب' : 'Chat on WhatsApp'}</span>
-                                </a>
+                                    <span>{whatsappLabel}</span>
+                                </a>}
                             </div>
                         </div>
 

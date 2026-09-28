@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from 'react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import PlatformIcon from '@/app/components/PlatformIcon';
 
 interface FooterCategoryOption {
@@ -164,8 +166,61 @@ export default function FooterContentSection({
     onFieldChange,
     t,
 }: FooterContentSectionProps) {
+    const [previewLanguage, setPreviewLanguage] = useState<'ar' | 'en'>('ar');
+    const previewArabic = previewLanguage === 'ar';
+    const localized = (englishKey: string, arabicKey: string, fallback = '') => {
+        const english = footerContent[englishKey] || fallback;
+        const arabic = footerContent[arabicKey] || english || fallback;
+        return previewArabic ? arabic : english || arabic;
+    };
+    const selectedCategories = [1, 2, 3, 4]
+        .map((slot) => categories.find((category) => category.id === footerContent[`footerCategory${slot}Id`]))
+        .filter((category): category is FooterCategoryOption => Boolean(category));
+
     return (
         <div className="space-y-8">
+            {/* Live preview */}
+            <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 px-6 py-4 dark:border-white/10 md:px-8">
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">معاينة مباشرة للتذييل</h3>
+                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">تتحدث المعاينة تلقائياً مع تعديل الحقول أدناه.</p>
+                    </div>
+                    <div className="flex rounded-lg bg-slate-100 p-1 dark:bg-gray-800" aria-label="Preview language">
+                        <button type="button" onClick={() => setPreviewLanguage('ar')} className={`rounded-md px-3 py-1.5 text-xs font-bold ${previewArabic ? 'bg-white text-slate-900 shadow-sm dark:bg-gray-700 dark:text-white' : 'text-slate-500'}`}>العربية</button>
+                        <button type="button" onClick={() => setPreviewLanguage('en')} className={`rounded-md px-3 py-1.5 text-xs font-bold ${!previewArabic ? 'bg-white text-slate-900 shadow-sm dark:bg-gray-700 dark:text-white' : 'text-slate-500'}`}>English</button>
+                    </div>
+                </div>
+                <div dir={previewArabic ? 'rtl' : 'ltr'} className="relative overflow-hidden bg-[#073b2d] px-5 py-8 text-white md:px-8">
+                    <div className="pointer-events-none absolute inset-0 bg-[url('/images/footer-bg.webp')] bg-cover bg-center opacity-25" />
+                    <div className="relative grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5">
+                        <div className="text-center lg:text-start">
+                            <div className="mb-3 text-xl font-black text-amber-300">{localized('footerBrandTitle', 'footerBrandTitleAr', 'زاد لاند')}</div>
+                            <p className="text-xs leading-6 text-white/75">{localized('footerBrandDescription', 'footerBrandDescriptionAr')}</p>
+                            <div className="mt-3 flex justify-center gap-2 lg:justify-start">
+                                {(['instagram', 'facebook', 'whatsapp'] as const).map((platform) => <span key={platform} className="flex size-7 items-center justify-center rounded-full border border-amber-300/40 text-amber-200"><PlatformIcon platform={platform} className="size-3.5" /></span>)}
+                            </div>
+                        </div>
+                        <PreviewColumn title={previewArabic ? 'روابط سريعة' : 'Quick Links'} items={previewArabic ? ['الرئيسية', 'من نحن', 'المنتجات', 'الشركات العالمية', 'تواصل معنا'] : ['Home', 'About Us', 'Products', 'Global Brands', 'Contact Us']} />
+                        <PreviewColumn title={localized('footerShopTitle', 'footerShopTitleAr', previewArabic ? 'المتجر' : 'Shop')} items={selectedCategories.length ? selectedCategories.map((category) => category.name) : [previewArabic ? 'جميع المنتجات' : 'All products']} />
+                        <div className="text-center lg:text-start">
+                            <h4 className="mb-3 text-sm font-extrabold text-amber-300">{localized('footerContactTitle', 'footerContactTitleAr', previewArabic ? 'معلومات التواصل' : 'Contact Information')}</h4>
+                            <div className="space-y-2.5 text-xs text-white/85">
+                                {localized('footerAddress', 'footerAddressAr') && <p className="flex items-center justify-center gap-2 lg:justify-start"><MapPin className="size-3.5 shrink-0 text-amber-300" />{localized('footerAddress', 'footerAddressAr')}</p>}
+                                {footerContent.footerPhone && <p className="flex items-center justify-center gap-2 lg:justify-start"><Phone className="size-3.5 shrink-0 text-amber-300" /><span dir="ltr">{footerContent.footerPhone}</span></p>}
+                                {footerContent.footerEmail && <p className="flex items-center justify-center gap-2 lg:justify-start"><Mail className="size-3.5 shrink-0 text-amber-300" />{footerContent.footerEmail}</p>}
+                                {footerContent.footerWhatsappUrl && footerContent.footerWhatsappUrl !== '#' && <p className="pt-1 font-bold text-amber-200">{localized('footerWhatsappLabel', 'footerWhatsappLabelAr', previewArabic ? 'تواصل معنا عبر واتساب' : 'Chat on WhatsApp')}</p>}
+                            </div>
+                        </div>
+                        <div className="text-center lg:text-start">
+                            <h4 className="mb-2 text-sm font-extrabold text-amber-300">{previewArabic ? 'جودة عالمية' : 'Global Quality'}</h4>
+                            <p className="text-xs text-white/75">{previewArabic ? 'في خدمة السوق السوري' : 'Serving the Syrian market'}</p>
+                        </div>
+                    </div>
+                    <div className="relative mt-7 border-t border-amber-300/30 pt-3 text-center text-[11px] text-white/70">{localized('footerCopyright', 'footerCopyrightAr')}</div>
+                </div>
+            </section>
+
             {/* Branding Section */}
             <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[var(--color-surface-dark)] p-6 md:p-8 shadow-xs">
                 <SectionTitle
@@ -216,6 +271,30 @@ export default function FooterContentSection({
                             value={footerContent.footerCopyrightAr}
                             onChange={(value) => onFieldChange('footerCopyrightAr', value)}
                         />
+                    </div>
+                </div>
+            </div>
+
+            {/* Contact Information Section */}
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)] md:p-8">
+                <SectionTitle
+                    title="معلومات التواصل"
+                    description="حرر عنوان القسم والعنوان ورقم الهاتف والبريد الإلكتروني ونص رابط واتساب بالعربية والإنجليزية. اترك أي قيمة فارغة لإخفائها من التذييل."
+                />
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                    <div className="space-y-4">
+                        <span className="inline-block rounded-md bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">🇬🇧 English</span>
+                        <TextField label="Section heading" value={footerContent.footerContactTitle} onChange={(value) => onFieldChange('footerContactTitle', value)} />
+                        <TextField label="Address" value={footerContent.footerAddress} onChange={(value) => onFieldChange('footerAddress', value)} />
+                        <TextField label="Phone number" value={footerContent.footerPhone} onChange={(value) => onFieldChange('footerPhone', value)} placeholder="+963 933 254 796" />
+                        <TextField label="Email address" value={footerContent.footerEmail} onChange={(value) => onFieldChange('footerEmail', value)} placeholder="info@example.com" />
+                        <TextField label="WhatsApp link text" value={footerContent.footerWhatsappLabel} onChange={(value) => onFieldChange('footerWhatsappLabel', value)} />
+                    </div>
+                    <div dir="rtl" className="space-y-4">
+                        <span className="inline-block rounded-md bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">🇸🇦 العربية</span>
+                        <TextField label="عنوان القسم" value={footerContent.footerContactTitleAr} onChange={(value) => onFieldChange('footerContactTitleAr', value)} />
+                        <TextField label="العنوان" value={footerContent.footerAddressAr} onChange={(value) => onFieldChange('footerAddressAr', value)} />
+                        <TextField label="نص رابط واتساب" value={footerContent.footerWhatsappLabelAr} onChange={(value) => onFieldChange('footerWhatsappLabelAr', value)} />
                     </div>
                 </div>
             </div>
@@ -436,4 +515,11 @@ export default function FooterContentSection({
             </div>
         </div>
     );
+}
+
+function PreviewColumn({ title, items }: { title: string; items: string[] }) {
+    return <div className="text-center lg:text-start">
+        <h4 className="mb-3 text-sm font-extrabold text-amber-300">{title}</h4>
+        <ul className="space-y-2 text-xs text-white/80">{items.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
+    </div>;
 }

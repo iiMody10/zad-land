@@ -34,6 +34,14 @@ interface SiteSettings {
     footerInstagramUrl: string | null;
     footerFacebookUrl: string | null;
     footerWhatsappUrl: string | null;
+    footerContactTitle: string | null;
+    footerContactTitleAr: string | null;
+    footerAddress: string | null;
+    footerAddressAr: string | null;
+    footerPhone: string | null;
+    footerEmail: string | null;
+    footerWhatsappLabel: string | null;
+    footerWhatsappLabelAr: string | null;
     footerShopTitle: string | null;
     footerShopTitleAr: string | null;
     footerSupportTitle: string | null;
@@ -212,6 +220,14 @@ export default function SiteContentClient({
         footerInstagramUrl: initialSettings?.footerInstagramUrl || "",
         footerFacebookUrl: initialSettings?.footerFacebookUrl || "",
         footerWhatsappUrl: initialSettings?.footerWhatsappUrl || "",
+        footerContactTitle: initialSettings?.footerContactTitle || "Contact Information",
+        footerContactTitleAr: initialSettings?.footerContactTitleAr || "معلومات التواصل",
+        footerAddress: initialSettings?.footerAddress || "Homs, Syria",
+        footerAddressAr: initialSettings?.footerAddressAr || "حمص، سوريا",
+        footerPhone: initialSettings?.footerPhone || "+963 933 254 796",
+        footerEmail: initialSettings?.footerEmail || "info@zadland.com",
+        footerWhatsappLabel: initialSettings?.footerWhatsappLabel || "Chat on WhatsApp",
+        footerWhatsappLabelAr: initialSettings?.footerWhatsappLabelAr || "تواصل معنا عبر واتساب",
         footerShopTitle: initialSettings?.footerShopTitle || "",
         footerShopTitleAr: initialSettings?.footerShopTitleAr || "",
         footerSupportTitle: initialSettings?.footerSupportTitle || "",
