@@ -43,7 +43,10 @@ class BrandLogoSeeder extends Seeder
             $file = $logos[$brand->name];
             $path = '/brand-logos/'.$file;
 
-            if (! is_file(public_path($path))) {
+            // The Laravel API lives in /backend, while these assets are served
+            // from the sibling Next.js app's /public directory.
+            $assetPath = dirname(base_path()).'/public/brand-logos/'.$file;
+            if (! is_file($assetPath)) {
                 $missingFiles[] = $file;
                 continue;
             }
