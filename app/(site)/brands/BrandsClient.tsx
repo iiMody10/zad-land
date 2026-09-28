@@ -94,9 +94,6 @@ export default function BrandsClient({ brands }: BrandsClientProps) {
             {/* Header Area */}
             <div className="mb-8 md:mb-10 border-b border-slate-200/80 pb-6 dark:border-white/10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
                 <div>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.24em] text-[var(--color-accent)] dark:text-[var(--color-accent-light)] block mb-1">
-                        {isArabic ? 'كتالوج العلامات التجارية والشركاء المعتمدين' : 'AUTHORIZED GLOBAL BRANDS'}
-                    </span>
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--color-brand)] dark:text-white tracking-tight">
                         {isArabic ? 'العلامات التجارية' : 'Brands'}
                     </h1>
