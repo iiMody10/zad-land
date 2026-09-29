@@ -24,6 +24,9 @@ class PricedProductCatalogSeeder extends Seeder
                 $barcode = trim((string) $row['barcode']);
                 $mainName = trim((string) $row['mainCategory']);
                 $brandName = trim((string) ($row['brand'] ?: 'عام'));
+                if ($brandName === 'اميركانا') {
+                    $brandName = 'امريكانا';
+                }
                 $categoryName = trim((string) $row['category']);
                 $nameAr = trim((string) $row['nameAr']);
                 $nameEn = trim((string) $row['nameEn']);

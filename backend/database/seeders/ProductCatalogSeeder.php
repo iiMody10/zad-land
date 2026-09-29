@@ -56,6 +56,9 @@ class ProductCatalogSeeder extends Seeder
             );
 
             $brandName = trim($row['brand']);
+            if ($brandName === 'اميركانا') {
+                $brandName = 'امريكانا';
+            }
             $brandKey = mb_strtolower($brandName);
             $brands[$brandKey] ??= Brand::firstOrCreate(
                 ['name' => $brandName],
