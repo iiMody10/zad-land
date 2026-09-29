@@ -4,7 +4,6 @@ import { laravelClientFetch } from "@/lib/laravel-client";
 
 import { useState, useEffect, useRef } from "react";
 import { X as MdClose, ChevronDown as MdExpandMore, RefreshCw as MdSync, CircleCheck as MdCheckCircle, CloudUpload as MdCloudUpload } from 'lucide-react';
-import { createProduct, updateProduct } from "../../../../lib/admin-actions";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { toast } from "react-hot-toast";
 import { formatPackaging } from "@/lib/packaging";
@@ -213,19 +212,25 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                 mainCategoryId: formData.mainCategoryId || null,
             };
 
-            const result = product
-                ? await updateProduct(product.id, formDataToSubmit)
-                : await createProduct(formDataToSubmit);
-
-            if (result.success) {
-                toast.success(product ? (t("admin.productUpdated") || "Product updated") : (t("admin.productCreated") || "Product created"));
-                onClose();
-            } else {
-                toast.error(result.error || (product ? "Failed to update product" : "Failed to create product"));
+            const response = await laravelClientFetch(
+                product ? `/api/admin/products/${encodeURIComponent(product.id)}` : "/api/admin/products",
+                {
+                    method: product ? "PATCH" : "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formDataToSubmit),
+                },
+            );
+            const result = await response.json().catch(() => null);
+            if (!response.ok) {
+                const validationError = result?.errors && Object.values(result.errors).flat()[0];
+                throw new Error(String(validationError || result?.error || result?.message || `Request failed (${response.status})`));
             }
+
+            toast.success(product ? (t("admin.productUpdated") || "Product updated") : (t("admin.productCreated") || "Product created"));
+            onClose();
         } catch (err) {
             console.error(product ? "Error updating product:" : "Error creating product:", err);
-            toast.error("An unexpected error occurred");
+            toast.error(err instanceof Error ? err.message : (product ? "Failed to update product" : "Failed to create product"));
         } finally {
             setIsLoading(false);
         }
@@ -641,6 +646,7 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                         {language === 'ar' ? 'إلغاء' : 'Cancel'}
                     </button>
                     <button
+                        type="button"
                         onClick={handleSubmit}
                         disabled={isLoading}
                         className="bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] dark:bg-[var(--color-accent)] dark:hover:bg-[var(--color-accent-hover)] disabled:opacity-50 text-white h-12 px-8 rounded-xl font-bold text-sm flex items-center gap-2 transition-all shadow-sm transform active:scale-[0.98] cursor-pointer"
