@@ -47,11 +47,6 @@ export default function ContactClient({ language, dir, content, settings }: Cont
                     </div>
                     <h1 className="mb-3 text-2xl font-black text-[var(--color-brand)] dark:text-[#F5F0E0] sm:text-3xl md:text-4xl">{copy('heroTitle')}</h1>
                     <p className="text-sm leading-relaxed text-[var(--color-text-muted-light)] dark:text-[var(--color-text-muted-dark)] md:text-base">{copy('heroDescription')}</p>
-                    <div className="mt-4 flex select-none items-center justify-center gap-3 text-[var(--color-accent)] opacity-80">
-                        <span className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--color-accent)]" />
-                        <span>🌾</span><span className="text-xs font-bold tracking-wider">ZAD LAND</span><span>🌾</span>
-                        <span className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--color-accent)]" />
-                    </div>
                 </header>}
 
                 <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
