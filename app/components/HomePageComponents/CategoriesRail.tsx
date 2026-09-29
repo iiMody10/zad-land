@@ -49,7 +49,7 @@ const CategoriesRail = ({ categories = [] }: CategoriesRailProps) => {
                             {categories.map((category, index) => (
                                 <div key={category.id || category.slug}>
                                     <Link
-                                        href={`/products?category=${category.slug}`}
+                                        href={`/products?categoryIds=${encodeURIComponent(category.slug)}`}
                                         className="flex flex-col items-center gap-2 w-[100px] md:w-[120px] flex-none snap-start group/card"
                                     >
                                         <div className="w-[64px] h-[64px] md:w-[84px] md:h-[84px] rounded-full p-0.5 transition-all duration-300 border border-gray-200 dark:border-white/10 group-hover/card:border-[var(--color-accent)] group-hover/card:ring-2 group-hover/card:ring-[var(--color-accent)]/20 shrink-0">

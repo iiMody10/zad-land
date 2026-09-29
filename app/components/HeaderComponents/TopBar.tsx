@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/app/context/LanguageContext';
-import CurrencyToggle from '../CurrencyToggle';
 import LanguageToggle from '../LanguageToggle';
 
 const TopBar = () => {
@@ -26,9 +25,6 @@ const TopBar = () => {
                     <span className="h-3 w-px bg-white/25" aria-hidden="true" />
                     <div className="[&>button]:text-white [&>button]:hover:bg-white/10">
                         <LanguageToggle />
-                    </div>
-                    <div className="[&>div>button]:text-white [&>div>button]:hover:bg-white/10">
-                        <CurrencyToggle />
                     </div>
                 </div>
             </div>

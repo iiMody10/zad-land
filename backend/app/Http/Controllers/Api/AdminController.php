@@ -418,12 +418,26 @@ class AdminController extends Controller
                         $seen = [];
                         foreach ($items as $item) {
                             if (! is_array($item)
-                                || ! in_array($item['type'] ?? null, ['mainCategory', 'category', 'brand'], true)
+                                || ! in_array($item['type'] ?? null, ['home', 'mainCategory', 'category', 'brand'], true)
                                 || ! is_string($item['id'] ?? null)
                                 || $item['id'] === ''
                                 || strlen($item['id']) > 191) {
-                                $fail('Each header navigation link must select a valid main category, category, or brand.');
+                                $fail('Each header navigation link must select a valid home page, main category, category, or brand.');
                                 return;
+                            }
+
+                            if (($item['type'] ?? null) === 'home') {
+                                if ($item['id'] !== 'home' || (isset($item['enabled']) && ! is_bool($item['enabled']))) {
+                                    $fail('The home navigation link must use the home id and a boolean enabled value.');
+                                    return;
+                                }
+                                $key = 'home:home';
+                                if (isset($seen[$key])) {
+                                    $fail('The home link can only appear once in the header navigation.');
+                                    return;
+                                }
+                                $seen[$key] = true;
+                                continue;
                             }
 
                             $exists = match ($item['type']) {

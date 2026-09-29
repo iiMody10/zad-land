@@ -26,11 +26,12 @@ interface HeaderCategory {
 interface HeaderProps {
     initialCategories?: HeaderCategory[];
     initialNavData?: NavMainCategory[];
+    showHomeNav?: boolean;
     dir: 'ltr' | 'rtl';
     language: 'en' | 'ar';
 }
 
-const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) => {
+const Header = ({ initialCategories = [], initialNavData = [], showHomeNav = true }: HeaderProps) => {
     const { language, dir } = useLanguage();
     const pathname = usePathname();
     const { totalItems, openDrawer } = useCart();
@@ -297,6 +298,17 @@ const Header = ({ initialCategories = [], initialNavData = [] }: HeaderProps) =>
 
                     <div className="flex min-w-0 flex-1 justify-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       <div className="flex w-max min-w-full items-center justify-center gap-0.5">
+                        {showHomeNav && (
+                            <Link
+                                href="/"
+                                onMouseEnter={closeDesktopMenus}
+                                onClick={closeDesktopMenus}
+                                aria-current={pathname === '/' ? 'page' : undefined}
+                                className={`flex h-10 shrink-0 items-center rounded-[7px] px-3 text-[13px] font-semibold transition-colors xl:text-sm ${pathname === '/' ? 'bg-[var(--color-brand-soft)] text-[var(--color-brand)] dark:bg-white/10 dark:text-white' : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-soft)] dark:text-gray-200 dark:hover:bg-white/10'}`}
+                            >
+                                {isArabic ? 'الرئيسية' : 'Home'}
+                            </Link>
+                        )}
                         {initialNavData.map((item) => {
                             const name = isArabic ? item.name : item.nameEn || item.name;
                             const isOpen = activeMegaMenu === item.slug;

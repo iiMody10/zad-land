@@ -1,14 +1,15 @@
 import type { NavMainCategory } from '@/lib/navigation';
 
-export type HeaderNavItemRef = {
-    type: 'mainCategory';
-    id: string;
-};
+export type HeaderNavItemRef =
+    | { type: 'home'; id: 'home'; enabled: boolean }
+    | { type: 'mainCategory'; id: string };
+
+const defaultHomeNavItem: HeaderNavItemRef = { type: 'home', id: 'home', enabled: true };
 
 export function getDefaultHeaderNavItems(mainCategories: Array<Pick<NavMainCategory, 'id' | 'showInNav'>>): HeaderNavItemRef[] {
     const categoriesWithLegacyVisibility = mainCategories.filter((category) => 'showInNav' in category && category.showInNav);
     const defaults = categoriesWithLegacyVisibility.length > 0 ? categoriesWithLegacyVisibility : mainCategories;
-    return defaults.slice(0, 6).map(({ id }) => ({ type: 'mainCategory', id }));
+    return [defaultHomeNavItem, ...defaults.slice(0, 6).map(({ id }) => ({ type: 'mainCategory' as const, id }))];
 }
 
 export function parseHeaderNavItems(value: unknown): HeaderNavItemRef[] {
@@ -18,22 +19,23 @@ export function parseHeaderNavItems(value: unknown): HeaderNavItemRef[] {
         const parsed: unknown = JSON.parse(value);
         if (!Array.isArray(parsed)) return [];
 
-        return parsed.filter((item): item is HeaderNavItemRef =>
-            Boolean(item)
-            && typeof item === 'object'
-            && (item as HeaderNavItemRef).type === 'mainCategory'
-            && typeof (item as HeaderNavItemRef).id === 'string'
-            && (item as HeaderNavItemRef).id.length > 0,
-        ).slice(0, 12);
+        return parsed.flatMap((item): HeaderNavItemRef[] => {
+            if (!item || typeof item !== 'object') return [];
+            const candidate = item as { type?: unknown; id?: unknown; enabled?: unknown };
+            if (candidate.type === 'home' && candidate.id === 'home') {
+                return [{ type: 'home', id: 'home', enabled: candidate.enabled !== false }];
+            }
+            if (candidate.type === 'mainCategory' && typeof candidate.id === 'string' && candidate.id.length > 0) {
+                return [{ type: 'mainCategory', id: candidate.id }];
+            }
+            return [];
+        }).slice(0, 12);
     } catch {
         return [];
     }
 }
 
-/**
- * Migrate saved brand/category links to main-category navigation. Intentionally
- * empty arrays stay empty so an admin can hide all configured category links.
- */
+/** Migrate older saved category-only navigation settings to the current links. */
 export function getConfiguredHeaderNavItems(
     value: unknown,
     mainCategories: Array<Pick<NavMainCategory, 'id' | 'showInNav'>>,
@@ -41,7 +43,11 @@ export function getConfiguredHeaderNavItems(
     if (value == null) return getDefaultHeaderNavItems(mainCategories);
 
     const configured = parseHeaderNavItems(value);
-    if (configured.length > 0) return configured;
+    if (configured.some((item) => item.type === 'home')) return configured;
+
+    // Older saved navigation had no explicit home item. Add it once during
+    // migration; the admin stores an explicit disabled item when switched off.
+    if (configured.length > 0) return [defaultHomeNavItem, ...configured].slice(0, 12);
 
     if (typeof value === 'string') {
         try {
@@ -54,7 +60,7 @@ export function getConfiguredHeaderNavItems(
         }
     }
 
-    return [];
+    return [defaultHomeNavItem];
 }
 
 export function selectHeaderNavigationItems(
@@ -62,6 +68,7 @@ export function selectHeaderNavigationItems(
     mainCategories: NavMainCategory[],
 ): NavMainCategory[] {
     return refs.flatMap((ref) => {
+        if (ref.type !== 'mainCategory') return [];
         const mainCategory = mainCategories.find((candidate) => candidate.id === ref.id);
         return mainCategory ? [mainCategory] : [];
     });

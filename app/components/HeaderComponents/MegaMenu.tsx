@@ -116,7 +116,7 @@ export default function MegaMenu({ data, onClose, onMouseLeave }: MegaMenuProps)
                         {data.categories.slice(0, 8).map((category) => (
                             <li key={category.id}>
                                 <Link
-                                    href={`/department/${data.slug}?category=${category.slug}`}
+                                    href={`/products?department=${encodeURIComponent(data.slug)}&categoryIds=${encodeURIComponent(category.id)}`}
                                     onClick={onClose}
                                     className="block rounded-[6px] px-2 py-2 text-[13px] font-medium leading-snug text-[var(--color-ink)] transition-colors hover:bg-[var(--color-brand-soft)] hover:text-[var(--color-brand-hover)] dark:text-white dark:hover:bg-white/10"
                                 >

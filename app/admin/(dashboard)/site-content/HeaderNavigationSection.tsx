@@ -21,20 +21,27 @@ export default function HeaderNavigationSection({ items, mainCategories, onChang
     const { language } = useLanguage();
     const isArabic = language === "ar";
     const [pendingValue, setPendingValue] = useState("");
+    const homeItem = items.find((item) => item.type === "home");
+    const categoryItems = items.filter((item): item is Extract<HeaderNavItemRef, { type: "mainCategory" }> => item.type === "mainCategory");
+
+    const setHomeEnabled = (enabled: boolean) => {
+        const nextHome: HeaderNavItemRef = { type: "home", id: "home", enabled };
+        onChange([nextHome, ...categoryItems]);
+    };
 
     const addItem = () => {
         const id = pendingValue;
-        if (!id || items.length >= 12 || items.some((item) => item.id === id)) return;
-        onChange([...items, { type: "mainCategory", id }]);
+        if (!id || categoryItems.length >= 11 || categoryItems.some((item) => item.id === id)) return;
+        onChange([{ type: "home", id: "home", enabled: homeItem?.type === "home" ? homeItem.enabled : true }, ...categoryItems, { type: "mainCategory", id }]);
         setPendingValue("");
     };
 
     const moveItem = (index: number, offset: -1 | 1) => {
         const nextIndex = index + offset;
-        if (nextIndex < 0 || nextIndex >= items.length) return;
-        const next = [...items];
+        if (nextIndex < 0 || nextIndex >= categoryItems.length) return;
+        const next = [...categoryItems];
         [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
-        onChange(next);
+        onChange([{ type: "home", id: "home", enabled: homeItem?.type === "home" ? homeItem.enabled : true }, ...next]);
     };
 
     const label = (item: HeaderNavItemRef) => {
@@ -50,10 +57,15 @@ export default function HeaderNavigationSection({ items, mainCategories, onChang
                 </h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                     {isArabic
-                        ? "اختر الأقسام الرئيسية التي تظهر في الشريط أسفل الترويسة ورتبها كما تريد. تعرض كل قائمة العلامات والفئات والمنتجات من هذا القسم."
-                        : "Choose and order the main categories shown in the lower header bar. Each menu shows its brands, categories, and featured products."}
+                        ? "تحكم في ظهور رابط الرئيسية، واختر الأقسام الرئيسية التي تظهر في الشريط أسفل الترويسة ورتبها كما تريد. تعرض كل قائمة العلامات والفئات والمنتجات من هذا القسم."
+                        : "Control whether Home appears, then choose and order the main categories shown in the lower header bar. Each menu shows its brands, categories, and featured products."}
                 </p>
             </div>
+
+            <label className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-slate-200/80 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-gray-800/60">
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{isArabic ? "إظهار الرئيسية في الشريط" : "Show Home in the navigation"}</span>
+                <input type="checkbox" checked={homeItem?.type === "home" ? homeItem.enabled : true} onChange={(event) => setHomeEnabled(event.target.checked)} className="size-5 accent-[var(--color-brand)]" />
+            </label>
 
             <div className="flex flex-col gap-3 sm:flex-row">
                 <select
@@ -74,7 +86,7 @@ export default function HeaderNavigationSection({ items, mainCategories, onChang
                 <button
                     type="button"
                     onClick={addItem}
-                    disabled={!pendingValue || items.length >= 12}
+                    disabled={!pendingValue || categoryItems.length >= 11}
                     className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--color-brand)] px-5 text-sm font-bold text-white transition hover:bg-[var(--color-brand-hover)] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     <Plus size={17} aria-hidden="true" />
@@ -83,7 +95,7 @@ export default function HeaderNavigationSection({ items, mainCategories, onChang
             </div>
 
             <ol className="mt-5 space-y-2">
-                {items.map((item, index) => (
+                {categoryItems.map((item, index) => (
                     <li key={`${item.type}-${item.id}`} className="flex items-center gap-3 rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-2.5 dark:border-white/10 dark:bg-gray-800/60">
                         <span className="flex min-w-0 flex-1 items-center gap-2 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
                             <bdi dir={isArabic ? "rtl" : "ltr"} className="truncate">{label(item)}</bdi>
@@ -94,15 +106,15 @@ export default function HeaderNavigationSection({ items, mainCategories, onChang
                         <button type="button" onClick={() => moveItem(index, -1)} disabled={index === 0} aria-label={isArabic ? "تحريك لأعلى" : "Move up"} className="rounded-lg p-2 text-slate-600 hover:bg-white disabled:opacity-30 dark:text-slate-300 dark:hover:bg-white/10">
                             <ArrowUp size={16} aria-hidden="true" />
                         </button>
-                        <button type="button" onClick={() => moveItem(index, 1)} disabled={index === items.length - 1} aria-label={isArabic ? "تحريك لأسفل" : "Move down"} className="rounded-lg p-2 text-slate-600 hover:bg-white disabled:opacity-30 dark:text-slate-300 dark:hover:bg-white/10">
+                        <button type="button" onClick={() => moveItem(index, 1)} disabled={index === categoryItems.length - 1} aria-label={isArabic ? "تحريك لأسفل" : "Move down"} className="rounded-lg p-2 text-slate-600 hover:bg-white disabled:opacity-30 dark:text-slate-300 dark:hover:bg-white/10">
                             <ArrowDown size={16} aria-hidden="true" />
                         </button>
-                        <button type="button" onClick={() => onChange(items.filter((_, itemIndex) => itemIndex !== index))} aria-label={isArabic ? "حذف الرابط" : "Remove link"} className="rounded-lg p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30">
+                        <button type="button" onClick={() => onChange([{ type: "home", id: "home", enabled: homeItem?.type === "home" ? homeItem.enabled : true }, ...categoryItems.filter((_, itemIndex) => itemIndex !== index)])} aria-label={isArabic ? "حذف الرابط" : "Remove link"} className="rounded-lg p-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30">
                             <Trash2 size={16} aria-hidden="true" />
                         </button>
                     </li>
                 ))}
-                {items.length === 0 && (
+                {categoryItems.length === 0 && (
                     <li className="rounded-xl border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-500 dark:border-white/15 dark:text-slate-400">
                         {isArabic ? "لم تتم إضافة روابط بعد." : "No links added yet."}
                     </li>

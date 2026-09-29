@@ -37,6 +37,7 @@ export default async function SiteLayout({
             {/* Header with Server-Side Pre-rendered Navigation Data */}
             <Header
                 initialNavData={configuredNavigation}
+                showHomeNav={configuredItems.some((item) => item.type === 'home' && item.enabled)}
                 dir={dir}
                 language={language}
             />

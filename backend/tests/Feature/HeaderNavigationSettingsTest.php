@@ -38,4 +38,27 @@ class HeaderNavigationSettingsTest extends TestCase
             'header_nav_items' => $links,
         ]);
     }
+
+    public function test_admin_can_control_the_home_link_in_header_navigation(): void
+    {
+        $admin = User::create([
+            'id' => 'admin-home-navigation-test',
+            'username' => 'home-navigation-admin',
+            'password' => 'password',
+            'role' => 'SUPER_ADMIN',
+        ]);
+        $links = json_encode([
+            ['type' => 'home', 'id' => 'home', 'enabled' => false],
+        ], JSON_THROW_ON_ERROR);
+
+        $response = $this->actingAs($admin, 'web')->putJson('/api/admin/settings', [
+            'headerNavItems' => $links,
+        ]);
+
+        $response->assertOk()->assertJsonPath('headerNavItems', $links);
+        $this->assertDatabaseHas('settings', [
+            'id' => 'site-settings',
+            'header_nav_items' => $links,
+        ]);
+    }
 }

@@ -253,7 +253,7 @@ const MobileMenu = ({
                                                         {activeMainCat.categories.map((cat) => (
                                                             <Link
                                                                 key={cat.id}
-                                                                href={`/categories/${cat.slug}`}
+                                                                href={`/products?department=${encodeURIComponent(activeMainCat.slug)}&categoryIds=${encodeURIComponent(cat.id)}`}
                                                                 onClick={() => setIsMobileMenuOpen(false)}
                                                                 className="flex items-center py-2.5 text-[14px] font-medium text-zinc-700 dark:text-gray-300 hover:text-[var(--color-accent)] dark:hover:text-white border-b border-gray-100/50 dark:border-white/5 last:border-b-0 transition-colors"
                                                             >
