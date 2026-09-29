@@ -27,7 +27,7 @@ export interface PromoCodeInput { code: string; discountPercentage: number; dele
 
 export interface HomeCollectionSectionProduct {
     id: string; slug: string; name: string; description: string | null; price: number | null; discountPrice: number | null;
-    images: string; categoryId: string; stock: number; minOrder: number; packaging: string | null;
+    images: string; categoryId: string; stock: number | null; minOrder: number; packaging: string | null;
     itemsPerPackage: string | null; isTrending: boolean; brand?: { id: string; name: string; slug: string; group: BrandGroup } | null;
 }
 export interface HomeCollectionSection {
@@ -52,9 +52,9 @@ export interface DashboardStats {
     totalRevenue: number; totalOrders: number; totalProducts: number; totalCategories: number; averageOrderValue: number;
     deliveredOrdersCount: number;
     pipeline: { pending: number; processing: number; shipped: number; delivered: number; cancelled: number };
-    inventory: { totalProducts: number; lowStockCount: number; outOfStockCount: number; inStockCount: number };
-    lowStockProducts: { id: string; name: string; nameAr: string | null; stock: number; price: number; image: string; categoryName: string }[];
-    topProducts: { id: string; name: string; nameAr: string | null; image: string; unitsSold: number; revenue: number; stock: number; price: number }[];
+    inventory: { totalProducts: number; trackedProductsCount: number; lowStockCount: number; outOfStockCount: number; inStockCount: number };
+    lowStockProducts: { id: string; name: string; nameAr: string | null; stock: number | null; price: number | null; image: string; categoryName: string }[];
+    topProducts: { id: string; name: string; nameAr: string | null; image: string; unitsSold: number; revenue: number; stock: number | null; price: number | null }[];
     salesTrend: { date: string; label: string; revenue: number; orders: number }[];
     topCities: { city: string; orderCount: number; totalRevenue: number }[];
     recentOrders: { id: string; Name: string; customer: string; phone: string; streetAddress: string; city: string; product: string; date: string; createdAt: string; amount: string; totalAmount: number; status: string; statusColor: string; items: { id: string; quantity: number; price: number; product: { name: string; images: string } | null }[] }[];

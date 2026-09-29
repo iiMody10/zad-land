@@ -112,12 +112,12 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
             "@type": "Brand",
             "name": product.brand?.name || "Zad Land",
         },
-        ...(canViewPrices ? { "offers": {
+        ...(canViewPrices && product.price != null && !product.pricingNeedsReview ? { "offers": {
             "@type": "Offer",
             "url": `https://zadland.com/products/${product.slug}`,
             "priceCurrency": "USD",
             "price": Number(product.discountPrice || product.price),
-            "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            ...(product.stock == null ? {} : { "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" }),
             "itemCondition": "https://schema.org/NewCondition",
         } } : {}),
     };
@@ -155,7 +155,7 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
                     />
 
                     <ProductPrice
-                        price={canViewPrices ? product.price.toString() : null}
+                        price={canViewPrices && product.price != null ? product.price.toString() : null}
                         discountPrice={canViewPrices ? product.discountPrice?.toString() : null}
                     />
 
@@ -165,7 +165,7 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
                             name: product.name,
                             nameAr: product.nameAr,
                             nameEn: product.nameEn,
-                            price: canViewPrices ? Number(product.discountPrice || product.price) : null,
+                            price: canViewPrices && product.price != null && !product.pricingNeedsReview ? Number(product.discountPrice || product.price) : null,
                             image: mainImage,
                             slug: product.slug,
                             options: product.options,
@@ -175,6 +175,7 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
                             description: product.description,
                             descriptionAr: product.descriptionAr,
                             descriptionEn: product.descriptionEn,
+                            pricingNeedsReview: product.pricingNeedsReview,
                         }}
                         stock={product.stock}
                     />
@@ -196,12 +197,13 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
 
             <RelatedProducts products={relatedProducts.map(p => ({
                 ...p,
-                price: canViewPrices ? Number(p.price) : null,
+                price: canViewPrices && p.price != null && !p.pricingNeedsReview ? Number(p.price) : null,
                 discountPrice: canViewPrices && p.discountPrice ? Number(p.discountPrice) : null,
                 discountType: canViewPrices ? p.discountType : null,
                 discountValue: canViewPrices && p.discountValue ? Number(p.discountValue) : null,
                 createdAt: p.createdAt,
                 updatedAt: p.updatedAt,
+                pricingNeedsReview: p.pricingNeedsReview,
             }))} />
         </main>
     );

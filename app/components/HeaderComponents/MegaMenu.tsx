@@ -34,7 +34,7 @@ interface TrendingProduct {
     price: number | null;
     discountPrice: number | null;
     minOrder: number;
-    stock: number;
+    stock: number | null;
     packaging: string | null;
     itemsPerPackage: string | null;
     brand?: { name: string } | null;

@@ -14,7 +14,8 @@ interface Product {
     discountPrice?: string | number | null;
     images: string;
     minOrder?: number;
-    stock?: number;
+    stock?: number | null;
+    pricingNeedsReview?: boolean;
     packaging?: string | null;
     itemsPerPackage?: string | null;
 }
@@ -32,7 +33,7 @@ const AddToCartButton = ({ product, label, language, variant = 'desktop' }: AddT
     const handleQuickAdd = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (product.price == null || product.stock === 0) return;
+        if (product.price == null || product.stock === 0 || product.pricingNeedsReview) return;
 
         addItem({
             id: product.id,
@@ -49,6 +50,7 @@ const AddToCartButton = ({ product, label, language, variant = 'desktop' }: AddT
         });
     };
 
+    if (product.pricingNeedsReview) return <span className="absolute bottom-2 ltr:right-2 rtl:left-2 rounded-full bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-800">{language === 'ar' ? 'السعر قيد المراجعة' : 'Price under review'}</span>;
     if (variant === 'mobile') {
         if (product.price == null) return <Link href="/account/login" className="lg:hidden absolute bottom-2 ltr:right-2 rtl:left-2 rounded-full bg-white px-2 py-1 text-xs font-bold text-[var(--color-brand-hover)]">{language === 'ar' ? 'دخول' : 'Sign in'}</Link>;
         return (

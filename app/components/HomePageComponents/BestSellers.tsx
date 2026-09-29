@@ -18,12 +18,13 @@ interface Product {
     descriptionAr?: string | null;
     descriptionEn?: string | null;
     options?: string | null;
-    price: number;
+    price: number | null;
     discountPrice?: number | null;
     images: string;
     categoryId: string;
     isTrending: boolean;
-    stock: number;
+    stock: number | null;
+    pricingNeedsReview?: boolean;
     brand?: {
         id: string;
         name: string;

@@ -13,9 +13,9 @@ import { formatPackageQuantity } from "@/lib/packaging";
 
 type OrderProduct = {
     id: string; name: string; nameAr: string | null; nameEn: string | null;
-    slug: string; images: string; stock: number; minOrder: number;
+    slug: string; images: string; stock: number | null; minOrder: number;
     packaging: string | null; itemsPerPackage: string | null;
-    options: string | null; price: string; discountPrice: string | null;
+    options: string | null; price: string | null; discountPrice: string | null;
     brand: { isActive: boolean };
 };
 type Order = {
@@ -86,7 +86,7 @@ export default function OrderHistory({ customerPhone }: { customerPhone: string 
         let added = 0;
         for (const item of order.items) {
             const product = item.product;
-            if (!product?.brand.isActive || product.stock < product.minOrder) continue;
+            if (!product?.brand.isActive || (product.stock != null && product.stock < product.minOrder) || product.price == null) continue;
             if (item.options && !product.options?.split(",").map((option) => option.trim()).includes(item.options)) continue;
             const currentPrice = Number(product.price);
             const discounted = Number(product.discountPrice);
@@ -95,7 +95,7 @@ export default function OrderHistory({ customerPhone }: { customerPhone: string 
                 id: product.id, slug: product.slug,
                 name: (ar ? product.nameAr : product.nameEn) || product.name,
                 image: product.images.split(",")[0]?.trim() || "",
-                price, quantity: Math.min(product.stock, Math.max(product.minOrder, item.quantity)),
+                price, quantity: product.stock == null ? Math.max(product.minOrder, item.quantity) : Math.min(product.stock, Math.max(product.minOrder, item.quantity)),
                 minOrder: product.minOrder, stock: product.stock, packaging: product.packaging,
                 itemsPerPackage: product.itemsPerPackage, selectedOption: item.options || undefined,
             });

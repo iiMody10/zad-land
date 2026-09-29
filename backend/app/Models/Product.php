@@ -19,7 +19,7 @@ class Product extends Model
 
     protected function casts(): array
     {
-        return ['price' => 'decimal:2', 'discount_price' => 'decimal:2', 'discount_value' => 'decimal:2', 'stock' => 'integer', 'min_order' => 'integer', 'is_trending' => 'boolean'];
+        return ['price' => 'decimal:2', 'discount_price' => 'decimal:2', 'discount_value' => 'decimal:2', 'stock' => 'integer', 'min_order' => 'integer', 'is_trending' => 'boolean', 'pricing_needs_review' => 'boolean'];
     }
 
     public function getImagesAttribute(?string $value): string

@@ -26,7 +26,10 @@ class PricedProductCatalogSeederTest extends TestCase
             ['/uploads/products/catalog-batch/1.webp'],
             json_decode($imported->getRawOriginal('images'), true, flags: JSON_THROW_ON_ERROR),
         );
-        $this->assertSame('0.35', (string) $imported->price);
+        $this->assertSame('6.30', (string) $imported->price);
+        $this->assertSame('18', $imported->items_per_package);
+        $this->assertNull($imported->stock);
+        $this->assertFalse($imported->pricing_needs_review);
         $this->assertSame(1, Product::where('sku', '1')->count());
         $countAfterFirstImport = Product::count();
 

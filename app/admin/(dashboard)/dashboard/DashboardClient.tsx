@@ -277,7 +277,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                         {t('admin.inventoryHealth')}
                                     </p>
                                     <div className={`p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl shrink-0 ${
-                                        stats.inventory.lowStockCount > 0 || stats.inventory.outOfStockCount > 0
+                                        stats.inventory.trackedProductsCount > 0 && (stats.inventory.lowStockCount > 0 || stats.inventory.outOfStockCount > 0)
                                             ? "bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400"
                                             : "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400"
                                     }`}>
@@ -286,13 +286,15 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                 </div>
                                 <div className="mt-1 sm:mt-2">
                                     <h3 className="text-slate-900 dark:text-white text-lg sm:text-2xl lg:text-3xl font-black tracking-tight">
-                                        {stats.inventory.inStockCount} <span className="text-xs sm:text-sm font-semibold text-slate-400">/ {stats.inventory.totalProducts}</span>
+                                        {stats.inventory.inStockCount} <span className="text-xs sm:text-sm font-semibold text-slate-400">/ {stats.inventory.trackedProductsCount}</span>
                                     </h3>
                                 </div>
                             </div>
                             <div className="flex items-center justify-between mt-2 sm:mt-4 pt-2 sm:pt-3 border-t border-slate-100 dark:border-white/5 text-[10px] sm:text-xs">
                                 <span className="text-slate-500 dark:text-slate-400 font-medium truncate">
-                                    {stats.inventory.lowStockCount + stats.inventory.outOfStockCount > 0 ? (
+                                    {stats.inventory.trackedProductsCount === 0 ? (
+                                        <span className="text-slate-500 dark:text-slate-400 font-bold">{isArabic ? 'بيانات المخزون غير مسجلة' : 'Inventory is not tracked'}</span>
+                                    ) : stats.inventory.lowStockCount + stats.inventory.outOfStockCount > 0 ? (
                                         <span className="text-rose-600 dark:text-rose-400 font-bold">
                                             ⚠️ {stats.inventory.lowStockCount + stats.inventory.outOfStockCount} {t('admin.unitsLeft')}
                                         </span>
@@ -736,7 +738,7 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
                                                         {isArabic && product.nameAr ? product.nameAr : product.name}
                                                     </p>
                                                     <p className="text-[11px] text-slate-500 font-medium">
-                                                        ${product.price.toFixed(2)} • {product.stock} {t('admin.stockRemaining')}
+                                                        {product.price == null ? (isArabic ? 'السعر قيد المراجعة' : 'Price under review') : `$${product.price.toFixed(2)}`} • {product.stock == null ? (isArabic ? 'المخزون غير متتبع' : 'Stock not tracked') : `${product.stock} ${t('admin.stockRemaining')}`}
                                                     </p>
                                                 </div>
                                             </div>
@@ -824,11 +826,13 @@ export default function DashboardClient({ stats }: { stats: DashboardStats }) {
 
                                                 <div className="flex items-center gap-2 shrink-0">
                                                     <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
-                                                        p.stock <= 0
+                                                        p.stock == null
+                                                            ? 'bg-slate-100 text-slate-600'
+                                                            : p.stock <= 0
                                                             ? 'bg-rose-600 text-white' 
                                                             : 'bg-amber-500 text-white'
                                                     }`}>
-                                                        {p.stock <= 0 ? t('admin.outOfStock') : `${p.stock} ${t('admin.unitsLeft')}`}
+                                                        {p.stock == null ? (isArabic ? 'غير محدد' : 'Not tracked') : p.stock <= 0 ? t('admin.outOfStock') : `${p.stock} ${t('admin.unitsLeft')}`}
                                                     </span>
                                                 </div>
                                             </div>

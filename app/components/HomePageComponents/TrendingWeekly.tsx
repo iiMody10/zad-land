@@ -19,7 +19,8 @@ interface Product {
     discountPrice?: number | null;
     images: string;
     categoryId: string;
-    stock: number;
+    stock: number | null;
+    pricingNeedsReview?: boolean;
     isTrending: boolean;
     brand?: {
         id: string;

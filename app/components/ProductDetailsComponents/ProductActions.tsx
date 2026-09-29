@@ -26,8 +26,9 @@ interface ProductActionsProps {
         description?: string | null;
         descriptionAr?: string | null;
         descriptionEn?: string | null;
+        pricingNeedsReview?: boolean;
     };
-    stock?: number;
+    stock?: number | null;
 }
 
 const ProductActions = ({ product, stock }: ProductActionsProps) => {
@@ -58,7 +59,7 @@ const ProductActions = ({ product, stock }: ProductActionsProps) => {
         parsedOptions.length > 0 ? parsedOptions[0] : ""
     );
     const quantityInCart = items.reduce((sum, item) => item.id === product.id ? sum + item.quantity : sum, 0);
-    const remainingStock = stock === undefined ? Number.POSITIVE_INFINITY : Math.max(0, stock - quantityInCart);
+    const remainingStock = stock == null ? Number.POSITIVE_INFINITY : Math.max(0, stock - quantityInCart);
 
     const displayName = (language === 'ar' ? product.nameAr : product.nameEn) || product.name || product.nameAr || '';
     const displayDesc = language === 'ar'
@@ -81,7 +82,7 @@ const ProductActions = ({ product, stock }: ProductActionsProps) => {
 
     const addSelectedQuantity = () => {
         if (product.price == null) return 0;
-        const remaining = stock === undefined ? Number.POSITIVE_INFINITY : Math.max(0, stock - items.reduce((sum, item) => item.id === product.id ? sum + item.quantity : sum, 0));
+        const remaining = stock == null ? Number.POSITIVE_INFINITY : Math.max(0, stock - items.reduce((sum, item) => item.id === product.id ? sum + item.quantity : sum, 0));
         const minOrder = product.minOrder || 1;
         if (remaining < minOrder) {
             toast.error(language === 'ar' ? 'وصلت إلى الحد الأقصى المتاح من هذا المنتج' : 'You already have all available stock in your cart');
@@ -128,10 +129,11 @@ const ProductActions = ({ product, stock }: ProductActionsProps) => {
         router.push("/place-order");
     };
 
-    const displayStock = stock !== undefined ? stock : 0;
+    const displayStock = stock ?? 0;
 
+    if (product.pricingNeedsReview) return <p role="status" className="my-3 rounded-xl bg-amber-50 px-5 py-3.5 text-center text-sm font-bold text-amber-900">{language === 'ar' ? 'سعر الطرد قيد المراجعة، ولا يمكن طلبه حالياً.' : 'The package price is under review and this product cannot be ordered yet.'}</p>;
     if (product.price == null) return <Link href="/account/login" className="my-3 inline-flex w-full justify-center rounded-xl bg-[var(--color-brand-hover)] px-5 py-3.5 text-sm font-bold text-white hover:bg-[var(--color-brand-hover)]">{language === 'ar' ? 'سجل الدخول لعرض السعر والطلب' : 'Sign in to view prices and order'}</Link>;
-    if (stock !== undefined && stock < (product.minOrder || 1)) return <div className="my-3 space-y-3"><p className="rounded-xl bg-amber-50 px-5 py-3.5 text-center text-sm font-bold text-amber-900">{language === 'ar' ? 'الكمية المطلوبة غير متوفرة حالياً' : 'Not enough packages available right now'}</p><WishlistButton productId={product.id} showLabel className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-[var(--color-brand-hover)] dark:border-white/10" /></div>;
+    if (stock != null && stock < (product.minOrder || 1)) return <div className="my-3 space-y-3"><p className="rounded-xl bg-amber-50 px-5 py-3.5 text-center text-sm font-bold text-amber-900">{language === 'ar' ? 'الكمية المطلوبة غير متوفرة حالياً' : 'Not enough packages available right now'}</p><WishlistButton productId={product.id} showLabel className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-[var(--color-brand-hover)] dark:border-white/10" /></div>;
 
     return (
         <div className="flex flex-col gap-4 my-2">
@@ -176,7 +178,7 @@ const ProductActions = ({ product, stock }: ProductActionsProps) => {
                     <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[var(--color-brand)] dark:text-white">
                         <span className="inline-flex rounded-full h-2.5 w-2.5 bg-[var(--color-brand-hover)]"></span>
                         <span>
-                            {language === 'ar' ? 'متوفر للتوريد المباشر بالجملة' : 'In Stock for Wholesale Supply'}
+                            {language === 'ar' ? 'توريد مباشر بالجملة' : 'Wholesale supply'}
                         </span>
                     </div>
                     <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[var(--color-brand-hover)]/10 text-[var(--color-brand-hover)] dark:bg-[var(--color-brand-hover)]/20 dark:text-[var(--color-brand-light)]">

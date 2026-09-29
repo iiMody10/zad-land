@@ -29,7 +29,7 @@ class AdminController extends Controller
         'brands' => [Brand::class, 'brands', ['name', 'slug', 'description', 'image', 'group', 'is_active', 'is_featured', 'main_category_id']],
         'main-categories' => [MainCategory::class, 'main_categories', ['name', 'slug', 'description', 'image', 'is_active', 'show_in_nav', 'nav_order', 'is_featured']],
         'categories' => [Category::class, 'categories', ['name', 'slug', 'description', 'image', 'brand_id', 'main_category_id', 'is_featured', 'show_in_nav', 'nav_order']],
-        'products' => [Product::class, 'products', ['name', 'name_ar', 'name_en', 'slug', 'images', 'is_trending', 'description', 'description_ar', 'description_en', 'price', 'discount_price', 'discount_type', 'discount_value', 'stock', 'min_order', 'packaging', 'items_per_package', 'options', 'category_id', 'sku', 'brand_id', 'main_category_id']],
+        'products' => [Product::class, 'products', ['name', 'name_ar', 'name_en', 'slug', 'images', 'is_trending', 'description', 'description_ar', 'description_en', 'price', 'discount_price', 'discount_type', 'discount_value', 'stock', 'min_order', 'packaging', 'items_per_package', 'pricing_needs_review', 'options', 'category_id', 'sku', 'brand_id', 'main_category_id']],
         'banners' => [Banner::class, 'banners', ['title', 'subtitle', 'title_ar', 'subtitle_ar', 'image', 'image_mobile', 'button_text', 'button_text_ar', 'link', 'badge', 'badge_ar', 'is_active']],
         'promo-codes' => [PromoCode::class, 'promo_codes', ['code', 'discount_percentage', 'delegate_name', 'is_active']],
     ];
@@ -161,11 +161,20 @@ class AdminController extends Controller
         $nameAr = trim((string) $pick(['nameAr', 'name ar', 'arabic name', 'product name', 'name', 'اسم المنتج', 'الاسم']));
         $nameEn = trim((string) $pick(['nameEn', 'name en', 'english name']));
         $price = $pick(['price', 'السعر']);
-        $stock = $pick(['stock', 'quantity', 'available stock', 'الكمية', 'المخزون']);
+        $itemsPerPackage = $pick(['itemsPerPackage', 'items per package', 'package quantity', 'الكمية']);
+        $stock = $pick(['stock', 'available stock', 'المخزون']);
         $image = $pick(['image', 'images', 'image url', 'الصورة', 'رابط الصورة']);
-        if ($mainName === '' || $categoryName === '' || $brandName === '' || $nameAr === '' || ! is_numeric($price) || (float) $price < 0 || ! is_numeric($stock) || (int) $stock < 0) {
-            return response()->json(['error' => 'Each row needs a department, category, brand, product name, valid price, and non-negative stock.'], 422);
+        $packageCount = null;
+        if ($itemsPerPackage !== null && $itemsPerPackage !== '') {
+            if (! is_numeric($itemsPerPackage) || (float) $itemsPerPackage < 1 || floor((float) $itemsPerPackage) !== (float) $itemsPerPackage) {
+                return response()->json(['error' => 'Package quantity must be a positive whole number.'], 422);
+            }
+            $packageCount = (int) $itemsPerPackage;
         }
+        if ($mainName === '' || $categoryName === '' || $brandName === '' || $nameAr === '' || ! is_numeric($price) || (float) $price <= 0 || ($stock !== null && $stock !== '' && (! is_numeric($stock) || (float) $stock < 0 || floor((float) $stock) !== (float) $stock))) {
+            return response()->json(['error' => 'Each row needs a department, category, brand, product name, valid price, and valid optional stock.'], 422);
+        }
+        $packagePrice = $packageCount === null ? (float) $price : round((float) $price * $packageCount, 2);
         $mainName = match (trim($mainName)) {
             'مفزرات' => 'مفرزات', default => trim($mainName)
         };
@@ -186,7 +195,8 @@ class AdminController extends Controller
             'name' => $nameAr, 'name_ar' => $nameAr, 'name_en' => $nameEn ?: null,
             'description' => $descriptionAr, 'description_ar' => $descriptionAr, 'description_en' => $descriptionEn ?: null,
             'images' => json_encode($imageList, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-            'price' => $price, 'stock' => (int) $stock, 'min_order' => 1, 'packaging' => 'طرد',
+            'price' => $packagePrice, 'stock' => $stock === null || $stock === '' ? null : (int) $stock,
+            'items_per_package' => $packageCount === null ? null : (string) $packageCount, 'min_order' => 1, 'packaging' => 'طرد',
             'category_id' => $category->id, 'brand_id' => $brand->id, 'main_category_id' => $main->id,
         ]);
 
@@ -225,7 +235,16 @@ class AdminController extends Controller
         if ($resource === 'promo-codes' && isset($input['code'])) {
             $input['code'] = strtoupper($input['code']);
         }
-        $record->fill($input)->save();
+        $record->fill($input);
+        if ($resource === 'products' && array_key_exists('pricing_needs_review', $input)) {
+            $record->pricing_needs_review = (bool) $input['pricing_needs_review'];
+        } elseif ($resource === 'products' && $record->price !== null && trim((string) $record->items_per_package) !== '') {
+            // Editing both the carton price and its item count completes the workbook review.
+            if (array_key_exists('price', $input) && array_key_exists('items_per_package', $input)) {
+                $record->pricing_needs_review = false;
+            }
+        }
+        $record->save();
 
         if ($resource === 'categories'
             && $record->main_category_id
@@ -620,7 +639,7 @@ class AdminController extends Controller
                 'id' => $item->id, 'name' => $item->name, 'nameAr' => $item->nameAr,
                 'image' => is_string($item->images) ? (json_decode($item->images, true)[0] ?? explode(',', $item->images)[0]) : '',
                 'unitsSold' => (int) $item->unitsSold, 'revenue' => (float) $item->revenue,
-                'stock' => (int) $item->stock, 'price' => (float) $item->price,
+                'stock' => $item->stock === null ? null : (int) $item->stock, 'price' => $item->price === null ? null : (float) $item->price,
             ]);
         $totalOrders = Order::count();
         $totalRevenue = (float) $delivered->sum('total_amount');
@@ -644,7 +663,7 @@ class AdminController extends Controller
             'totalRevenue' => $totalRevenue, 'totalOrders' => $totalOrders, 'totalProducts' => Product::count(),
             'totalCategories' => Category::count(), 'averageOrderValue' => $deliveredCount ? $totalRevenue / $deliveredCount : 0,
             'deliveredOrdersCount' => $deliveredCount, 'pipeline' => $statuses,
-            'inventory' => ['totalProducts' => Product::count(), 'lowStockCount' => Product::whereBetween('stock', [1, 5])->count(), 'outOfStockCount' => $outOfStockCount, 'inStockCount' => Product::where('stock', '>', 0)->count()],
+            'inventory' => ['totalProducts' => Product::count(), 'trackedProductsCount' => Product::whereNotNull('stock')->count(), 'lowStockCount' => Product::whereBetween('stock', [1, 5])->count(), 'outOfStockCount' => $outOfStockCount, 'inStockCount' => Product::where('stock', '>', 0)->count()],
             'lowStockProducts' => $lowStock->map(fn (Product $product) => ['id' => $product->id, 'name' => $product->name, 'nameAr' => $product->name_ar, 'stock' => $product->stock, 'price' => (float) $product->price, 'image' => explode(',', $product->images)[0] ?? '', 'categoryName' => $product->category?->name]),
             'topProducts' => $topProducts, 'salesTrend' => $trend, 'topCities' => $topCities, 'recentOrders' => $recentOrders,
         ]);
@@ -694,10 +713,12 @@ class AdminController extends Controller
         }
         foreach (['stock', 'min_order', 'nav_order', 'discount_percentage'] as $field) {
             if (in_array($field, $fields, true)) {
-                $rules[Str::camel($field)] = ['sometimes', 'integer', 'min:'.($field === 'min_order' ? 1 : 0), 'max:'.($field === 'discount_percentage' ? 100 : 2147483647)];
+                $rules[Str::camel($field)] = $field === 'stock'
+                    ? ['sometimes', 'nullable', 'integer', 'min:0', 'max:2147483647']
+                    : ['sometimes', 'integer', 'min:'.($field === 'min_order' ? 1 : 0), 'max:'.($field === 'discount_percentage' ? 100 : 2147483647)];
             }
         }
-        foreach (['is_active', 'is_featured', 'show_in_nav', 'is_trending'] as $field) {
+        foreach (['is_active', 'is_featured', 'show_in_nav', 'is_trending', 'pricing_needs_review'] as $field) {
             if (in_array($field, $fields, true)) {
                 $rules[Str::camel($field)] = ['sometimes', 'boolean'];
             }

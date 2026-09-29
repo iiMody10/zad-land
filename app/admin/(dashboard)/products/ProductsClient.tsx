@@ -27,11 +27,12 @@ interface Product {
     categoryId: string;
     mainCategoryId?: string | null;
     sku: string | null;
-    price: number;
+    price: number | null;
     discountPrice: number | null;
     discountType: string | null;
     discountValue: number | null;
-    stock: number;
+    stock: number | null;
+    pricingNeedsReview?: boolean;
     minOrder: number;
     packaging: string | null;
     itemsPerPackage: string | null;
@@ -165,8 +166,8 @@ export default function ProductsClient({
     // Calculate stats
     const stats = useMemo(() => {
         const total = products.length;
-        const outOfStock = products.filter(p => Number(p.stock) === 0).length;
-        const lowStock = products.filter(p => Number(p.stock) > 0 && Number(p.stock) <= 10).length;
+        const outOfStock = products.filter(p => p.stock != null && p.stock === 0).length;
+        const lowStock = products.filter(p => p.stock != null && p.stock > 0 && p.stock <= 10).length;
         const categories = new Set(products.map(p => p.category?.name).filter(Boolean)).size;
         const onSale = products.filter(p => p.discountPrice !== null).length;
         return { total, outOfStock, lowStock, categories, onSale };
@@ -196,9 +197,9 @@ export default function ProductsClient({
             const matchesCategory = selectedCategory === "All Categories" || selectedCategory === t('admin.allCategories') || p.category?.name === selectedCategory;
 
             let matchesStock = true;
-            if (selectedStockStatus === "In Stock" || selectedStockStatus === t('admin.inStock')) matchesStock = Number(p.stock) > 10;
-            else if (selectedStockStatus === "Low Stock" || selectedStockStatus === t('admin.lowStock')) matchesStock = Number(p.stock) > 0 && Number(p.stock) <= 10;
-            else if (selectedStockStatus === "Out of Stock" || selectedStockStatus === t('admin.outOfStock')) matchesStock = Number(p.stock) === 0;
+            if (selectedStockStatus === "In Stock" || selectedStockStatus === t('admin.inStock')) matchesStock = p.stock != null && p.stock > 10;
+            else if (selectedStockStatus === "Low Stock" || selectedStockStatus === t('admin.lowStock')) matchesStock = p.stock != null && p.stock > 0 && p.stock <= 10;
+            else if (selectedStockStatus === "Out of Stock" || selectedStockStatus === t('admin.outOfStock')) matchesStock = p.stock === 0;
 
             const matchesTrending = !showTrendingOnly || p.isTrending;
             const matchesOnSale = !showOnSaleOnly || p.discountPrice !== null;
@@ -210,8 +211,8 @@ export default function ProductsClient({
             let comparison = 0;
 
             if (key === 'price') {
-                const priceA = a.discountPrice || a.price;
-                const priceB = b.discountPrice || b.price;
+                const priceA = Number(a.discountPrice ?? a.price ?? 0);
+                const priceB = Number(b.discountPrice ?? b.price ?? 0);
                 comparison = priceA - priceB;
             } else if (key === 'stock') {
                 comparison = Number(a.stock) - Number(b.stock);
@@ -978,7 +979,7 @@ export default function ProductsClient({
                                                     </span>
                                                 </td>
                                                 <td className="p-3 sm:p-5 text-xs sm:text-sm font-bold text-text-main dark:text-white">
-                                                    {product.discountPrice ? (
+                                                    {product.pricingNeedsReview ? <span className="text-amber-700">{language === 'ar' ? 'السعر قيد المراجعة' : 'Price under review'}</span> : product.price == null ? <span className="text-text-sub">—</span> : product.discountPrice ? (
                                                         <div className="flex flex-col">
                                                             <span className="text-primary">${Number(product.discountPrice).toFixed(2)}</span>
                                                             <span className="text-[10px] text-text-sub line-through decoration-red-400/50">${Number(product.price).toFixed(2)}</span>
@@ -990,11 +991,11 @@ export default function ProductsClient({
                                                 <td className="p-3 sm:p-5">
                                                     <div className="flex flex-col gap-1 w-full max-w-[140px]">
                                                         <div className="flex flex-wrap items-center text-[10px] sm:text-xs">
-                                                            <span className={`font-medium ${Number(product.stock) === 0 ? 'text-red-500' :
+                                                            <span className={`font-medium ${product.stock == null ? 'text-gray-500' : Number(product.stock) === 0 ? 'text-red-500' :
                                                                 Number(product.stock) <= 10 ? 'text-orange-500' :
                                                                     'text-emerald-500'
                                                                 }`}>
-                                                                {Number(product.stock) === 0 ? t('admin.outOfStock') : `${product.stock} ${t('admin.inStock')}`}
+                                                                {product.stock == null ? (language === 'ar' ? 'غير محدد' : 'Not tracked') : Number(product.stock) === 0 ? t('admin.outOfStock') : `${product.stock} ${t('admin.inStock')}`}
                                                             </span>
                                                             {Number(product.stock) > 0 && Number(product.stock) <= 10 && (
                                                                 <span className="text-orange-500 text-[10px] font-bold uppercase ms-1 sm:ml-2">Low</span>
@@ -1017,12 +1018,12 @@ export default function ProductsClient({
                                                     </button>
                                                 </td>
                                                 <td className="p-3 sm:p-5">
-                                                    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium border ${Number(product.stock) > 0
+                                                    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium border ${product.stock == null ? 'bg-gray-50 text-gray-500 border-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-white/[0.04]' : Number(product.stock) > 0
                                                         ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-800/50'
                                                         : 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-white/[0.04]'
                                                         }`}>
-                                                        <span className={`size-1 sm:size-1.5 rounded-full ${Number(product.stock) > 0 ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
-                                                        {Number(product.stock) > 0 ? t('admin.active') : t('admin.draft')}
+                                                        <span className={`size-1 sm:size-1.5 rounded-full ${product.stock == null ? 'bg-gray-400' : Number(product.stock) > 0 ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
+                                                        {product.stock == null ? (language === 'ar' ? 'غير متتبع' : 'Not tracked') : Number(product.stock) > 0 ? t('admin.active') : t('admin.draft')}
                                                     </span>
                                                 </td>
                                                 <td className={`p-3 sm:p-5 ${dir === 'rtl' ? 'text-start' : 'text-end'}`}>

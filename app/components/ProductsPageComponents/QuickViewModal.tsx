@@ -22,7 +22,8 @@ interface Product {
     discountPrice?: string | number | null;
     images: string;
     categoryId?: string;
-    stock?: number;
+    stock?: number | null;
+    pricingNeedsReview?: boolean;
     minOrder?: number;
     packaging?: string | null;
     itemsPerPackage?: string | null;
@@ -63,7 +64,7 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
     const primaryImage = images[0] || '';
 
     const handleAddToCart = () => {
-        if (product.price == null || product.stock === 0) return;
+        if (product.price == null || product.stock === 0 || product.pricingNeedsReview) return;
         addItem({
             id: product.id,
             name: displayName,
@@ -135,7 +136,7 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
                     )}
 
                     {/* Wholesale Packaging Badge */}
-                    {product.stock && product.stock > 0 ? (
+                    {product.stock != null && product.stock > 0 ? (
                         <div className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-gray-300 font-semibold mb-3 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3 py-1.5 rounded-lg border border-[var(--color-accent)]/20">
                             <span>{formatPackageQuantity(product.stock, product.packaging, language)} {language === 'ar' ? 'متاح' : 'available'}</span>
                         </div>
@@ -159,18 +160,18 @@ const QuickViewModal = ({ product, isOpen, onClose }: QuickViewModalProps) => {
                     </div>
 
                     <div className="flex items-center gap-4 mb-4">
-                        {product.price == null ? <Link href="/account/login" onClick={onClose} className="flex-1 rounded-xl bg-[var(--color-brand-hover)] py-3 text-center text-sm font-bold text-white">{language === 'ar' ? 'دخول التاجر لعرض السعر' : 'Merchant sign in for price'}</Link> : <button
+                        {product.pricingNeedsReview ? <span className="flex-1 rounded-xl bg-amber-50 py-3 text-center text-sm font-bold text-amber-800">{language === 'ar' ? 'سعر الطرد قيد المراجعة' : 'Package price under review'}</span> : product.price == null ? <Link href="/account/login" onClick={onClose} className="flex-1 rounded-xl bg-[var(--color-brand-hover)] py-3 text-center text-sm font-bold text-white">{language === 'ar' ? 'دخول التاجر لعرض السعر' : 'Merchant sign in for price'}</Link> : <button
                             onClick={handleAddToCart}
-                            disabled={product.stock !== undefined && product.stock < (product.minOrder || 1)}
+                            disabled={product.stock != null && product.stock < (product.minOrder || 1)}
                             className="flex-1 bg-[var(--color-brand-hover)] hover:bg-[var(--color-brand-hover)] text-white py-3 rounded-xl font-bold transition-all text-sm cursor-pointer"
                         >
-                            {product.stock !== undefined && product.stock < (product.minOrder || 1) ? (language === 'ar' ? 'غير متوفر' : 'Unavailable') : language === 'ar' ? 'إضافة للسلة' : 'Add to Cart'}
+                            {product.stock != null && product.stock < (product.minOrder || 1) ? (language === 'ar' ? 'غير متوفر' : 'Unavailable') : language === 'ar' ? 'إضافة للسلة' : 'Add to Cart'}
                         </button>}
                         
                         <div className="flex items-center justify-between border border-gray-200 dark:border-white/10 rounded-xl px-3 py-2 w-28 bg-gray-50 dark:bg-zinc-800">
                             <button onClick={() => setQuantity(Math.max(product.minOrder || 1, quantity - 1))} className="text-gray-500 hover:text-[var(--color-accent)] font-bold cursor-pointer">-</button>
                             <span className="font-bold text-zinc-900 dark:text-white select-none">{quantity}</span>
-                            <button onClick={() => setQuantity((current) => product.stock === undefined ? current + 1 : Math.min(product.stock, current + 1))} className="text-gray-500 hover:text-[var(--color-accent)] font-bold cursor-pointer">+</button>
+                            <button onClick={() => setQuantity((current) => product.stock == null ? current + 1 : Math.min(product.stock, current + 1))} className="text-gray-500 hover:text-[var(--color-accent)] font-bold cursor-pointer">+</button>
                         </div>
                     </div>
 

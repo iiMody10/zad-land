@@ -40,11 +40,11 @@ interface Product {
     descriptionEn?: string | null;
     categoryId: string;
     mainCategoryId?: string | null;
-    price: number;
+    price: number | null;
     discountPrice: number | null;
     discountType: string | null;
     discountValue: number | null;
-    stock: number;
+    stock: number | null;
     minOrder?: number;
     packaging?: string | null;
     itemsPerPackage?: string | null;
@@ -142,10 +142,10 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                 mainCategoryId: product.mainCategoryId || "",
                 brandId: product.brandId,
                 categoryId: product.categoryId,
-                price: product.price.toString(),
+                price: product.price?.toString() || "",
                 discountType: product.discountType || "NONE",
                 discountValue: product.discountValue?.toString() || "",
-                stock: product.stock.toString(),
+                stock: product.stock?.toString() || "",
                 minOrder: String(product.minOrder || 1),
                 packaging: product.packaging || "طرد",
                 itemsPerPackage: product.itemsPerPackage || "",
@@ -210,7 +210,7 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                 price: parseFloat(formData.price) || 0,
                 discountPrice: calculatedDiscountPrice,
                 discountValue: formData.discountType === "NONE" ? null : parseFloat(formData.discountValue),
-                stock: parseInt(formData.stock) || 0,
+                stock: formData.stock.trim() ? (parseInt(formData.stock, 10) || 0) : null,
                 minOrder: Math.max(1, parseInt(formData.minOrder, 10) || 1),
                 packaging: formData.packaging.trim() || "طرد",
                 itemsPerPackage: formData.itemsPerPackage.trim() || null,

@@ -37,11 +37,12 @@ interface Product {
     descriptionAr?: string | null;
     descriptionEn?: string | null;
     options?: string | null;
-    price: number;
+    price: number | null;
     discountPrice?: number | null;
     images: string;
     categoryId: string;
-    stock: number;
+    stock: number | null;
+    pricingNeedsReview?: boolean;
     isTrending: boolean;
     category: {
         name: string;

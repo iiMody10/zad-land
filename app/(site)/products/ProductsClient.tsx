@@ -27,14 +27,15 @@ interface Product {
     description: string | null;
     descriptionAr?: string | null;
     descriptionEn?: string | null;
-    price: string;
+    price: string | null;
     discountPrice?: string | null;
     images: string;
     brandId: string;
     categoryId: string;
     mainCategoryId?: string | null;
     options?: string | null;
-    stock: number;
+    stock: number | null;
+    pricingNeedsReview?: boolean;
     isTrending: boolean;
     brand?: Brand | null;
 }

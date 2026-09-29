@@ -13,7 +13,7 @@ export interface CartItem {
     selectedOption?: string;
     minOrder?: number;
     /** Maximum total quantity available across all options for this product. */
-    stock?: number;
+    stock?: number | null;
     packaging?: string | null;
     itemsPerPackage?: string | null;
 }
@@ -74,8 +74,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const normalizedItem = { ...newItem, quantity: Math.max(minOrder, newItem.quantity) };
         setItems(prev => {
             const productQuantity = prev.reduce((sum, item) => item.id === normalizedItem.id ? sum + item.quantity : sum, 0);
-            const stock = normalizedItem.stock ?? prev.find(item => item.id === normalizedItem.id)?.stock;
-            const remaining = stock === undefined ? Number.POSITIVE_INFINITY : Math.max(0, stock - productQuantity);
+            const stock = normalizedItem.stock === undefined ? prev.find(item => item.id === normalizedItem.id)?.stock : normalizedItem.stock;
+            const remaining = stock == null ? Number.POSITIVE_INFINITY : Math.max(0, stock - productQuantity);
             if (remaining < minOrder) return prev;
             const quantityToAdd = Math.min(normalizedItem.quantity, remaining);
             if (quantityToAdd < minOrder) return prev;
@@ -111,10 +111,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 : item.id === id);
             if (!targetItems.length) return prev;
             const item = targetItems[0];
-            const stock = item.stock ?? prev.find(candidate => candidate.id === id && candidate.stock !== undefined)?.stock;
+            const stock = item.stock === undefined ? prev.find(candidate => candidate.id === id && candidate.stock !== undefined)?.stock : item.stock;
             const otherQuantity = prev.reduce((sum, candidate) =>
                 candidate.id === id && !targetItems.includes(candidate) ? sum + candidate.quantity : sum, 0);
-            const maxForTarget = stock === undefined ? Number.POSITIVE_INFINITY : Math.max(0, stock - otherQuantity);
+            const maxForTarget = stock == null ? Number.POSITIVE_INFINITY : Math.max(0, stock - otherQuantity);
             const nextQuantity = Math.min(Math.max(item.minOrder || 1, quantity), maxForTarget);
             if (nextQuantity < (item.minOrder || 1)) return prev;
             return prev.map(candidate => targetItems.includes(candidate)

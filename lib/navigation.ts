@@ -6,7 +6,7 @@ export interface NavCategory { id: string; name: string; slug: string }
 export interface NavTopProduct { id: string; name: string; nameAr?: string | null; nameEn?: string | null; slug: string }
 export interface NavTrendingProduct {
     id: string; name: string; nameAr?: string | null; nameEn?: string | null; slug: string;
-    images: string; price: number | null; discountPrice: number | null; minOrder: number; stock: number;
+    images: string; price: number | null; discountPrice: number | null; minOrder: number; stock: number | null;
     packaging: string | null; itemsPerPackage: string | null; brand?: { name: string } | null;
 }
 export interface NavMainCategory {

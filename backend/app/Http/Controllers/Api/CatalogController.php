@@ -121,7 +121,7 @@ class CatalogController extends Controller
                 }
 
                 return ['category' => ['id' => $category->id, 'name' => trim($category->name), 'slug' => $category->slug, 'description' => $category->description ? trim($category->description) : null, 'image' => $category->image, 'productCount' => Product::where('category_id', $category->id)->whereHas('brand', fn ($q) => $q->where('is_active', true))->count()],
-                    'products' => $products->map(fn (Product $p) => ['id' => $p->id, 'slug' => $p->slug, 'name' => $p->name, 'description' => $p->description, 'price' => (float) $p->price, 'discountPrice' => $p->discount_price !== null ? (float) $p->discount_price : null, 'images' => $p->images, 'categoryId' => $p->category_id, 'stock' => $p->stock, 'minOrder' => $p->min_order, 'packaging' => $p->packaging, 'itemsPerPackage' => $p->items_per_package, 'isTrending' => $p->is_trending, 'brand' => $p->brand ? ApiJson::camel($p->brand->only(['id', 'name', 'slug', 'group'])) : null])->values()];
+                    'products' => $products->map(fn (Product $p) => ['id' => $p->id, 'slug' => $p->slug, 'name' => $p->name, 'description' => $p->description, 'price' => $p->price !== null ? (float) $p->price : null, 'discountPrice' => $p->discount_price !== null ? (float) $p->discount_price : null, 'images' => $p->images, 'categoryId' => $p->category_id, 'stock' => $p->stock, 'minOrder' => $p->min_order, 'packaging' => $p->packaging, 'itemsPerPackage' => $p->items_per_package, 'pricingNeedsReview' => $p->pricing_needs_review, 'isTrending' => $p->is_trending, 'brand' => $p->brand ? ApiJson::camel($p->brand->only(['id', 'name', 'slug', 'group'])) : null])->values()];
             })->filter()->values();
 
         return response()->json(['banners' => ApiJson::camel($banners), 'featuredCategories' => $featuredCategories, 'featuredMainBrands' => $featuredBrands, 'collectionSections' => $sections])
@@ -172,7 +172,7 @@ class CatalogController extends Controller
                 }
             }
             $products = $main->products;
-            $format = fn (Product $p) => ['id' => $p->id, 'name' => $p->name, 'nameAr' => $p->name_ar, 'nameEn' => $p->name_en, 'slug' => $p->slug, 'images' => $p->images, 'price' => (float) $p->price, 'discountPrice' => $p->discount_price !== null ? (float) $p->discount_price : null, 'minOrder' => $p->min_order, 'stock' => $p->stock, 'packaging' => $p->packaging, 'itemsPerPackage' => $p->items_per_package, 'brand' => $p->brand ? ['name' => $p->brand->name] : null];
+            $format = fn (Product $p) => ['id' => $p->id, 'name' => $p->name, 'nameAr' => $p->name_ar, 'nameEn' => $p->name_en, 'slug' => $p->slug, 'images' => $p->images, 'price' => $p->price !== null ? (float) $p->price : null, 'discountPrice' => $p->discount_price !== null ? (float) $p->discount_price : null, 'minOrder' => $p->min_order, 'stock' => $p->stock, 'packaging' => $p->packaging, 'itemsPerPackage' => $p->items_per_package, 'pricingNeedsReview' => $p->pricing_needs_review, 'brand' => $p->brand ? ['name' => $p->brand->name] : null];
             $trending = $products->where('is_trending', true)->take(3)->values();
             if ($trending->count() < 3) {
                 $trending = $trending->concat($products->reject(fn ($p) => $trending->contains('id', $p->id))->take(3 - $trending->count()));

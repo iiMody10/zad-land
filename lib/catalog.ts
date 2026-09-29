@@ -24,7 +24,7 @@ export interface CatalogProduct {
     description: string | null;
     descriptionAr?: string | null;
     descriptionEn?: string | null;
-    price: string;
+    price: string | null;
     discountPrice: string | null;
     discountType?: string | null;
     discountValue?: string | null;
@@ -32,7 +32,8 @@ export interface CatalogProduct {
     brandId: string;
     categoryId: string;
     mainCategoryId: string | null;
-    stock: number;
+    stock: number | null;
+    pricingNeedsReview?: boolean;
     minOrder?: number;
     packaging?: string | null;
     itemsPerPackage?: string | null;

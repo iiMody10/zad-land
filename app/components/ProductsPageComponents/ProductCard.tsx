@@ -26,7 +26,8 @@ export interface Product {
     discountPrice?: string | number | null;
     images: string;
     categoryId?: string;
-    stock?: number;
+    stock?: number | null;
+    pricingNeedsReview?: boolean;
     minOrder?: number;
     packaging?: string | null;
     itemsPerPackage?: string | null;
@@ -81,7 +82,7 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
     const cartItem = items.find(item => item.id === product.id && item.selectedOption === defaultOption);
     const quantityInCart = cartItem ? cartItem.quantity : 0;
     const totalQuantityInCart = items.reduce((sum, item) => item.id === product.id ? sum + item.quantity : sum, 0);
-    const stockLimitReached = product.stock !== undefined && totalQuantityInCart >= product.stock;
+    const stockLimitReached = product.stock != null && totalQuantityInCart >= product.stock;
 
     const images = typeof product.images === 'string'
         ? product.images.split(',').map(img => img.trim()).filter(Boolean)
@@ -94,7 +95,7 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
     const handleInitialAdd = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (product.price == null || product.stock === 0 || stockLimitReached) return;
+        if (product.price == null || product.stock === 0 || product.pricingNeedsReview || stockLimitReached) return;
         addItem({
             id: product.id,
             name: displayName,
@@ -114,7 +115,7 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
     const handleIncrease = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!stockLimitReached && (product.stock === undefined || quantityInCart < product.stock)) updateQuantity(product.id, quantityInCart + 1, defaultOption);
+        if (!stockLimitReached && (product.stock == null || quantityInCart < product.stock)) updateQuantity(product.id, quantityInCart + 1, defaultOption);
     };
 
     const handleDecrease = (e: React.MouseEvent) => {
@@ -245,7 +246,7 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
                                 <PriceText amount={product.price} className="text-xs font-extrabold text-[var(--color-brand)] dark:text-white sm:text-base" />
                             )}
                         </div>
-                        {product.stock && product.stock > 0 ? (
+                        {product.stock != null && product.stock > 0 ? (
                             <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-gray-400 shrink-0">
                                 {formatPackageQuantity(product.stock, product.packaging, language)} {language === 'ar' ? 'متاح' : 'available'}
                             </span>
@@ -254,9 +255,11 @@ const ProductCard = ({ product, badge, showBadge = true }: ProductCardProps) => 
 
                     {/* Mobile-Optimized Touch Target Add to Cart / Quantity Controller */}
                     <div className="mt-2.5 relative h-9 sm:h-10 w-full overflow-hidden rounded-xl">
-                        {product.price == null ? (
+                        {product.pricingNeedsReview ? (
+                            <span className="flex h-full w-full items-center justify-center rounded-xl bg-amber-50 text-center text-[10px] font-bold text-amber-800 sm:text-xs">{language === 'ar' ? 'سعر الطرد قيد المراجعة' : 'Package price under review'}</span>
+                        ) : product.price == null ? (
                             <Link href="/account/login" className="flex h-full w-full items-center justify-center rounded-xl bg-[var(--color-brand-hover)] text-center text-[11px] font-bold text-white sm:text-xs">{language === 'ar' ? 'دخول التاجر لعرض السعر' : 'Merchant sign in for price'}</Link>
-                        ) : product.stock !== undefined && product.stock < (product.minOrder || 1) ? (
+                        ) : product.stock != null && product.stock < (product.minOrder || 1) ? (
                             <span className="flex h-full w-full items-center justify-center rounded-xl bg-slate-100 text-xs font-bold text-slate-500">{language === 'ar' ? 'غير متوفر حالياً' : 'Unavailable'}</span>
                         ) : stockLimitReached && quantityInCart === 0 ? (
                             <span className="flex h-full w-full items-center justify-center rounded-xl bg-slate-100 text-[10px] font-bold text-slate-500 sm:text-xs">{language === 'ar' ? 'اكتملت الكمية المتاحة في السلة' : 'All available stock is in your cart'}</span>

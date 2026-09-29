@@ -98,6 +98,9 @@ class OrderController extends Controller
                     if (! $product || ! $product->brand?->is_active) {
                         throw new HttpException(409, 'A product in your cart is no longer available.');
                     }
+                    if ($product->pricing_needs_review || $product->price === null) {
+                        throw new HttpException(409, 'The package price for '.($product->name_ar ?: $product->name).' is being reviewed.');
+                    }
                     if ($line['options'] && ! in_array($line['options'], array_map('trim', explode(',', (string) $product->options)), true)) {
                         throw new HttpException(409, 'The selected product option is no longer available.');
                     }
@@ -111,10 +114,12 @@ class OrderController extends Controller
                     if ($quantity > self::MAX_PACKAGES) {
                         throw new HttpException(400, 'Too many packages requested for a product.');
                     }
-                    if ($product->stock < $quantity) {
+                    if ($product->stock !== null && $product->stock < $quantity) {
                         throw new HttpException(409, 'Not enough packages available for '.($product->name_ar ?: $product->name).'.');
                     }
-                    $product->decrement('stock', $quantity);
+                    if ($product->stock !== null) {
+                        $product->decrement('stock', $quantity);
+                    }
                 }
                 $subtotal = 0;
                 $items = [];
@@ -254,10 +259,10 @@ class OrderController extends Controller
                     if (! $product) {
                         continue;
                     }
-                    if ($restore) {
+                    if ($restore && $product->stock !== null) {
                         $product->increment('stock', $quantity);
                     }
-                    if ($reserve) {
+                    if ($reserve && $product->stock !== null) {
                         if ($product->stock < $quantity) {
                             throw new HttpException(409, 'Not enough stock to reopen this order.');
                         }
@@ -280,7 +285,7 @@ class OrderController extends Controller
             if ($order->stock_reserved === true && in_array($order->status, ['PENDING', 'PROCESSING'], true)) {
                 foreach ($order->items->groupBy('product_id') as $productId => $items) {
                     $product = Product::whereKey($productId)->lockForUpdate()->first();
-                    if ($product) {
+                    if ($product && $product->stock !== null) {
                         $product->increment('stock', $items->sum('quantity'));
                     }
                 }

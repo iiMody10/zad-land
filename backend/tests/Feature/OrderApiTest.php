@@ -84,6 +84,34 @@ class OrderApiTest extends TestCase
         $this->assertSame(6, $product->fresh()->stock);
     }
 
+    public function test_order_is_allowed_when_inventory_is_not_tracked(): void
+    {
+        $product = $this->product();
+        $product->update(['stock' => null]);
+
+        $this->postJson('/api/orders', [
+            'shopName' => 'Store One', 'ownerName' => 'Owner One', 'phone' => '0912345678',
+            'city' => 'حمص', 'streetAddress' => 'Main street 12', 'idempotencyKey' => 'untracked-stock-order-01',
+            'items' => [['productId' => $product->id, 'quantity' => 2]],
+        ])->assertCreated()->assertJsonPath('totalAmount', '19.00');
+
+        $this->assertNull($product->fresh()->stock);
+    }
+
+    public function test_product_with_workbook_price_pending_review_cannot_be_ordered(): void
+    {
+        $product = $this->product();
+        $product->update(['price' => null, 'pricing_needs_review' => true]);
+
+        $this->postJson('/api/orders', [
+            'shopName' => 'Store One', 'ownerName' => 'Owner One', 'phone' => '0912345678',
+            'city' => 'حمص', 'streetAddress' => 'Main street 12', 'idempotencyKey' => 'pending-price-order-0001',
+            'items' => [['productId' => $product->id, 'quantity' => 2]],
+        ])->assertConflict()->assertJsonPath('message', 'The package price for Test product is being reviewed.');
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
     public function test_order_rejects_below_minimum_and_does_not_reserve_stock(): void
     {
         $product = $this->product();
@@ -305,7 +333,7 @@ class OrderApiTest extends TestCase
         $row = [
             'mainCategory' => 'مشروبات', 'category' => 'عصائر', 'brand' => 'ندى',
             'nameAr' => 'عصير اختبار 200 مل', 'nameEn' => 'Test Juice 200ml',
-            'price' => '0.35', 'stock' => 18, 'image' => 'https://example.test/juice.webp',
+            'السعر' => '0.35', 'الكمية' => 18, 'image' => 'https://example.test/juice.webp',
         ];
 
         $this->actingAs($admin, 'web')->postJson('/api/admin/products/import', $row)
@@ -314,6 +342,7 @@ class OrderApiTest extends TestCase
             ->assertOk()->assertJsonPath('created', false);
 
         $this->assertDatabaseCount('products', 1);
+        $this->assertDatabaseHas('products', ['price' => '6.30', 'stock' => null, 'items_per_package' => '18']);
         $this->getJson('/api/products')->assertOk()->assertJsonPath('products.0.images', 'https://example.test/juice.webp');
     }
 
