@@ -14,7 +14,7 @@ export interface ProductInput {
     options?: string | null; sku?: string | null; images: string; brandId: string; categoryId: string; mainCategoryId?: string | null;
 }
 
-interface CategoryInput { name: string; description?: string; image?: string; isFeatured?: boolean; brandId?: string }
+interface CategoryInput { name: string; description?: string; image?: string; isFeatured?: boolean; showInNav?: boolean; navOrder?: number; brandId?: string; mainCategoryId?: string | null }
 interface BrandInput { name: string; description?: string; image?: string; group?: BrandGroup; isActive?: boolean; isFeatured?: boolean; mainCategoryId?: string }
 interface MainCategoryInput { name: string; description?: string; image?: string; isActive?: boolean; isFeatured?: boolean; showInNav?: boolean; navOrder?: number }
 type ProductImportRow = Record<string, string | number | boolean | null | undefined>;

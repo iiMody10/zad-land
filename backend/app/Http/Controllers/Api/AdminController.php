@@ -28,7 +28,7 @@ class AdminController extends Controller
     private const RESOURCES = [
         'brands' => [Brand::class, 'brands', ['name', 'slug', 'description', 'image', 'group', 'is_active', 'is_featured', 'main_category_id']],
         'main-categories' => [MainCategory::class, 'main_categories', ['name', 'slug', 'description', 'image', 'is_active', 'show_in_nav', 'nav_order', 'is_featured']],
-        'categories' => [Category::class, 'categories', ['name', 'slug', 'description', 'image', 'brand_id', 'main_category_id', 'is_featured']],
+        'categories' => [Category::class, 'categories', ['name', 'slug', 'description', 'image', 'brand_id', 'main_category_id', 'is_featured', 'show_in_nav', 'nav_order']],
         'products' => [Product::class, 'products', ['name', 'name_ar', 'name_en', 'slug', 'images', 'is_trending', 'description', 'description_ar', 'description_en', 'price', 'discount_price', 'discount_type', 'discount_value', 'stock', 'min_order', 'packaging', 'items_per_package', 'options', 'category_id', 'sku', 'brand_id', 'main_category_id']],
         'banners' => [Banner::class, 'banners', ['title', 'subtitle', 'title_ar', 'subtitle_ar', 'image', 'image_mobile', 'button_text', 'button_text_ar', 'link', 'badge', 'badge_ar', 'is_active']],
         'promo-codes' => [PromoCode::class, 'promo_codes', ['code', 'discount_percentage', 'delegate_name', 'is_active']],
@@ -111,6 +111,9 @@ class AdminController extends Controller
         if ($resource === 'categories' && empty($input['brand_id'])) {
             $brand = Brand::firstOrCreate(['slug' => 'zad-land'], ['name' => 'Zad Land', 'group' => 'MAIN', 'is_active' => true, 'is_featured' => true]);
             $input['brand_id'] = $brand->id;
+        }
+        if ($resource === 'categories' && ! array_key_exists('main_category_id', $input)) {
+            $input['main_category_id'] = Brand::find($input['brand_id'])?->main_category_id;
         }
         $this->validateResource($request, $resource, $table, $fields, $input);
         if (in_array('slug', $fields, true) && empty($input['slug'])) {
@@ -223,6 +226,20 @@ class AdminController extends Controller
             $input['code'] = strtoupper($input['code']);
         }
         $record->fill($input)->save();
+
+        if ($resource === 'categories'
+            && $record->main_category_id
+            && (array_key_exists('show_in_nav', $input) || array_key_exists('nav_order', $input))) {
+            $normalizedName = mb_strtolower(trim(preg_replace('/\\s+/u', ' ', $record->name) ?? $record->name));
+            $matchingIds = Category::where('main_category_id', $record->main_category_id)
+                ->get(['id', 'name'])
+                ->filter(fn (Category $category) => mb_strtolower(trim(preg_replace('/\\s+/u', ' ', $category->name) ?? $category->name)) === $normalizedName)
+                ->pluck('id');
+            $menuFields = array_intersect_key($input, array_flip(['show_in_nav', 'nav_order']));
+            if ($matchingIds->isNotEmpty() && $menuFields !== []) {
+                Category::whereIn('id', $matchingIds)->update($menuFields);
+            }
+        }
 
         return response()->json(ApiJson::camel($record->fresh()));
     }

@@ -16,22 +16,30 @@ interface CategoryModalProps {
         description: string | null;
         image: string | null;
         brandId?: string;
+        mainCategoryId?: string | null;
         isFeatured?: boolean;
+        showInNav?: boolean;
+        navOrder?: number;
     } | null;
     brands: {
         id: string;
         name: string;
+        mainCategoryId?: string | null;
     }[];
+    mainCategories: { id: string; name: string; description?: string | null }[];
 }
 
-export default function CategoryModal({ isOpen, onClose, category, brands }: CategoryModalProps) {
+export default function CategoryModal({ isOpen, onClose, category, brands, mainCategories }: CategoryModalProps) {
     const { t, language } = useLanguage();
     const isArabic = language === 'ar';
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [image, setImage] = useState("");
     const [brandId, setBrandId] = useState("");
+    const [mainCategoryId, setMainCategoryId] = useState("");
     const [isFeatured, setIsFeatured] = useState(false);
+    const [showInNav, setShowInNav] = useState(true);
+    const [navOrder, setNavOrder] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -40,13 +48,19 @@ export default function CategoryModal({ isOpen, onClose, category, brands }: Cat
             setDescription(category.description || "");
             setImage(category.image || "");
             setBrandId(category.brandId || brands[0]?.id || "");
+            setMainCategoryId(category.mainCategoryId || brands.find((brand) => brand.id === category.brandId)?.mainCategoryId || "");
             setIsFeatured(category.isFeatured ?? false);
+            setShowInNav(category.showInNav ?? true);
+            setNavOrder(category.navOrder ?? 0);
         } else {
             setName("");
             setDescription("");
             setImage("");
             setBrandId(brands[0]?.id || "");
+            setMainCategoryId(brands[0]?.mainCategoryId || "");
             setIsFeatured(false);
+            setShowInNav(true);
+            setNavOrder(0);
         }
     }, [category, isOpen, brands]);
 
@@ -57,7 +71,7 @@ export default function CategoryModal({ isOpen, onClose, category, brands }: Cat
         setIsSubmitting(true);
 
         try {
-            const data = { name, description, image, isFeatured, brandId };
+            const data = { name, description, image, isFeatured, showInNav, navOrder, brandId, mainCategoryId: mainCategoryId || null };
             let result;
 
             if (category) {
@@ -138,7 +152,11 @@ export default function CategoryModal({ isOpen, onClose, category, brands }: Cat
                         </label>
                         <select
                             value={brandId}
-                            onChange={(e) => setBrandId(e.target.value)}
+                            onChange={(e) => {
+                                setBrandId(e.target.value);
+                                const brandMainCategoryId = brands.find((brand) => brand.id === e.target.value)?.mainCategoryId;
+                                setMainCategoryId(brandMainCategoryId || "");
+                            }}
                             required
                             className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-800 text-[var(--color-brand)] dark:text-white focus:ring-2 focus:ring-[var(--color-accent)]/20 focus:border-[var(--color-accent)] transition-all outline-none text-sm cursor-pointer"
                         >
@@ -148,6 +166,38 @@ export default function CategoryModal({ isOpen, onClose, category, brands }: Cat
                             ))}
                         </select>
                     </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-gray-300">
+                            {isArabic ? 'القسم الرئيسي' : 'Main category'}
+                        </label>
+                        <select
+                            value={mainCategoryId}
+                            onChange={(e) => setMainCategoryId(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-800 text-[var(--color-brand)] dark:text-white outline-none text-sm cursor-pointer"
+                        >
+                            <option value="">{isArabic ? 'بدون قسم رئيسي' : 'No main category'}</option>
+                            {mainCategories.map((item) => (
+                                <option key={item.id} value={item.id}>{isArabic ? item.name : item.description || item.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_150px]">
+                        <label className={`flex items-center gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${showInNav ? 'border-emerald-500/40 bg-emerald-50/60 dark:bg-emerald-950/20' : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-zinc-800/50'}`}>
+                            <input type="checkbox" checked={showInNav} onChange={(e) => setShowInNav(e.target.checked)} className="size-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer" />
+                            <span className="text-xs font-bold text-[var(--color-brand)] dark:text-white">{isArabic ? 'إظهار في قائمة القسم' : 'Show in department menu'}</span>
+                        </label>
+                        <label className="flex flex-col gap-1 text-[11px] font-bold text-slate-600 dark:text-gray-300">
+                            {isArabic ? 'ترتيب الظهور' : 'Display order'}
+                            <input type="number" min={0} value={navOrder} onChange={(e) => setNavOrder(Math.max(0, Number(e.target.value) || 0))} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-[var(--color-brand)] dark:border-white/10 dark:bg-zinc-800 dark:text-white" />
+                        </label>
+                    </div>
+                    <p className="-mt-3 text-[11px] leading-relaxed text-slate-500 dark:text-gray-400">
+                        {isArabic
+                            ? 'تظهر الفئات المفعّلة فقط في قائمة القسم الرئيسي، بحد أقصى 8 فئات مختلفة. استخدم ترتيب الظهور لتحديد أولويتها.'
+                            : 'Only enabled subcategories appear in the department menu, up to 8 unique names. Use display order to set their priority.'}
+                    </p>
 
                     {/* Image Upload */}
                     <ImageUploadField

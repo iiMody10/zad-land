@@ -19,7 +19,7 @@ class Category extends Model
 
     protected function casts(): array
     {
-        return ['is_featured' => 'boolean'];
+        return ['is_featured' => 'boolean', 'show_in_nav' => 'boolean', 'nav_order' => 'integer'];
     }
 
     public function brand(): BelongsTo

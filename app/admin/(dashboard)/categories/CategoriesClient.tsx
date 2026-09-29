@@ -26,6 +26,9 @@ interface Category {
         group: string;
     } | null;
     isFeatured: boolean;
+    showInNav: boolean;
+    navOrder: number;
+    mainCategoryId?: string | null;
     _count?: {
         products: number;
     };
@@ -37,9 +40,12 @@ interface Brand {
     slug: string;
     group: string;
     isActive: boolean;
+    mainCategoryId?: string | null;
 }
 
-export default function CategoriesClient({ categories: initialCategories, brands }: { categories: Category[], brands: Brand[] }) {
+interface MainCategoryOption { id: string; name: string; description?: string | null }
+
+export default function CategoriesClient({ categories: initialCategories, brands, mainCategories }: { categories: Category[], brands: Brand[], mainCategories: MainCategoryOption[] }) {
     const router = useRouter();
     const { data: session } = useAdminSession();
     const { t, dir, language } = useLanguage();
@@ -325,6 +331,7 @@ export default function CategoriesClient({ categories: initialCategories, brands
                         }}
                         category={selectedCategory}
                         brands={brands}
+                        mainCategories={mainCategories}
                     />
 
                     <RelatedItemsModal
