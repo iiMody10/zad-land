@@ -60,7 +60,7 @@ export default async function BrandPage(
         notFound();
     }
 
-    const { categories, products, totalProducts } = await getCatalogInitialData(undefined, brand.id);
+    const { categories, products, totalProducts } = await getCatalogInitialData(undefined, brand.id, undefined, 12, "bestselling");
 
     return (
         <BrandShowcaseClient

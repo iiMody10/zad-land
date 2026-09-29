@@ -1,4 +1,4 @@
-export type CatalogSort = "newest" | "price_asc" | "price_desc";
+export type CatalogSort = "newest" | "bestselling" | "price_asc" | "price_desc";
 export type CatalogView = "grid" | "list";
 export type CatalogOption = { id: string; slug: string };
 export type CatalogBrand = CatalogOption & { mainCategoryId: string | null };
@@ -63,7 +63,7 @@ export function parseCatalogFilters(
         inStock: params.get("inStock") === "true",
         onSale: params.get("onSale") === "true",
         isTrending: params.get("isTrending") === "true",
-        sort: sort === "price_asc" || sort === "price_desc" ? sort : "newest",
+        sort: sort === "price_asc" || sort === "price_desc" || sort === "bestselling" ? sort : "newest",
         view: params.get("view") === "list" ? "list" : "grid",
     }, categories, brands);
 }

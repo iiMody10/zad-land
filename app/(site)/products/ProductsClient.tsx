@@ -86,6 +86,7 @@ const ProductsClient = ({
             const mainCategoryQuery = activeMainCategory ? `&mainCategoryId=${activeMainCategory.id}` : "";
 
             let sortQuery = "";
+            if (sort === "best_sellers") sortQuery = "&sort=bestselling";
             if (sort === "price_asc") sortQuery = "&sort=price_asc";
             else if (sort === "price_desc") sortQuery = "&sort=price_desc";
             else if (sort === "newest") sortQuery = "&sort=newest";

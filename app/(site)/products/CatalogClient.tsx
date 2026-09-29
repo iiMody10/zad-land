@@ -412,8 +412,9 @@ export default function CatalogClient({ initialCategories, initialSubcategories,
                                     aria-label={isArabic ? "ترتيب حسب" : "Sort by"}
                                     className="h-11 w-full min-w-0 max-w-[170px] cursor-pointer rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-semibold text-[var(--color-brand)] outline-none transition-colors focus:border-[var(--color-brand-hover)] dark:border-white/15 dark:bg-zinc-900 dark:text-white sm:px-3 sm:text-sm sm:max-w-none"
                                 >
-                                    <option value="newest">{t("products.newestArrivals")}</option>
-                                    <option value="price_asc">{t("products.priceLowHigh")}</option>
+                                <option value="newest">{t("products.newestArrivals")}</option>
+                                <option value="bestselling">{t("products.bestSellers")}</option>
+                                <option value="price_asc">{t("products.priceLowHigh")}</option>
                                     <option value="price_desc">{t("products.priceHighLow")}</option>
                                 </select>
                             </label>

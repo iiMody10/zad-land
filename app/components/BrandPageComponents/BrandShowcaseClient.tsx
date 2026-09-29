@@ -66,6 +66,7 @@ export default function BrandShowcaseClient({
             params.set("page", targetPage.toString());
             params.set("limit", "12");
             params.set("brandIds", brand.id);
+            if (sort === "best_sellers") params.set("sort", "bestselling");
 
             if (activeCategoryId !== "all") {
                 params.set("categoryIds", activeCategoryId);

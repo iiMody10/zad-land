@@ -130,11 +130,13 @@ export const getCatalogInitialData = cache(async (
     brandId?: string,
     mainCategoryId?: string,
     pageSize = 12,
+    sort?: string,
 ) => {
     const query = new URLSearchParams({ page: "1", limit: String(Math.min(32, Math.max(1, pageSize))) });
     if (categoryId) query.set("categoryIds", categoryId);
     if (brandId) query.set("brandIds", brandId);
     if (mainCategoryId) query.set("mainCategoryId", mainCategoryId);
+    if (sort) query.set("sort", sort);
 
     const [catalog, categories] = await Promise.all([
         laravelJson<{ products: CatalogProduct[]; pagination: { total: number } }>(`/api/products?${query.toString()}`, { products: [], pagination: { total: 0 } }),

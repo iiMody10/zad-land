@@ -10,6 +10,7 @@ use App\Models\MainCategory;
 use App\Models\Product;
 use App\Support\ApiJson;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CatalogController extends Controller
 {
@@ -49,12 +50,25 @@ class CatalogController extends Controller
             $term = '%'.addcslashes($data['search'], '%_\\').'%';
             $query->where(fn ($q) => $q->where('name', 'like', $term)->orWhere('name_ar', 'like', $term)->orWhere('name_en', 'like', $term)->orWhere('description', 'like', $term)->orWhere('description_ar', 'like', $term)->orWhere('description_en', 'like', $term));
         }
-        match ($data['sort'] ?? '') {
-            'price_asc' => $query->orderBy('price'),
-            'price_desc' => $query->orderByDesc('price'),
-            'newest' => $query->orderByDesc('created_at'),
-            default => $query->orderByDesc('created_at'),
-        };
+        if (($data['sort'] ?? '') === 'bestselling') {
+            $sales = DB::table('order_items')
+                ->join('orders', 'orders.id', '=', 'order_items.order_id')
+                ->where('orders.status', '!=', 'CANCELLED')
+                ->select('order_items.product_id')
+                ->selectRaw('SUM(order_items.quantity) AS units_sold')
+                ->groupBy('order_items.product_id');
+            $query->leftJoinSub($sales, 'product_sales', fn ($join) => $join->on('product_sales.product_id', '=', 'products.id'))
+                ->select('products.*')
+                ->orderByRaw('COALESCE(product_sales.units_sold, 0) DESC')
+                ->orderByDesc('products.created_at');
+        } else {
+            match ($data['sort'] ?? '') {
+                'price_asc' => $query->orderBy('price'),
+                'price_desc' => $query->orderByDesc('price'),
+                'newest' => $query->orderByDesc('created_at'),
+                default => $query->orderByDesc('created_at'),
+            };
+        }
         $skipCount = in_array($request->query('skipCount'), ['true', '1'], true);
         $total = ($skipCount || ($page > 1 && array_key_exists('knownTotal', $data))) ? (int) ($data['knownTotal'] ?? 0) : (clone $query)->count();
         $products = $query->skip(($page - 1) * $limit)->take($limit)->get();
