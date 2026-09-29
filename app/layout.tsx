@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { getI18n } from "@/lib/i18n";
-import { getSiteSettings } from "@/lib/admin-actions";
 import { canViewWholesalePrices } from "@/lib/price-visibility";
 
 const metadataBase =
@@ -119,12 +118,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [{ language, dir }, settings, priceVisible] = await Promise.all([
+  const [{ language, dir }, priceVisible] = await Promise.all([
     getI18n(),
-    getSiteSettings(),
     canViewWholesalePrices(),
   ]);
-  const exchangeRate = settings?.exchangeRate ? Number(settings.exchangeRate) : 135;
 
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -134,7 +131,7 @@ export default async function RootLayout({
     "logo": `${metadataBase}/logo.jpeg`,
     "image": `${metadataBase}/og-image.jpg`,
     "description": "شركة زاد لاند لتجارة وتوزيع المواد الغذائية والمنتجات الاستهلاكية بالجملة.",
-    "currenciesAccepted": "SYP, USD",
+    "currenciesAccepted": "USD",
     "paymentAccepted": "Cash, Bank Transfer",
     "areaServed": "Syria",
     "address": {
@@ -178,7 +175,7 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <div id="app-shell">
-          <Providers initialExchangeRate={exchangeRate} initialLanguage={language} priceVisible={priceVisible}>
+          <Providers initialLanguage={language} priceVisible={priceVisible}>
             {children}
           </Providers>
         </div>

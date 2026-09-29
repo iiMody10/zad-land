@@ -158,7 +158,6 @@ interface SiteSettings {
     aboutSeoTitleAr: string | null;
     aboutSeoDescription: string | null;
     aboutSeoDescriptionAr: string | null;
-    exchangeRate: number | null;
     middleBanner1Image: string | null;
     middleBanner1Link: string | null;
     middleBanner2Image: string | null;
@@ -312,8 +311,6 @@ export default function SiteContentClient({
 
     const [shippingReturnsImage, setShippingReturnsImage] = useState(initialSettings?.shippingReturnsImage || "");
 
-    const [exchangeRate, setExchangeRate] = useState(initialSettings?.exchangeRate || 135);
-
     // Middle Banner 1
     const [middleBanner1Image, setMiddleBanner1Image] = useState(initialSettings?.middleBanner1Image || "");
     const [middleBanner1Link, setMiddleBanner1Link] = useState(initialSettings?.middleBanner1Link || "");
@@ -356,7 +353,6 @@ export default function SiteContentClient({
 
         try {
             const result = await updateSiteSettings({
-                exchangeRate: Number(exchangeRate) || 135,
                 headerNavItems: JSON.stringify(headerNavItems),
                 categoriesCtaTitle: ctaTitle,
                 categoriesCtaDesc: ctaDesc,
@@ -505,28 +501,10 @@ export default function SiteContentClient({
                                 </div>
                             </div>
 
-                            <div className="max-w-md space-y-4">
-                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
-                                    {t('admin.exchangeRateLabel')} (1 USD = X SYP)
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={exchangeRate}
-                                        onChange={(e) => setExchangeRate(parseFloat(e.target.value) || 0)}
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 border border-slate-200/80 dark:border-white/10 rounded-xl text-lg font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-[var(--color-brand)] outline-none transition-all"
-                                        placeholder="135"
-                                        required
-                                    />
-                                    <span className="absolute end-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                                        SYP / USD
-                                    </span>
-                                </div>
-                                <p className="text-xs text-slate-400">
-                                    {t('admin.currencyHelpText') || "All prices stored in USD will be multiplied by this rate when customer views prices in Syrian Pounds."}
-                                </p>
+                            <div className="max-w-xl rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-100">
+                                <p className="font-bold">{t('admin.usdOnlyTitle')}</p>
+                                <p className="mt-1 leading-6">{t('admin.usdOnlyDescription')}</p>
+                                <span className="mt-3 inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-extrabold text-emerald-800 shadow-xs dark:bg-white/10 dark:text-emerald-100">$ USD</span>
                             </div>
                         </div>
                     )}

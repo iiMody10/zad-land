@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import ResilientImage from '@/app/components/ResilientImage';
+import { ChevronLeft as MdChevronLeft, ChevronRight as MdChevronRight } from 'lucide-react';
 import type { HomeMainCategory } from '@/lib/admin-actions';
 
 interface CategoryHighlightCardsProps {
@@ -92,7 +93,7 @@ const CategoryHighlightCards = ({ categories = [], language = 'ar' }: CategoryHi
                             aria-label={isArabic ? 'الفئات السابقة' : 'Previous categories'}
                             className="absolute left-0 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--color-accent)]/25 bg-white/95 text-2xl leading-none text-[var(--color-accent)] shadow-md transition-colors hover:bg-[var(--color-canvas)] md:flex"
                         >
-                            ‹
+                            <MdChevronLeft aria-hidden="true" className="size-5" />
                         </button>
                         <button
                             type="button"
@@ -100,7 +101,7 @@ const CategoryHighlightCards = ({ categories = [], language = 'ar' }: CategoryHi
                             aria-label={isArabic ? 'الفئات التالية' : 'Next categories'}
                             className="absolute right-0 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--color-accent)]/25 bg-white/95 text-2xl leading-none text-[var(--color-accent)] shadow-md transition-colors hover:bg-[var(--color-canvas)] md:flex"
                         >
-                            ›
+                            <MdChevronRight aria-hidden="true" className="size-5" />
                         </button>
                     </>
                 )}

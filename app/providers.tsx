@@ -12,19 +12,17 @@ import { WishlistProvider } from "./context/WishlistContext";
 export function Providers({ 
     children, 
     session, 
-    initialExchangeRate = 135,
     initialLanguage = 'ar',
     priceVisible = false
 }: { 
     children: React.ReactNode, 
     session?: any, 
-    initialExchangeRate?: number,
     initialLanguage?: 'en' | 'ar',
     priceVisible?: boolean
 }) {
     return (
         <LanguageProvider initialLanguage={initialLanguage}>
-            <CurrencyProvider initialExchangeRate={initialExchangeRate}>
+            <CurrencyProvider>
                 <PriceVisibilityProvider allowed={priceVisible}>
                 <WishlistProvider>
                 <CartProvider>
