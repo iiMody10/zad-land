@@ -10,7 +10,8 @@ import { getConfiguredHeaderNavItems, selectHeaderNavigationItems } from "@/lib/
 
 import React, { Suspense } from "react";
 import NavigationProgressBar from "../components/NavigationProgressBar";
-import { BusinessContactProvider, toWhatsAppUrl } from "@/app/context/BusinessContactContext";
+import { BusinessContactProvider } from "@/app/context/BusinessContactContext";
+import { toWhatsAppUrl } from "@/lib/business-contact";
 
 export default async function SiteLayout({
     children,

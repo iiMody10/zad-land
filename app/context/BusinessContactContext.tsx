@@ -23,8 +23,3 @@ export function BusinessContactProvider({
 export function useBusinessContact() {
     return useContext(BusinessContactContext);
 }
-
-export function toWhatsAppUrl(phone: string) {
-    const digits = phone.replace(/\D/g, "");
-    return digits ? `https://wa.me/${digits}` : "#";
-}
