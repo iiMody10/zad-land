@@ -17,12 +17,12 @@ class OrderApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function product(int $stock = 8, int $minOrder = 2): Product
+    private function product(int $stock = 8, int $minOrder = 2, ?string $discountPrice = '9.50'): Product
     {
         $brand = Brand::create(['name' => 'Test Brand', 'slug' => 'test-brand', 'group' => 'MAIN', 'is_active' => true]);
         $category = Category::create(['name' => 'Test Category', 'slug' => 'test-category', 'brand_id' => $brand->id]);
 
-        return Product::create(['name' => 'Test product', 'slug' => 'test-product', 'images' => '[]', 'price' => '10.25', 'discount_price' => '9.50', 'stock' => $stock, 'min_order' => $minOrder, 'category_id' => $category->id, 'brand_id' => $brand->id]);
+        return Product::create(['name' => 'Test product', 'slug' => 'test-product', 'images' => '[]', 'price' => '10.25', 'discount_price' => $discountPrice, 'stock' => $stock, 'min_order' => $minOrder, 'category_id' => $category->id, 'brand_id' => $brand->id]);
     }
 
     public function test_catalog_keeps_current_price_visibility(): void
@@ -67,6 +67,21 @@ class OrderApiTest extends TestCase
         $body['items'][0]['quantity'] = 4;
         $this->postJson('/api/orders', $body)->assertConflict();
         $this->assertSame(0, $product->fresh()->stock);
+    }
+
+    public function test_order_uses_regular_price_when_product_has_no_discount(): void
+    {
+        $product = $this->product(discountPrice: null);
+
+        $this->postJson('/api/orders', [
+            'shopName' => 'Store One', 'ownerName' => 'Owner One', 'phone' => '0912345678',
+            'city' => 'حمص', 'streetAddress' => 'Main street 12', 'idempotencyKey' => 'regular-price-order-0001',
+            'items' => [['productId' => $product->id, 'quantity' => 2]],
+        ])->assertCreated()
+            ->assertJsonPath('totalAmount', '20.50')
+            ->assertJsonPath('items.0.price', '10.25');
+
+        $this->assertSame(6, $product->fresh()->stock);
     }
 
     public function test_order_rejects_below_minimum_and_does_not_reserve_stock(): void

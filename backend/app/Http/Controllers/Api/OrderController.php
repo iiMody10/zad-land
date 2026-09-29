@@ -120,8 +120,13 @@ class OrderController extends Controller
                 $items = [];
                 foreach ($lines as $line) {
                     $product = $products->get($line['productId']);
-                    $price = $this->priceCents($product->discount_price) > 0 && $this->priceCents($product->discount_price) < $this->priceCents($product->price) ? $product->discount_price : $product->price;
-                    $unitCents = $this->priceCents($price);
+                    $regularPriceCents = $this->priceCents($product->price);
+                    $discountPriceCents = $product->discount_price !== null
+                        ? $this->priceCents($product->discount_price)
+                        : 0;
+                    $unitCents = $discountPriceCents > 0 && $discountPriceCents < $regularPriceCents
+                        ? $discountPriceCents
+                        : $regularPriceCents;
                     $subtotal += $unitCents * $line['quantity'];
                     $items[] = ['product_id' => $product->id, 'quantity' => $line['quantity'], 'options' => $line['options'], 'price' => number_format($unitCents / 100, 2, '.', '')];
                 }
