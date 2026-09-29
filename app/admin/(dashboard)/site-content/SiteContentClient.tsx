@@ -10,7 +10,9 @@ import { useLanguage } from "@/app/context/LanguageContext";
 import FooterContentSection from "./FooterContentSection";
 import HeaderNavigationSection from "./HeaderNavigationSection";
 import AboutContentSection, { type AboutSettingsForm } from "./AboutContentSection";
+import ContactContentSection from "./ContactContentSection";
 import type { HeaderNavItemRef } from "@/lib/header-navigation";
+import { parseContactPageContent, type ContactPageContent } from "@/lib/contact-page-content";
 
 interface FooterCategoryOption {
     id: string;
@@ -19,6 +21,7 @@ interface FooterCategoryOption {
 
 interface SiteSettings {
     id: string;
+    contactPageContent: string | null;
     headerNavItems: string | null;
     categoriesCtaTitle: string | null;
     categoriesCtaDesc: string | null;
@@ -182,7 +185,7 @@ interface SiteSettings {
     featuredCollectionAllProductsUrl: string | null;
 }
 
-type TabType = "currency" | "navigation" | "footer" | "banners" | "shipping" | "about" | "featured";
+type TabType = "currency" | "navigation" | "footer" | "banners" | "shipping" | "about" | "contact" | "featured";
 
 export default function SiteContentClient({ 
     initialSettings,
@@ -200,6 +203,7 @@ export default function SiteContentClient({
     const [activeTab, setActiveTab] = useState<TabType>("currency");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [headerNavItems, setHeaderNavItems] = useState<HeaderNavItemRef[]>(initialHeaderNavItems);
+    const [contactContent, setContactContent] = useState<ContactPageContent>(() => parseContactPageContent(initialSettings?.contactPageContent));
 
     // Site Settings State - Categories CTA
     const [ctaTitle, setCtaTitle] = useState(initialSettings?.categoriesCtaTitle || "");
@@ -388,6 +392,7 @@ export default function SiteContentClient({
                 hygieneDescAr,
                 shippingReturnsImage,
                 ...aboutContent,
+                contactPageContent: JSON.stringify(contactContent),
                 middleBanner1Image,
                 middleBanner1Link,
                 middleBanner2Image,
@@ -422,6 +427,7 @@ export default function SiteContentClient({
         { id: "featured", label: t('admin.tabFeaturedCollection') || "Featured Collection", icon: <MdViewCarousel className="text-lg" /> },
         { id: "shipping", label: t('admin.tabShipping') || "Shipping & Policy", icon: <MdLocalShipping className="text-lg" /> },
         { id: "about", label: t('admin.tabAbout') || "About Us Story", icon: <MdInfoOutline className="text-lg" /> },
+        { id: "contact", label: t('admin.tabContact') || "Contact Page", icon: <MdInfoOutline className="text-lg" /> },
     ];
 
     return (
@@ -841,7 +847,18 @@ export default function SiteContentClient({
                             value={aboutContent}
                             onChange={(key, next) => setAboutContent((current) => ({ ...current, [key]: next }))}
                         />
-                    )}                </div>
+                    )}
+                    {activeTab === "contact" && (
+                        <ContactContentSection
+                            value={contactContent}
+                            onChange={(key, next) => setContactContent((current) => ({ ...current, [key]: next }))}
+                            email={footerContent.footerEmail}
+                            whatsappUrl={footerContent.footerWhatsappUrl}
+                            facebookUrl={footerContent.footerFacebookUrl}
+                            instagramUrl={footerContent.footerInstagramUrl}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

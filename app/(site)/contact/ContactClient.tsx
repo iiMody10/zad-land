@@ -2,35 +2,30 @@
 
 import React, { useState } from 'react';
 import PlatformIcon from '@/app/components/PlatformIcon';
-import { Phone as LuPhone, Mail as LuMail, MapPin as LuMapPin, Clock as LuClock, Send as LuSend } from 'lucide-react';
-import { CircleCheck as IoCheckmarkCircle } from 'lucide-react';
-
-interface ContactSettings {
-    footerWhatsappUrl?: string | null;
-    footerFacebookUrl?: string | null;
-    footerInstagramUrl?: string | null;
-}
+import { Phone as LuPhone, Mail as LuMail, MapPin as LuMapPin, Clock as LuClock, Send as LuSend, CircleCheck as IoCheckmarkCircle } from 'lucide-react';
+import type { ContactPageContent } from '@/lib/contact-page-content';
 
 interface ContactClientProps {
     language: 'ar' | 'en';
     dir: 'rtl' | 'ltr';
-    settings: ContactSettings | null;
+    content: ContactPageContent;
+    settings: {
+        footerWhatsappUrl?: string | null;
+        footerFacebookUrl?: string | null;
+        footerInstagramUrl?: string | null;
+        footerEmail?: string | null;
+    } | null;
 }
 
-export default function ContactClient({ language, dir, settings }: ContactClientProps) {
+export default function ContactClient({ language, dir, content, settings }: ContactClientProps) {
     const isAr = language === 'ar';
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [form, setForm] = useState({ name: '', businessName: '', phone: '', message: '' });
+    const copy = (key: string) => content[`${key}${isAr ? 'Ar' : 'En'}` as keyof ContactPageContent] as string;
 
-    const [form, setForm] = useState({
-        name: '',
-        businessName: '',
-        phone: '',
-        message: '',
-    });
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
@@ -38,258 +33,93 @@ export default function ContactClient({ language, dir, settings }: ContactClient
         }, 600);
     };
 
-    const whatsappUrl =
-        settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#'
-            ? settings.footerWhatsappUrl
-            : 'https://wa.me/';
+    const whatsappUrl = settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#'
+        ? settings.footerWhatsappUrl
+        : 'https://wa.me/';
 
     return (
-        <div className="bg-[var(--color-canvas)] dark:bg-[#141410] min-h-screen py-8 md:py-14" dir={dir}>
+        <div className="min-h-screen bg-[var(--color-canvas)] py-8 dark:bg-[#141410] md:py-14" dir={dir}>
             <div className="container-custom max-w-5xl">
-                {/* Header */}
-                <div className="text-center max-w-2xl mx-auto mb-10 md:mb-14">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-100/70 text-[var(--color-accent)] dark:bg-amber-950/40 dark:text-[var(--color-accent-light)] text-xs font-bold mb-3">
+                {content.heroEnabled && <header className="mx-auto mb-10 max-w-2xl text-center md:mb-14">
+                    <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-100/70 px-3.5 py-1 text-xs font-bold text-[var(--color-accent)] dark:bg-amber-950/40 dark:text-[var(--color-accent-light)]">
                         <LuPhone className="text-sm" />
-                        <span>{isAr ? 'خدمة عملاء وتوريد الجملة' : 'Wholesale Support & Sales'}</span>
+                        <span>{copy('heroBadge')}</span>
                     </div>
-
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-[var(--color-brand)] dark:text-[#F5F0E0] mb-3">
-                        {isAr ? 'تواصل معنا - شركة زاد لاند' : 'Contact Zad Land Wholesale'}
-                    </h1>
-
-                    <p className="text-sm md:text-base text-[var(--color-text-muted-light)] dark:text-[var(--color-text-muted-dark)] leading-relaxed">
-                        {isAr
-                            ? 'فريق مبيعات الجملة والتوزيع جاهز للرد على استفساراتكم وتزويدكم بعروض الأسعار وجداول التسليم لكافة المحافظات.'
-                            : 'Our wholesale sales & distribution team is ready to assist your business with customized supply quotes and scheduled deliveries.'}
-                    </p>
-
-                    {/* Signature Ornamental Divider */}
-                    <div className="flex items-center justify-center gap-3 mt-4 text-[var(--color-accent)] opacity-80 select-none">
-                        <span className="h-[1px] w-12 bg-gradient-to-r from-transparent to-[var(--color-accent)]" />
-                        <span>🌾</span>
-                        <span className="text-xs font-bold tracking-wider">ZAD LAND</span>
-                        <span>🌾</span>
-                        <span className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[var(--color-accent)]" />
+                    <h1 className="mb-3 text-2xl font-black text-[var(--color-brand)] dark:text-[#F5F0E0] sm:text-3xl md:text-4xl">{copy('heroTitle')}</h1>
+                    <p className="text-sm leading-relaxed text-[var(--color-text-muted-light)] dark:text-[var(--color-text-muted-dark)] md:text-base">{copy('heroDescription')}</p>
+                    <div className="mt-4 flex select-none items-center justify-center gap-3 text-[var(--color-accent)] opacity-80">
+                        <span className="h-px w-12 bg-gradient-to-r from-transparent to-[var(--color-accent)]" />
+                        <span>🌾</span><span className="text-xs font-bold tracking-wider">ZAD LAND</span><span>🌾</span>
+                        <span className="h-px w-12 bg-gradient-to-l from-transparent to-[var(--color-accent)]" />
                     </div>
-                </div>
+                </header>}
 
-                {/* Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    {/* Contact Info Column */}
-                    <div className="lg:col-span-5 space-y-4">
-                        {/* Direct WhatsApp Action Card */}
-                        <a
-                            href={whatsappUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl p-6 flex items-center gap-4 transition-all duration-300 shadow-sm hover:shadow-md group block"
-                        >
-                            <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform">
-                                <PlatformIcon platform="whatsapp" className="size-7" />
+                <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+                    {(content.whatsappEnabled || content.contactInfoEnabled || content.socialEnabled) && <aside className="space-y-4 lg:col-span-5">
+                        {content.whatsappEnabled && <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="group block rounded-2xl bg-emerald-600 p-6 text-white shadow-sm transition-all duration-300 hover:bg-emerald-700 hover:shadow-md">
+                            <div className="flex items-center gap-4">
+                                <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-white/20 text-3xl transition-transform group-hover:scale-110"><PlatformIcon platform="whatsapp" className="size-7" /></div>
+                                <div><h2 className="text-base font-bold md:text-lg">{copy('whatsappTitle')}</h2><p className="mt-0.5 text-xs text-white/85">{copy('whatsappDescription')}</p></div>
                             </div>
-                            <div>
-                                <h2 className="font-bold text-base md:text-lg">
-                                    {isAr ? 'محادثة مباشرة عبر واتساب' : 'Chat via WhatsApp'}
-                                </h2>
-                                <p className="text-xs text-white/85 mt-0.5">
-                                    {isAr
-                                        ? 'استجابة فورية لطلبات الجملة وقوائم الأسعار'
-                                        : 'Instant response for wholesale quotes'}
-                                </p>
-                            </div>
-                        </a>
+                        </a>}
 
-                        {/* Info Card */}
-                        <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-gray-100 dark:border-white/10 p-6 space-y-6 shadow-xs">
-                            <div className="flex items-start gap-3.5">
-                                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-white/5 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] flex items-center justify-center shrink-0 text-lg">
-                                    <LuMapPin />
-                                </div>
-                                <div>
-                                    <h3 className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
-                                        {isAr ? 'المقر الرئيسي والمستودعات' : 'Headquarters & Warehouses'}
-                                    </h3>
-                                    <p className="text-sm font-semibold text-[var(--color-brand)] dark:text-white mt-0.5">
-                                        {isAr ? 'المنطقة الصناعية - حمص، سوريا' : 'Industrial Area - Homs, Syria'}
-                                    </p>
-                                    <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-                                        {isAr ? 'أسطول توزيع يغطي كافة المحافظات' : 'Logistics fleet covering all governorates'}
-                                    </p>
-                                </div>
-                            </div>
+                        {content.contactInfoEnabled && (content.addressEnabled || content.hoursEnabled || content.emailEnabled) && <div className="space-y-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                            {content.addressEnabled && <InfoItem icon={<LuMapPin />} title={copy('addressTitle')} primary={copy('addressLine')} secondary={copy('addressDescription')} />}
+                            {content.hoursEnabled && <InfoItem icon={<LuClock />} title={copy('hoursTitle')} primary={copy('hoursLine')} secondary={copy('hoursDescription')} />}
+                            {content.emailEnabled && <InfoItem icon={<LuMail />} title={copy('emailTitle')} primary={settings?.footerEmail || ''} />}
+                        </div>}
 
-                            <div className="flex items-start gap-3.5">
-                                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-white/5 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] flex items-center justify-center shrink-0 text-lg">
-                                    <LuClock />
-                                </div>
-                                <div>
-                                    <h3 className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
-                                        {isAr ? 'أوقات العمل والتوزيع' : 'Operating Hours'}
-                                    </h3>
-                                    <p className="text-sm font-semibold text-[var(--color-brand)] dark:text-white mt-0.5">
-                                        {isAr ? 'السبت - الخميس: ٨:٠٠ ص - ٦:٠٠ م' : 'Sat - Thu: 8:00 AM - 6:00 PM'}
-                                    </p>
-                                    <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-                                        {isAr ? 'استقبال طلبات الشحن على مدار الساعة' : '24/7 order dispatch processing'}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start gap-3.5">
-                                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-white/5 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] flex items-center justify-center shrink-0 text-lg">
-                                    <LuMail />
-                                </div>
-                                <div>
-                                    <h3 className="text-xs font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">
-                                        {isAr ? 'البريد الإلكتروني التجاري' : 'Commercial Email'}
-                                    </h3>
-                                    <p className="text-sm font-semibold text-[var(--color-brand)] dark:text-white mt-0.5">
-                                        info@zadland.com
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Social Links */}
-                        <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-gray-100 dark:border-white/10 p-5 flex items-center justify-between shadow-xs">
-                            <span className="text-xs font-bold text-slate-600 dark:text-zinc-400">
-                                {isAr ? 'تابع صفحاتنا الرسمية:' : 'Follow Official Channels:'}
-                            </span>
+                        {content.socialEnabled && <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                            <span className="text-xs font-bold text-slate-600 dark:text-zinc-400">{copy('socialTitle')}</span>
                             <div className="flex items-center gap-3">
-                                {settings?.footerFacebookUrl && (
-                                    <a
-                                        href={settings.footerFacebookUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                                        aria-label="Facebook"
-                                    >
-                                        <PlatformIcon platform="facebook" className="size-4" />
-                                    </a>
-                                )}
-                                {settings?.footerInstagramUrl && (
-                                    <a
-                                        href={settings.footerInstagramUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                                        aria-label="Instagram"
-                                    >
-                                        <PlatformIcon platform="instagram" className="size-4" />
-                                    </a>
-                                )}
+                                {settings?.footerFacebookUrl && <SocialLink href={settings.footerFacebookUrl} platform="facebook" label="Facebook" />}
+                                {settings?.footerInstagramUrl && <SocialLink href={settings.footerInstagramUrl} platform="instagram" label="Instagram" />}
                             </div>
-                        </div>
-                    </div>
+                        </div>}
+                    </aside>}
 
-                    {/* Inquiry Form Column */}
-                    <div className="lg:col-span-7 bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-gray-100 dark:border-white/10 p-6 sm:p-8 shadow-xs">
-                        <h2 className="text-xl font-bold text-[var(--color-brand)] dark:text-white mb-1">
-                            {isAr ? 'طلب تسعير أو استفسار جملة' : 'Request Wholesale Quote'}
-                        </h2>
-                        <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mb-6">
-                            {isAr
-                                ? 'أرسل تفاصيل نشاطك التجاري وسيتواصل معك مندوب المبيعات المعتمد فوراً.'
-                                : 'Fill out your business details and our dedicated sales representative will reach out promptly.'}
-                        </p>
+                    {content.formEnabled && <section className={`${content.whatsappEnabled || content.contactInfoEnabled || content.socialEnabled ? 'lg:col-span-7' : 'lg:col-span-12'} rounded-2xl border border-gray-100 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)] sm:p-8`}>
+                        <h2 className="mb-1 text-xl font-bold text-[var(--color-brand)] dark:text-white">{copy('formTitle')}</h2>
+                        <p className="mb-6 text-xs text-slate-500 dark:text-zinc-400 sm:text-sm">{copy('formDescription')}</p>
 
-                        {submitted ? (
-                            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-8 text-center space-y-3">
-                                <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto text-2xl">
-                                    <IoCheckmarkCircle />
-                                </div>
-                                <h3 className="text-lg font-bold text-emerald-900 dark:text-emerald-200">
-                                    {isAr ? 'تم استلام طلبكم بنجاح!' : 'Inquiry Received Successfully!'}
-                                </h3>
-                                <p className="text-xs sm:text-sm text-emerald-700 dark:text-emerald-300 max-w-md mx-auto">
-                                    {isAr
-                                        ? 'شكراً لتواصلكم مع شركة زاد لاند. سيقوم فريق المبيعات بالتواصل معكم في أقرب وقت.'
-                                        : 'Thank you for reaching out to Zad Land. Our wholesale sales team will contact you shortly.'}
-                                </p>
+                        {submitted ? <div className="space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center dark:border-emerald-800 dark:bg-emerald-950/30">
+                            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-emerald-100 text-2xl text-emerald-600 dark:bg-emerald-900 dark:text-emerald-400"><IoCheckmarkCircle /></div>
+                            <h3 className="text-lg font-bold text-emerald-900 dark:text-emerald-200">{copy('successTitle')}</h3>
+                            <p className="mx-auto max-w-md text-xs text-emerald-700 dark:text-emerald-300 sm:text-sm">{copy('successDescription')}</p>
+                        </div> : <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <TextField label={copy('nameLabel')} placeholder={copy('namePlaceholder')} value={form.name} onChange={(name) => setForm((current) => ({ ...current, name }))} />
+                                <TextField label={copy('businessLabel')} placeholder={copy('businessPlaceholder')} value={form.businessName} onChange={(businessName) => setForm((current) => ({ ...current, businessName }))} />
                             </div>
-                        ) : (
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
-                                            {isAr ? 'الاسم الكامل *' : 'Full Name *'}
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={form.name}
-                                            onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                            placeholder={isAr ? 'محمد خالد' : 'John Doe'}
-                                            className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
-                                            {isAr ? 'اسم المتجر / الشركة *' : 'Business / Store Name *'}
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={form.businessName}
-                                            onChange={(e) => setForm({ ...form, businessName: e.target.value })}
-                                            placeholder={isAr ? 'سوبرماركت الأمانة' : 'Al-Amana Supermarket'}
-                                            className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
-                                        {isAr ? 'رقم الهاتف أو الواتساب *' : 'Phone or WhatsApp Number *'}
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        required
-                                        value={form.phone}
-                                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                                        placeholder="+963..."
-                                        className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all"
-                                    />
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
-                                        {isAr ? 'تفاصيل الطلب أو الاستفسار *' : 'Inquiry / Order Details *'}
-                                    </label>
-                                    <textarea
-                                        required
-                                        rows={4}
-                                        value={form.message}
-                                        onChange={(e) => setForm({ ...form, message: e.target.value })}
-                                        placeholder={
-                                            isAr
-                                                ? 'اكتب المنتجات أو الكميات المطلوبة والمحافظة...'
-                                                : 'Specify products, quantities needed, and location...'
-                                        }
-                                        className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-[var(--color-canvas)] dark:bg-zinc-800 px-3.5 py-2.5 text-sm text-[var(--color-brand)] dark:text-white outline-none focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 transition-all resize-none"
-                                    />
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full py-3 px-6 rounded-xl bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 active:scale-98 shadow-sm cursor-pointer disabled:opacity-70"
-                                >
-                                    {loading ? (
-                                        <span>{isAr ? 'جاري الإرسال...' : 'Sending...'}</span>
-                                    ) : (
-                                        <>
-                                            <LuSend className="text-base" />
-                                            <span>{isAr ? 'إرسال طلب التسعير' : 'Submit Wholesale Inquiry'}</span>
-                                        </>
-                                    )}
-                                </button>
-                            </form>
-                        )}
-                    </div>
+                            <TextField label={copy('phoneLabel')} placeholder={copy('phonePlaceholder')} value={form.phone} onChange={(phone) => setForm((current) => ({ ...current, phone }))} type="tel" />
+                            <label className="block space-y-1.5 text-xs font-bold text-slate-700 dark:text-zinc-300">
+                                <span>{copy('messageLabel')}</span>
+                                <textarea required rows={4} value={form.message} onChange={(event) => setForm((current) => ({ ...current, message: event.target.value }))} placeholder={copy('messagePlaceholder')} className={inputClass + ' resize-none'} />
+                            </label>
+                            <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-accent)] px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-[var(--color-accent-hover)] active:scale-[0.98] disabled:opacity-70">
+                                {loading ? <span>{copy('sendingLabel')}</span> : <><LuSend className="text-base" /><span>{copy('submitLabel')}</span></>}
+                            </button>
+                        </form>}
+                    </section>}
                 </div>
             </div>
         </div>
     );
+}
+
+const inputClass = "w-full rounded-xl border border-gray-200 bg-[var(--color-canvas)] px-3.5 py-2.5 text-sm text-[var(--color-brand)] outline-none transition-all focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 dark:border-white/10 dark:bg-zinc-800 dark:text-white";
+
+function InfoItem({ icon, title, primary, secondary }: { icon: React.ReactNode; title: string; primary: string; secondary?: string }) {
+    return <div className="flex items-start gap-3.5">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-lg text-[var(--color-accent)] dark:bg-white/5 dark:text-[var(--color-accent-light)]">{icon}</div>
+        <div><h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">{title}</h3><p className="mt-0.5 text-sm font-semibold text-[var(--color-brand)] dark:text-white">{primary}</p>{secondary && <p className="mt-0.5 text-xs text-slate-500 dark:text-zinc-400">{secondary}</p>}</div>
+    </div>;
+}
+
+function SocialLink({ href, platform, label }: { href: string; platform: "facebook" | "instagram"; label: string }) {
+    return <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label} className="flex size-9 items-center justify-center rounded-full border border-gray-200 text-slate-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:text-zinc-300 dark:hover:bg-white/5"><PlatformIcon platform={platform} className="size-4" /></a>;
+}
+
+function TextField({ label, placeholder, value, onChange, type = "text" }: { label: string; placeholder: string; value: string; onChange: (value: string) => void; type?: string }) {
+    return <label className="block space-y-1.5 text-xs font-bold text-slate-700 dark:text-zinc-300"><span>{label}</span><input type={type} required value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} className={inputClass} /></label>;
 }
