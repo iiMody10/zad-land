@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class UploadController extends Controller
@@ -12,7 +11,12 @@ class UploadController extends Controller
     public function store(Request $request)
     {
         $folder = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $request->input('folder', 'general')) ?: 'general';
-        $user = Auth::guard('web')->user();
+        // Use the same authenticated user resolved by auth:sanctum. Looking up
+        // the web guard directly can be null for valid Sanctum admin sessions.
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
         $permission = match ($folder) {
             'products' => 'can_manage_products', 'brands' => 'can_manage_brands',
             'categories', 'main-categories' => 'can_manage_categories', 'banners' => 'can_manage_banners',

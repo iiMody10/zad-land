@@ -60,7 +60,8 @@ export default function ImageUploadField({
                 onChange(data.url);
                 toast.success(isArabic ? "تم رفع الصورة بنجاح" : "Image uploaded successfully");
             } else {
-                toast.error(data.error || (isArabic ? "فشل رفع الصورة" : "Failed to upload image"));
+                const validationError = data.errors?.file?.[0] || data.message;
+                toast.error(data.error || validationError || (isArabic ? "فشل رفع الصورة" : "Failed to upload image"));
             }
         } catch (error) {
             console.error("Upload error:", error);
