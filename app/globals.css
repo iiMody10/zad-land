@@ -2,10 +2,6 @@
 
 @plugin "tailwindcss-animate";
 
-@view-transition {
-  navigation: auto;
-}
-
 @custom-variant dark (&:where(.dark, .dark *));
 @variant dark (&:where(.dark, .dark *));
 @variant ltr (&:where([dir="ltr"], [dir="ltr"] *));
