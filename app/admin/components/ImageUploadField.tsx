@@ -55,13 +55,22 @@ export default function ImageUploadField({
                 body: formData,
             });
 
-            const data = await res.json();
+            const responseText = await res.text();
+            let data: { url?: string; error?: string; message?: string; errors?: { file?: string[] } } = {};
+            try {
+                data = JSON.parse(responseText);
+            } catch {
+                // Laravel or the proxy may return an HTML error page. Keep the
+                // status visible instead of replacing it with a JSON parse error.
+            }
             if (res.ok && data.url) {
                 onChange(data.url);
                 toast.success(isArabic ? "تم رفع الصورة بنجاح" : "Image uploaded successfully");
             } else {
                 const validationError = data.errors?.file?.[0] || data.message;
-                toast.error(data.error || validationError || (isArabic ? "فشل رفع الصورة" : "Failed to upload image"));
+                toast.error(data.error || validationError || (res.status >= 500
+                    ? (isArabic ? `خطأ في الخادم أثناء رفع الصورة (${res.status})` : `Server error while uploading image (${res.status})`)
+                    : (isArabic ? `فشل رفع الصورة (${res.status})` : `Image upload failed (${res.status})`)));
             }
         } catch (error) {
             console.error("Upload error:", error);
