@@ -4,9 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/app/context/LanguageContext';
 import { ShoppingBag as MdShoppingBag } from 'lucide-react';
+import { useBusinessContact } from '@/app/context/BusinessContactContext';
 
 const OrderSupportFooter = () => {
     const { t } = useLanguage();
+    const { whatsappUrl } = useBusinessContact();
 
     return (
         <>
@@ -24,7 +26,7 @@ const OrderSupportFooter = () => {
                     {t('checkout.needAssistance')}{' '}
                     <a
                         className="text-[var(--color-brand)] dark:text-[var(--color-accent)] font-bold hover:underline"
-                        href="https://wa.me/963933254796"
+                        href={whatsappUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                     >

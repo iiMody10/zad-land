@@ -10,6 +10,7 @@ import { getConfiguredHeaderNavItems, selectHeaderNavigationItems } from "@/lib/
 
 import React, { Suspense } from "react";
 import NavigationProgressBar from "../components/NavigationProgressBar";
+import { BusinessContactProvider, toWhatsAppUrl } from "@/app/context/BusinessContactContext";
 
 export default async function SiteLayout({
     children,
@@ -43,9 +44,16 @@ export default async function SiteLayout({
             />
 
             {/* Main Content */}
-            <main className="flex-1 pb-24 md:pb-0">
-                {children}
-            </main>
+            <BusinessContactProvider
+                whatsappNumber={siteSettings?.footerPhone || "+963 933 254 796"}
+                whatsappUrl={siteSettings?.footerWhatsappUrl && siteSettings.footerWhatsappUrl !== "#"
+                    ? siteSettings.footerWhatsappUrl
+                    : toWhatsAppUrl(siteSettings?.footerPhone || "+963 933 254 796")}
+            >
+                <main className="flex-1 pb-24 md:pb-0">
+                    {children}
+                </main>
+            </BusinessContactProvider>
 
             {/* Footer */}
             <Footer t={t} language={language} />

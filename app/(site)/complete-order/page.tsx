@@ -14,6 +14,7 @@ import OrderShippingAndPayment from "@/app/components/CompleteOrderComponents/Or
 import OrderItemsSelection from "@/app/components/CompleteOrderComponents/OrderItemsSelection";
 import OrderSupportFooter from "@/app/components/CompleteOrderComponents/OrderSupportFooter";
 import { buildWhatsAppOrderUrl, type WhatsAppOrder } from "@/lib/order-whatsapp";
+import { useBusinessContact } from "@/app/context/BusinessContactContext";
 
 type Order = WhatsAppOrder & { createdAt: string; whatsappNumber?: string };
 
@@ -22,6 +23,7 @@ function CompleteOrderContent() {
     const router = useRouter();
     const { language } = useLanguage();
     const { formatPrice } = useCurrency();
+    const { whatsappNumber } = useBusinessContact();
     const orderId = searchParams.get("id");
     const token = searchParams.get("token");
     const [order, setOrder] = useState<Order | null>(null);
@@ -53,7 +55,7 @@ function CompleteOrderContent() {
     if (loading) return <div className="flex min-h-[60vh] items-center justify-center"><MdRefresh className="animate-spin text-4xl text-[var(--color-brand)]" /></div>;
     if (!order) return null;
 
-    const whatsappUrl = buildWhatsAppOrderUrl(order.whatsappNumber || "+963933254796", order, formatPrice);
+    const whatsappUrl = buildWhatsAppOrderUrl(order.whatsappNumber || whatsappNumber, order, formatPrice);
     return <main className="mx-auto flex w-full max-w-4xl flex-col items-center px-4 py-8 md:py-16">
         <OrderSuccessHeader />
 

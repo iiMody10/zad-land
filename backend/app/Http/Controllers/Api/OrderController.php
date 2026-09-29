@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\PromoCode;
+use App\Models\Settings;
 use App\Support\ApiJson;
 use App\Support\MerchantPhone;
 use Illuminate\Database\QueryException;
@@ -237,7 +238,7 @@ class OrderController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        return response()->json([...ApiJson::camel($order), 'whatsappNumber' => config('services.zad.whatsapp', '+963933254796')])->header('Cache-Control', 'private, no-store');
+        return response()->json([...ApiJson::camel($order), 'whatsappNumber' => $this->whatsappNumber()])->header('Cache-Control', 'private, no-store');
     }
 
     public function updateStatus(Request $request, string $id)
@@ -329,7 +330,7 @@ class OrderController extends Controller
     {
         $token = $this->signOrderToken($order->id);
 
-        return response()->json([...ApiJson::camel($order), 'orderToken' => $token, 'whatsappNumber' => config('services.zad.whatsapp', '+963933254796')], $status)
+        return response()->json([...ApiJson::camel($order), 'orderToken' => $token, 'whatsappNumber' => $this->whatsappNumber()], $status)
             ->header('Cache-Control', 'private, no-store')
             ->cookie(cookie('zad_order_'.$order->id, $token, 10080, '/', null, request()->isSecure(), true, false, 'lax'));
     }
@@ -341,6 +342,14 @@ class OrderController extends Controller
         }
 
         return $this->createdResponse($order, 200);
+    }
+
+    private function whatsappNumber(): string
+    {
+        $phone = Settings::query()->value('footer_phone');
+        $phone = is_string($phone) ? preg_replace('/[^0-9+]/', '', $phone) : '';
+
+        return $phone ?: '+963933254796';
     }
 
     private function signOrderToken(string $id): string

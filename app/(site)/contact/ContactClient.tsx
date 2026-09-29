@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import PlatformIcon from '@/app/components/PlatformIcon';
 import { Phone as LuPhone, Mail as LuMail, MapPin as LuMapPin, Clock as LuClock, Send as LuSend, CircleCheck as IoCheckmarkCircle } from 'lucide-react';
 import type { ContactPageContent } from '@/lib/contact-page-content';
+import { useBusinessContact } from '@/app/context/BusinessContactContext';
 
 interface ContactClientProps {
     language: 'ar' | 'en';
@@ -18,6 +19,7 @@ interface ContactClientProps {
 }
 
 export default function ContactClient({ language, dir, content, settings }: ContactClientProps) {
+    const { whatsappUrl } = useBusinessContact();
     const isAr = language === 'ar';
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -33,11 +35,8 @@ export default function ContactClient({ language, dir, content, settings }: Cont
         }, 600);
     };
 
-    const whatsappUrl = content.contactWhatsappUrl || (settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#'
-        ? settings.footerWhatsappUrl
-        : 'https://wa.me/');
-    const facebookUrl = content.contactFacebookUrl || settings?.footerFacebookUrl;
-    const instagramUrl = content.contactInstagramUrl || settings?.footerInstagramUrl;
+    const facebookUrl = settings?.footerFacebookUrl;
+    const instagramUrl = settings?.footerInstagramUrl;
     const showFacebook = content.facebookEnabled && Boolean(facebookUrl && facebookUrl !== '#');
     const showInstagram = content.instagramEnabled && Boolean(instagramUrl && instagramUrl !== '#');
 

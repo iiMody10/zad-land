@@ -6,6 +6,7 @@ import { ChevronRight as MdChevronRight } from 'lucide-react';
 import { useLanguage } from "@/app/context/LanguageContext";
 import CategoriesGrid from "./CategoriesGrid";
 import { getSafeImageUrl } from '@/lib/image-utils';
+import { useBusinessContact } from '@/app/context/BusinessContactContext';
 
 interface Category {
     id: string;
@@ -22,6 +23,7 @@ interface CategoriesContentProps {
 
 export default function CategoriesContent({ categories, siteSettings }: CategoriesContentProps) {
     const { t, language } = useLanguage();
+    const { whatsappUrl } = useBusinessContact();
 
     const ctaTitle = language === 'ar'
         ? (siteSettings?.categoriesCtaTitleAr || t('categoriesPage.cantDecide'))
@@ -63,7 +65,7 @@ export default function CategoriesContent({ categories, siteSettings }: Categori
                         <p className="text-text-muted-light dark:text-text-muted-dark max-w-md">{ctaDesc}</p>
                         <div className="flex flex-wrap gap-4 mt-2 justify-center md:justify-start">
                             <Link href="/products" className="px-8 py-3 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full font-bold text-sm hover:bg-black dark:hover:bg-gray-200 transition-all">{t('categoriesPage.viewAllProducts')}</Link>
-                            <Link target="_blank" href="https://wa.me/963933254796" className="px-8 py-3 bg-transparent border border-zinc-900 dark:border-white text-zinc-900 dark:text-white rounded-full font-bold text-sm hover:bg-black/5 dark:hover:bg-white/10 transition-all">{t('footer.contactUs')}</Link>
+                            <a target="_blank" rel="noopener noreferrer" href={whatsappUrl} className="px-8 py-3 bg-transparent border border-zinc-900 dark:border-white text-zinc-900 dark:text-white rounded-full font-bold text-sm hover:bg-black/5 dark:hover:bg-white/10 transition-all">{t('footer.contactUs')}</a>
                         </div>
                     </div>
                     <div className="hidden lg:block w-1/3">

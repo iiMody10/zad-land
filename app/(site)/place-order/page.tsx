@@ -15,12 +15,14 @@ import OrderSummary from "@/app/components/PlaceOrderComponents/OrderSummary";
 import { validatePromoCode } from "@/lib/admin-actions";
 import { buildWhatsAppOrderUrl, type WhatsAppOrder } from "@/lib/order-whatsapp";
 import { findGovernorate, normalizeSyrianPhone, validateOrderForm, type OrderFormData, type OrderFormErrors } from "@/lib/order-validation";
+import { useBusinessContact } from "@/app/context/BusinessContactContext";
 
 const emptyForm: OrderFormData = { shopName: "", ownerName: "", phone: "", streetAddress: "", city: "", notes: "" };
 
 export default function PlaceOrderPage() {
     const { items, subtotal, clearCart, isHydrated } = useCart();
     const { language } = useLanguage();
+    const { whatsappNumber } = useBusinessContact();
     const { formatPrice } = useCurrency();
     const router = useRouter();
     const [formData, setFormData] = useState<OrderFormData>(emptyForm);
@@ -120,7 +122,7 @@ export default function PlaceOrderPage() {
 
             setIsSuccess(true);
             toast.success(language === "ar" ? "تم تسجيل الطلب بنجاح" : "Order placed successfully");
-            const whatsappUrl = buildWhatsAppOrderUrl(data.whatsappNumber || "+963933254796", data as WhatsAppOrder, formatPrice);
+            const whatsappUrl = buildWhatsAppOrderUrl(data.whatsappNumber || whatsappNumber, data as WhatsAppOrder, formatPrice);
             try { window.open(whatsappUrl, "_blank", "noopener,noreferrer"); } catch { /* The confirmation page provides the same link. */ }
             clearCart();
             const token = data.orderToken ? `&token=${encodeURIComponent(data.orderToken)}` : "";

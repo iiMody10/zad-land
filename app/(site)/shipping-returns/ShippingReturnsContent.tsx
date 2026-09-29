@@ -4,6 +4,7 @@ import React from "react";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { Truck as MdLocalShipping, RotateCcw as MdAssignmentReturn, ShieldCheck as MdVerifiedUser, CircleCheck as MdCheckCircle, LockKeyhole as MdLock } from 'lucide-react';
 import ResilientImage from "@/app/components/ResilientImage";
+import { useBusinessContact } from "@/app/context/BusinessContactContext";
 
 interface ShippingReturnsContentProps {
     siteSettings: any | null;
@@ -11,6 +12,7 @@ interface ShippingReturnsContentProps {
 
 export default function ShippingReturnsContent({ siteSettings }: ShippingReturnsContentProps) {
     const { t, dir, language } = useLanguage();
+    const { whatsappUrl } = useBusinessContact();
 
     const getTranslatedArray = (key: string): string[] => {
         const content = t(key);
@@ -173,7 +175,7 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
                                         {t('shippingReturnsPage.support.description')}
                                     </p>
                                 </div>
-                                <a className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full text-center text-sm font-bold transition-all" target="_blank" href="https://wa.me/963933254796">
+                                <a className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full text-center text-sm font-bold transition-all" target="_blank" rel="noopener noreferrer" href={whatsappUrl}>
                                     {t('shippingReturnsPage.support.cta')}
                                 </a>
                             </div>

@@ -2,9 +2,18 @@ import React from 'react';
 import { Mail as MdEmail, Tag as MdLocalOffer, Star as MdStar } from 'lucide-react';
 import PlatformIcon from '@/app/components/PlatformIcon';
 import { getI18n } from '@/lib/i18n';
+import { getSiteSettings } from '@/lib/admin-actions';
 
 const FooterInfoBar = async () => {
-    const { t } = await getI18n();
+    const [{ t }, settings] = await Promise.all([getI18n(), getSiteSettings()]);
+    const instagramHandle = (() => {
+        try {
+            const path = new URL(settings?.footerInstagramUrl || '').pathname.split('/').filter(Boolean)[0];
+            return path ? `@${path.replace(/^@/, '')}` : '';
+        } catch {
+            return '';
+        }
+    })();
 
     const items = [
         {
@@ -20,7 +29,7 @@ const FooterInfoBar = async () => {
         {
             icon: <PlatformIcon platform="instagram" className="size-5" />,
             title: t('home.footerInfoInstagram'),
-            subtitle: t('home.footerInfoInstagramDesc'),
+            subtitle: instagramHandle || t('home.footerInfoInstagramDesc'),
         },
         {
             icon: <MdEmail />,

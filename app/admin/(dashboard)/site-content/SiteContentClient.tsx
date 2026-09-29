@@ -11,6 +11,7 @@ import FooterContentSection from "./FooterContentSection";
 import HeaderNavigationSection from "./HeaderNavigationSection";
 import AboutContentSection, { type AboutSettingsForm } from "./AboutContentSection";
 import ContactContentSection from "./ContactContentSection";
+import BusinessContactSection from "./BusinessContactSection";
 import type { HeaderNavItemRef } from "@/lib/header-navigation";
 import { parseContactPageContent, type ContactPageContent } from "@/lib/contact-page-content";
 
@@ -185,7 +186,7 @@ interface SiteSettings {
     featuredCollectionAllProductsUrl: string | null;
 }
 
-type TabType = "currency" | "navigation" | "footer" | "banners" | "shipping" | "about" | "contact" | "featured";
+type TabType = "currency" | "navigation" | "business" | "footer" | "banners" | "shipping" | "about" | "contact" | "featured";
 
 export default function SiteContentClient({ 
     initialSettings,
@@ -198,7 +199,7 @@ export default function SiteContentClient({
     mainCategories: Array<FooterCategoryOption & { nameEn?: string }>;
     initialHeaderNavItems: HeaderNavItemRef[];
 }) {
-    const { t, dir } = useLanguage();
+    const { t, dir, language } = useLanguage();
     const { openSidebar } = useAdminSidebar();
     const [activeTab, setActiveTab] = useState<TabType>("currency");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -422,7 +423,8 @@ export default function SiteContentClient({
     const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
         { id: "currency", label: t('admin.tabCurrency') || "Currency & Rates", icon: <MdCurrencyExchange className="text-lg" /> },
         { id: "navigation", label: t('admin.tabNavigation') || "Header Navigation", icon: <ListOrdered className="text-lg" /> },
-        { id: "footer", label: t('admin.tabFooter') || "Footer & Social", icon: <MdStorefront className="text-lg" /> },
+        { id: "business", label: language === "ar" ? "بيانات التواصل العامة" : "Global Contact Details", icon: <MdStorefront className="text-lg" /> },
+        { id: "footer", label: t('admin.tabFooter') || "Footer", icon: <MdStorefront className="text-lg" /> },
         { id: "banners", label: t('admin.tabBanners') || "Promo Banners", icon: <MdViewCarousel className="text-lg" /> },
         { id: "featured", label: t('admin.tabFeaturedCollection') || "Featured Collection", icon: <MdViewCarousel className="text-lg" /> },
         { id: "shipping", label: t('admin.tabShipping') || "Shipping & Policy", icon: <MdLocalShipping className="text-lg" /> },
@@ -520,6 +522,19 @@ export default function SiteContentClient({
                             items={headerNavItems}
                             mainCategories={mainCategories}
                             onChange={setHeaderNavItems}
+                        />
+                    )}
+
+                    {activeTab === "business" && (
+                        <BusinessContactSection
+                            value={{
+                                footerPhone: footerContent.footerPhone,
+                                footerEmail: footerContent.footerEmail,
+                                footerWhatsappUrl: footerContent.footerWhatsappUrl,
+                                footerFacebookUrl: footerContent.footerFacebookUrl,
+                                footerInstagramUrl: footerContent.footerInstagramUrl,
+                            }}
+                            onChange={handleFooterFieldChange}
                         />
                     )}
 

@@ -279,15 +279,13 @@ export default function FooterContentSection({
             <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)] md:p-8">
                 <SectionTitle
                     title="معلومات التواصل"
-                    description="حرر عنوان القسم والعنوان ورقم الهاتف والبريد الإلكتروني ونص رابط واتساب بالعربية والإنجليزية. اترك أي قيمة فارغة لإخفائها من التذييل."
+                    description="حرر عناوين قسم التواصل والعنوان ونص رابط واتساب. تُدار أرقام الهاتف والبريد والروابط الاجتماعية مرة واحدة من تبويب بيانات التواصل العامة."
                 />
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                     <div className="space-y-4">
                         <span className="inline-block rounded-md bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">🇬🇧 English</span>
                         <TextField label="Section heading" value={footerContent.footerContactTitle} onChange={(value) => onFieldChange('footerContactTitle', value)} />
                         <TextField label="Address" value={footerContent.footerAddress} onChange={(value) => onFieldChange('footerAddress', value)} />
-                        <TextField label="Phone number" value={footerContent.footerPhone} onChange={(value) => onFieldChange('footerPhone', value)} placeholder="+963 933 254 796" />
-                        <TextField label="Email address" value={footerContent.footerEmail} onChange={(value) => onFieldChange('footerEmail', value)} placeholder="info@example.com" />
                         <TextField label="WhatsApp link text" value={footerContent.footerWhatsappLabel} onChange={(value) => onFieldChange('footerWhatsappLabel', value)} />
                     </div>
                     <div dir="rtl" className="space-y-4">
@@ -295,53 +293,6 @@ export default function FooterContentSection({
                         <TextField label="عنوان القسم" value={footerContent.footerContactTitleAr} onChange={(value) => onFieldChange('footerContactTitleAr', value)} />
                         <TextField label="العنوان" value={footerContent.footerAddressAr} onChange={(value) => onFieldChange('footerAddressAr', value)} />
                         <TextField label="نص رابط واتساب" value={footerContent.footerWhatsappLabelAr} onChange={(value) => onFieldChange('footerWhatsappLabelAr', value)} />
-                    </div>
-                </div>
-            </div>
-
-            {/* Social Links Section */}
-            <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[var(--color-surface-dark)] p-6 md:p-8 shadow-xs">
-                <SectionTitle
-                    title={t('admin.socialLinks') || 'Social Media Links'}
-                    description={t('admin.socialLinksDescription') || 'Configure links to your official social profiles.'}
-                />
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-gray-800/40 p-4">
-                        <div className="mb-2.5 flex items-center gap-2 text-slate-800 dark:text-white">
-                            <PlatformIcon platform="instagram" className="size-5 text-pink-600" />
-                            <span className="text-xs font-bold uppercase">Instagram</span>
-                        </div>
-                        <TextField
-                            label={t('admin.linkUrl') || 'Profile URL'}
-                            value={footerContent.footerInstagramUrl}
-                            onChange={(value) => onFieldChange('footerInstagramUrl', value)}
-                            placeholder="https://instagram.com/zadland"
-                        />
-                    </div>
-                    <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-gray-800/40 p-4">
-                        <div className="mb-2.5 flex items-center gap-2 text-slate-800 dark:text-white">
-                            <PlatformIcon platform="facebook" className="size-5 text-blue-600" />
-                            <span className="text-xs font-bold uppercase">Facebook</span>
-                        </div>
-                        <TextField
-                            label={t('admin.linkUrl') || 'Page URL'}
-                            value={footerContent.footerFacebookUrl}
-                            onChange={(value) => onFieldChange('footerFacebookUrl', value)}
-                            placeholder="https://facebook.com/zadland"
-                        />
-                    </div>
-                    <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-gray-800/40 p-4">
-                        <div className="mb-2.5 flex items-center gap-2 text-slate-800 dark:text-white">
-                            <PlatformIcon platform="whatsapp" className="size-5 text-emerald-600" />
-                            <span className="text-xs font-bold uppercase">WhatsApp</span>
-                        </div>
-                        <TextField
-                            label={t('admin.linkUrl') || 'WhatsApp URL'}
-                            value={footerContent.footerWhatsappUrl}
-                            onChange={(value) => onFieldChange('footerWhatsappUrl', value)}
-                            placeholder="https://wa.me/9639..."
-                        />
                     </div>
                 </div>
             </div>

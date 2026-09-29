@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/app/context/LanguageContext';
 import PriceText from '@/app/components/PriceText';
 import { ArrowRight as MdArrowForward } from 'lucide-react';
+import { useBusinessContact } from '@/app/context/BusinessContactContext';
 
 interface CartSummaryProps {
     subtotal: number;
@@ -12,6 +13,7 @@ interface CartSummaryProps {
 
 const CartSummary = ({ subtotal }: CartSummaryProps) => {
     const { t, dir, language } = useLanguage();
+    const { whatsappUrl } = useBusinessContact();
 
     return (
         <div className="sticky top-[150px] space-y-4">
@@ -42,7 +44,7 @@ const CartSummary = ({ subtotal }: CartSummaryProps) => {
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('footer.contactUs')}</p>
                 <a 
                     className="text-xs font-bold text-[var(--color-brand)] dark:text-[var(--color-accent)] mt-1 inline-block hover:underline"
-                    href="https://wa.me/963933254796"
+                    href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                 >

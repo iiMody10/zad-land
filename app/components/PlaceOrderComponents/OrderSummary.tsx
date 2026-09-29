@@ -7,6 +7,7 @@ import PriceText from '@/app/components/PriceText';
 import { CreditCard as MdPayments, Headset as MdSupportAgent } from 'lucide-react';
 import { getSafeImageUrl } from '@/lib/image-utils';
 import { formatPackageQuantity } from '@/lib/packaging';
+import { useBusinessContact } from '@/app/context/BusinessContactContext';
 
 interface OrderSummaryProps {
     items: CartItem[];
@@ -18,6 +19,7 @@ interface OrderSummaryProps {
 
 const OrderSummary = ({ items, subtotal, total, discount = 0, onApplyPromo }: OrderSummaryProps) => {
     const { t, language } = useLanguage();
+    const { whatsappUrl } = useBusinessContact();
     const [promoCode, setPromoCode] = React.useState("");
     const [promoMessage, setPromoMessage] = React.useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [isApplyingPromo, setIsApplyingPromo] = React.useState(false);
@@ -163,7 +165,7 @@ const OrderSummary = ({ items, subtotal, total, discount = 0, onApplyPromo }: Or
                     <p className="text-xs font-bold text-zinc-900 dark:text-white mb-0.5">{t('checkout.needAssistance')}</p>
                     <a
                         className="text-xs font-semibold text-gray-500 hover:text-[var(--color-accent)] dark:hover:text-[var(--color-accent)] transition-colors hover:underline"
-                        href="https://wa.me/963933254796"
+                        href={whatsappUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                     >

@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\PromoCode;
+use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -128,11 +129,13 @@ class OrderApiTest extends TestCase
     public function test_guest_order_token_and_cookie_preserve_confirmation_page_access(): void
     {
         $product = $this->product();
+        Settings::firstOrCreate(['id' => 'site-settings'])->update(['footer_phone' => '+963 911 222 333']);
         $created = $this->postJson('/api/orders', [
             'shopName' => 'Guest Store', 'ownerName' => 'Guest Owner', 'phone' => '0912345678',
             'city' => 'حمص', 'streetAddress' => 'Main street 12', 'idempotencyKey' => 'guest-order-key-0001',
             'items' => [['productId' => $product->id, 'quantity' => 2]],
-        ])->assertCreated()->assertJsonStructure(['id', 'orderToken', 'whatsappNumber', 'items']);
+        ])->assertCreated()->assertJsonStructure(['id', 'orderToken', 'whatsappNumber', 'items'])
+            ->assertJsonPath('whatsappNumber', '+963911222333');
 
         $orderId = $created->json('id');
         $token = $created->json('orderToken');
