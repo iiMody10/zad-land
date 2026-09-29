@@ -33,9 +33,13 @@ export default function ContactClient({ language, dir, content, settings }: Cont
         }, 600);
     };
 
-    const whatsappUrl = settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#'
+    const whatsappUrl = content.contactWhatsappUrl || (settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#'
         ? settings.footerWhatsappUrl
-        : 'https://wa.me/';
+        : 'https://wa.me/');
+    const facebookUrl = content.contactFacebookUrl || settings?.footerFacebookUrl;
+    const instagramUrl = content.contactInstagramUrl || settings?.footerInstagramUrl;
+    const showFacebook = content.facebookEnabled && Boolean(facebookUrl && facebookUrl !== '#');
+    const showInstagram = content.instagramEnabled && Boolean(instagramUrl && instagramUrl !== '#');
 
     return (
         <div className="min-h-screen bg-[var(--color-canvas)] py-8 dark:bg-[#141410] md:py-14" dir={dir}>
@@ -50,7 +54,7 @@ export default function ContactClient({ language, dir, content, settings }: Cont
                 </header>}
 
                 <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-                    {(content.whatsappEnabled || content.contactInfoEnabled || content.socialEnabled) && <aside className="space-y-4 lg:col-span-5">
+                    {(content.whatsappEnabled || content.contactInfoEnabled || (content.socialEnabled && (showFacebook || showInstagram))) && <aside className="space-y-4 lg:col-span-5">
                         {content.whatsappEnabled && <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="group block rounded-2xl bg-emerald-600 p-6 text-white shadow-sm transition-all duration-300 hover:bg-emerald-700 hover:shadow-md">
                             <div className="flex items-center gap-4">
                                 <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-white/20 text-3xl transition-transform group-hover:scale-110"><PlatformIcon platform="whatsapp" className="size-7" /></div>
@@ -64,11 +68,11 @@ export default function ContactClient({ language, dir, content, settings }: Cont
                             {content.emailEnabled && <InfoItem icon={<LuMail />} title={copy('emailTitle')} primary={settings?.footerEmail || ''} />}
                         </div>}
 
-                        {content.socialEnabled && <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                        {content.socialEnabled && (showFacebook || showInstagram) && <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
                             <span className="text-xs font-bold text-slate-600 dark:text-zinc-400">{copy('socialTitle')}</span>
                             <div className="flex items-center gap-3">
-                                {settings?.footerFacebookUrl && <SocialLink href={settings.footerFacebookUrl} platform="facebook" label="Facebook" />}
-                                {settings?.footerInstagramUrl && <SocialLink href={settings.footerInstagramUrl} platform="instagram" label="Instagram" />}
+                                {showFacebook && facebookUrl && <SocialLink href={facebookUrl} platform="facebook" label="Facebook" />}
+                                {showInstagram && instagramUrl && <SocialLink href={instagramUrl} platform="instagram" label="Instagram" />}
                             </div>
                         </div>}
                     </aside>}

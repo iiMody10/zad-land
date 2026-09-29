@@ -7,7 +7,12 @@ export interface ContactPageContent {
     hoursEnabled: boolean;
     emailEnabled: boolean;
     socialEnabled: boolean;
+    facebookEnabled: boolean;
+    instagramEnabled: boolean;
     formEnabled: boolean;
+    contactWhatsappUrl: string;
+    contactFacebookUrl: string;
+    contactInstagramUrl: string;
     heroBadgeAr: string;
     heroBadgeEn: string;
     heroTitleAr: string;
@@ -77,7 +82,12 @@ export const DEFAULT_CONTACT_PAGE_CONTENT: ContactPageContent = {
     hoursEnabled: true,
     emailEnabled: true,
     socialEnabled: true,
+    facebookEnabled: true,
+    instagramEnabled: true,
     formEnabled: true,
+    contactWhatsappUrl: '',
+    contactFacebookUrl: '',
+    contactInstagramUrl: '',
     heroBadgeAr: 'خدمة عملاء وتوريد الجملة',
     heroBadgeEn: 'Wholesale Support & Sales',
     heroTitleAr: 'تواصل معنا - شركة زاد لاند',

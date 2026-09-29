@@ -4,7 +4,7 @@ import { useLanguage } from "@/app/context/LanguageContext";
 import type { ContactPageContent } from "@/lib/contact-page-content";
 import { MessageCircle, Phone } from "lucide-react";
 
-type TextKey = Exclude<keyof ContactPageContent, "pageEnabled" | "heroEnabled" | "whatsappEnabled" | "contactInfoEnabled" | "addressEnabled" | "hoursEnabled" | "emailEnabled" | "socialEnabled" | "formEnabled">;
+type TextKey = Exclude<keyof ContactPageContent, "pageEnabled" | "heroEnabled" | "whatsappEnabled" | "contactInfoEnabled" | "addressEnabled" | "hoursEnabled" | "emailEnabled" | "socialEnabled" | "facebookEnabled" | "instagramEnabled" | "formEnabled">;
 
 const fields: Array<{ title: string; keys: TextKey[]; multiline?: boolean }> = [
     { title: "Badge", keys: ["heroBadgeEn", "heroBadgeAr"] },
@@ -47,6 +47,8 @@ const visibility: Array<{ key: keyof ContactPageContent; ar: string; en: string 
     { key: "hoursEnabled", ar: "أوقات العمل", en: "Working hours" },
     { key: "emailEnabled", ar: "البريد الإلكتروني", en: "Email" },
     { key: "socialEnabled", ar: "روابط التواصل الاجتماعي", en: "Social links" },
+    { key: "facebookEnabled", ar: "زر فيسبوك", en: "Facebook button" },
+    { key: "instagramEnabled", ar: "زر إنستغرام", en: "Instagram button" },
     { key: "formEnabled", ar: "نموذج الرسالة", en: "Message form" },
 ];
 
@@ -62,12 +64,15 @@ export default function ContactContentSection({ value, onChange, email, whatsapp
     const isArabic = language === "ar";
     const tx = (ar: string, en: string) => isArabic ? ar : en;
     const text = (key: TextKey) => value[key];
+    const previewWhatsappUrl = value.contactWhatsappUrl || whatsappUrl;
+    const previewFacebookUrl = value.contactFacebookUrl || facebookUrl;
+    const previewInstagramUrl = value.contactInstagramUrl || instagramUrl;
 
     return (
         <div className="space-y-6" dir={isArabic ? "rtl" : "ltr"}>
             <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-950 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-100">
                 <Phone className="mt-0.5 size-5 shrink-0" />
-                <p className="text-sm leading-6">{tx("حرر نصوص صفحة التواصل بالعربية والإنجليزية، وتحكم في ظهور أقسامها. روابط واتساب وفيسبوك وإنستغرام والبريد تُدار من إعدادات الفوتر.", "Edit the contact page copy in Arabic and English and control section visibility. WhatsApp, Facebook, Instagram and footer email details are managed in the Footer tab.")}</p>
+                <p className="text-sm leading-6">{tx("حرر نصوص صفحة التواصل وروابط واتساب وفيسبوك وإنستغرام، وتحكم في ظهور كل قسم وزر. يمكن استخدام روابط الفوتر العامة بترك رابط الصفحة فارغاً.", "Edit the contact page copy and its WhatsApp, Facebook and Instagram URLs, and control the visibility of each section and button. Leave a page URL blank to use the shared Footer URL.")}</p>
             </div>
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[var(--color-surface-dark)] md:p-7">
@@ -79,6 +84,18 @@ export default function ContactContentSection({ value, onChange, email, whatsapp
                             <input type="checkbox" checked={value[key] !== false} onChange={(event) => onChange(key, event.target.checked)} className="size-4 accent-[var(--color-brand)]" />
                         </label>
                     ))}
+                </div>
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[var(--color-surface-dark)] md:p-7">
+                <h3 className="mb-1 text-lg font-extrabold text-slate-900 dark:text-white">{tx("روابط واتساب وأزرار التواصل", "WhatsApp and social buttons")}</h3>
+                <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">{tx("اترك الرابط فارغاً لاستخدام رابط الفوتر العام. روابط هذه الصفحة يمكن أن تختلف عن روابط الفوتر.", "Leave a URL blank to use the shared Footer URL. These contact page links can also differ from the Footer links.")}</p>
+                <div className="grid gap-4 md:grid-cols-3">
+                    {([
+                        ["contactWhatsappUrl", tx("رابط واتساب", "WhatsApp URL")],
+                        ["contactFacebookUrl", tx("رابط فيسبوك", "Facebook URL")],
+                        ["contactInstagramUrl", tx("رابط إنستغرام", "Instagram URL")],
+                    ] as const).map(([key, label]) => <label key={key} className="text-xs font-bold text-slate-500 dark:text-slate-300">{label}<input value={value[key]} onChange={(event) => onChange(key, event.target.value)} className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-[var(--color-brand)] dark:border-white/10 dark:bg-gray-800 dark:text-white" dir="ltr" placeholder="https://" /></label>)}
                 </div>
             </section>
 
@@ -106,7 +123,7 @@ export default function ContactContentSection({ value, onChange, email, whatsapp
                     <div className="rounded-xl bg-white/10 p-4"><strong>{text(isArabic ? "formTitleAr" : "formTitleEn")}</strong><p className="mt-1 text-sm text-white/75">{text(isArabic ? "submitLabelAr" : "submitLabelEn")}</p></div>
                     <div className="rounded-xl bg-white/10 p-4"><strong>{text(isArabic ? "addressTitleAr" : "addressTitleEn")}</strong><p className="mt-1 text-sm text-white/75">{text(isArabic ? "addressLineAr" : "addressLineEn")}</p></div>
                 </div>
-                <p className="mt-4 text-xs text-white/60">{tx(`البريد: ${email || "—"} · واتساب: ${whatsappUrl || "—"} · فيسبوك: ${facebookUrl ? "✓" : "—"} · إنستغرام: ${instagramUrl ? "✓" : "—"}`, `Email: ${email || "—"} · WhatsApp: ${whatsappUrl || "—"} · Facebook: ${facebookUrl ? "✓" : "—"} · Instagram: ${instagramUrl ? "✓" : "—"}`)}</p>
+                <p className="mt-4 text-xs text-white/60">{tx(`البريد: ${email || "—"} · واتساب: ${previewWhatsappUrl || "—"} · فيسبوك: ${previewFacebookUrl ? "✓" : "—"} · إنستغرام: ${previewInstagramUrl ? "✓" : "—"}`, `Email: ${email || "—"} · WhatsApp: ${previewWhatsappUrl || "—"} · Facebook: ${previewFacebookUrl ? "✓" : "—"} · Instagram: ${previewInstagramUrl ? "✓" : "—"}`)}</p>
             </section>
         </div>
     );
