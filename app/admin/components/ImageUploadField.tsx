@@ -1,6 +1,6 @@
 "use client";
 
-import { laravelClientFetch } from "@/lib/laravel-client";
+import { ImageUploadError, uploadImageFile } from "@/lib/image-upload-client";
 
 import { useState, useRef } from "react";
 import { CloudUpload as MdCloudUpload, Link as MdLink, RefreshCw as MdSync } from 'lucide-react';
@@ -45,36 +45,22 @@ export default function ImageUploadField({
         }
 
         setIsUploading(true);
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("folder", folder);
-
         try {
-            const res = await laravelClientFetch("/api/upload", {
-                method: "POST",
-                body: formData,
-            });
-
-            const responseText = await res.text();
-            let data: { url?: string; error?: string; message?: string; errors?: { file?: string[] } } = {};
-            try {
-                data = JSON.parse(responseText);
-            } catch {
-                // Laravel or the proxy may return an HTML error page. Keep the
-                // status visible instead of replacing it with a JSON parse error.
-            }
-            if (res.ok && data.url) {
-                onChange(data.url);
+            const url = await uploadImageFile(file, folder);
+            if (url) {
+                onChange(url);
                 toast.success(isArabic ? "تم رفع الصورة بنجاح" : "Image uploaded successfully");
-            } else {
-                const validationError = data.errors?.file?.[0] || data.message;
-                toast.error(data.error || validationError || (res.status >= 500
-                    ? (isArabic ? `خطأ في الخادم أثناء رفع الصورة (${res.status})` : `Server error while uploading image (${res.status})`)
-                    : (isArabic ? `فشل رفع الصورة (${res.status})` : `Image upload failed (${res.status})`)));
             }
         } catch (error) {
             console.error("Upload error:", error);
-            toast.error(isArabic ? "حدث خطأ أثناء رفع الصورة" : "An error occurred during upload");
+            if (error instanceof ImageUploadError) {
+                const message = error.status && error.status >= 500
+                    ? (isArabic ? `خطأ في الخادم أثناء رفع الصورة (${error.status})` : `Server error while uploading image (${error.status})`)
+                    : error.message;
+                toast.error(message);
+            } else {
+                toast.error(isArabic ? "حدث خطأ أثناء رفع الصورة" : "An error occurred during upload");
+            }
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) {

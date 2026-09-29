@@ -1,6 +1,7 @@
 "use client";
 
 import { laravelClientFetch } from "@/lib/laravel-client";
+import { uploadImageFile } from "@/lib/image-upload-client";
 
 import { useState, useEffect, useRef } from "react";
 import { X as MdClose, ChevronDown as MdExpandMore, RefreshCw as MdSync, CircleCheck as MdCheckCircle, CloudUpload as MdCloudUpload } from 'lucide-react';
@@ -96,16 +97,18 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
         setIsUploadingImage(true);
         try {
             const uploadedUrls: string[] = [];
+            let failedUploads = 0;
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                if (!file.type.startsWith("image/")) continue;
-                const fd = new FormData();
-                fd.append("file", file);
-                fd.append("folder", "products");
-                const res = await laravelClientFetch("/api/upload", { method: "POST", body: fd });
-                const data = await res.json();
-                if (res.ok && data.url) {
-                    uploadedUrls.push(data.url);
+                if (!file.type.startsWith("image/") || file.size > 10 * 1024 * 1024) {
+                    failedUploads++;
+                    continue;
+                }
+                try {
+                    uploadedUrls.push(await uploadImageFile(file, "products"));
+                } catch (error) {
+                    console.error("Product image upload error:", error);
+                    failedUploads++;
                 }
             }
             if (uploadedUrls.length > 0) {
@@ -113,6 +116,9 @@ export default function AddProductModal({ isOpen, onClose, categories, brands, m
                 const newImages = [...currentImages, ...uploadedUrls].filter(Boolean).join(',');
                 setFormData(prev => ({ ...prev, images: newImages }));
                 toast.success(language === 'ar' ? `تم رفع ${uploadedUrls.length} صورة بنجاح` : `Uploaded ${uploadedUrls.length} image(s)`);
+            }
+            if (failedUploads > 0) {
+                toast.error(language === 'ar' ? `تعذر رفع ${failedUploads} صورة. تأكد من نوع الصورة وحجمها (10 ميجابايت كحد أقصى).` : `${failedUploads} image(s) could not be uploaded. Check the file type and 10 MB size limit.`);
             }
         } catch (error) {
             console.error("Upload error:", error);
