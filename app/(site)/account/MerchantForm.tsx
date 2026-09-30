@@ -1,18 +1,14 @@
 "use client";
 
-import { laravelClientFetch } from "@/lib/laravel-client";
+import { laravelClientFetch, laravelLogin, SessionVerificationError } from "@/lib/laravel-client";
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useLanguage } from "@/app/context/LanguageContext";
-import { useWishlist } from "@/app/context/WishlistContext";
 import { validateMerchantForm, type MerchantFormErrors } from "@/lib/merchant-validation";
 
 export default function MerchantForm({ mode }: { mode: "login" | "register" }) {
-    const router = useRouter();
     const { language } = useLanguage();
-    const { refresh: refreshWishlist } = useWishlist();
     const ar = language === "ar";
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
@@ -22,6 +18,7 @@ export default function MerchantForm({ mode }: { mode: "login" | "register" }) {
 
     const submit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (busy) return;
         setError("");
         const validation = validateMerchantForm(form, mode, ar ? "ar" : "en");
         setFieldErrors(validation.errors);
@@ -32,19 +29,27 @@ export default function MerchantForm({ mode }: { mode: "login" | "register" }) {
         }
         setBusy(true);
         try {
-            const response = await laravelClientFetch(`/api/customer/auth/${mode}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(validation.cleanData) });
+            const response = mode === "login"
+                ? await laravelLogin("customer", validation.cleanData)
+                : await laravelClientFetch("/api/customer/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(validation.cleanData) });
             const data = await response.json();
             if (!response.ok) {
                 if (data.errors) setFieldErrors(data.errors);
                 throw new Error(data.error === "ACCOUNT_PENDING" ? (ar ? "حسابك بانتظار موافقة الإدارة." : "Your account is awaiting approval.") : data.error || "Request failed");
             }
             if (mode === "register") setSuccess(true);
-            else { await refreshWishlist().catch(() => undefined); router.push("/account"); router.refresh(); }
+            else {
+                // A fresh document also clears prefetched signed-out routes.
+                window.location.replace("/account");
+                return;
+            }
         } catch (cause) {
-            setError(cause instanceof Error ? cause.message : "Request failed");
-        } finally {
+            setError(cause instanceof SessionVerificationError
+                ? (ar ? "تعذر تأكيد جلسة الدخول. يرجى المحاولة مرة أخرى." : cause.message)
+                : cause instanceof Error ? cause.message : "Request failed");
             setBusy(false);
         }
+        if (mode === "register") setBusy(false);
     };
 
     const field = (key: keyof typeof form, labelAr: string, labelEn: string, options: { type?: string; autoComplete?: string; required?: boolean } = {}) => {

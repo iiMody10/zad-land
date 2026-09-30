@@ -1,14 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLanguage } from "@/app/context/LanguageContext";
 import LanguageToggle from "@/app/components/LanguageToggle";
 import { UserRound as MdPerson, LockKeyhole as MdLock } from 'lucide-react';
-import { laravelClientFetch } from "@/lib/laravel-client";
+import { adminLoginDestination, laravelLogin } from "@/lib/laravel-client";
 
 export default function AdminLoginPage() {
-    const router = useRouter();
     const { t, dir } = useLanguage();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -18,15 +16,12 @@ export default function AdminLoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (loading) return;
         setError("");
         setLoading(true);
 
         try {
-            const response = await laravelClientFetch("/api/admin/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password, rememberMe }),
-            });
+            const response = await laravelLogin("admin", { username, password, rememberMe });
             const result = await response.json().catch(() => ({}));
 
             if (!response.ok) {
@@ -34,10 +29,7 @@ export default function AdminLoginPage() {
                 setLoading(false);
             } else if (result?.user) {
                 const rawCallback = new URLSearchParams(window.location.search).get("callbackUrl");
-                const destination = (rawCallback && !rawCallback.startsWith("/admin/login")) 
-                    ? rawCallback 
-                    : "/admin/dashboard";
-                window.location.href = destination;
+                window.location.replace(adminLoginDestination(rawCallback));
             } else {
                 setError(t("admin.login.errorGeneric"));
                 setLoading(false);

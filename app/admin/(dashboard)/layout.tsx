@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getLaravelAdmin } from "@/lib/laravel-server";
 import DashboardLayoutClient from "./DashboardLayoutClient";
 
@@ -14,7 +15,8 @@ export default async function AdminLayout({
     // Don't check auth for login page - it's handled by route group
     // This layout only applies to protected routes
     if (!user) {
-        redirect("/admin/login");
+        const destination = (await headers()).get("x-admin-return-to") || "/admin/dashboard";
+        redirect(`/admin/login?callbackUrl=${encodeURIComponent(destination)}`);
     }
 
     return <DashboardLayoutClient session={{ user: user as never }}>{children}</DashboardLayoutClient>;
