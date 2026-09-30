@@ -12,7 +12,7 @@ import { useAdminSession } from "../../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { getSafeImageUrl } from '@/lib/image-utils';
 import { formatItemsPerPackage, formatPackaging } from '@/lib/packaging';
-import { ChevronRight as MdChevronRight, ChevronLeft as MdChevronLeft, Upload as MdFileUpload, Download as MdFileDownload, Plus as MdAdd, Search as MdSearch, ChevronDown as MdExpandMore, Flame as MdLocalFireDepartment, BadgePercent as MdSell, TrendingDown as MdTrendingDown, BadgeMinus as MdMoneyOff, Trash2 as MdDelete, Pencil as MdEdit, RefreshCw as MdSync, ArrowUp as MdArrowUpward, ArrowDown as MdArrowDownward, Share2 as MdShare, Copy as MdContentCopy } from 'lucide-react';
+import { ChevronRight as MdChevronRight, ChevronLeft as MdChevronLeft, Upload as MdFileUpload, Download as MdFileDownload, Plus as MdAdd, Search as MdSearch, ChevronDown as MdExpandMore, Flame as MdLocalFireDepartment, BadgePercent as MdSell, TrendingDown as MdTrendingDown, BadgeMinus as MdMoneyOff, Trash2 as MdDelete, Pencil as MdEdit, RefreshCw as MdSync, ArrowUp as MdArrowUpward, ArrowDown as MdArrowDownward, ArrowUpDown as MdArrowUpDown, Share2 as MdShare, Copy as MdContentCopy } from 'lucide-react';
 import PlatformIcon from '@/app/components/PlatformIcon';
 
 interface Product {
@@ -250,6 +250,24 @@ export default function ProductsClient({
             key,
             direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
         }));
+    };
+
+    const renderSortHeader = (label: string, key: string) => {
+        const isActive = sortConfig.key === key;
+        const SortIcon = !isActive ? MdArrowUpDown : sortConfig.direction === 'asc' ? MdArrowUpward : MdArrowDownward;
+
+        return (
+            <th key={key} scope="col" aria-sort={isActive ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending') : 'none'} className="px-3 py-2.5 sm:px-4 sm:py-3">
+                <button
+                    type="button"
+                    onClick={() => handleSort(key)}
+                    className={`group/sort inline-flex min-h-8 items-center gap-1.5 rounded-md text-start text-[11px] font-bold normal-case tracking-normal transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${isActive ? 'text-primary' : 'text-slate-600 dark:text-slate-300'}`}
+                >
+                    <span>{label}</span>
+                    <SortIcon aria-hidden="true" className={`size-3.5 shrink-0 transition-colors ${isActive ? 'text-primary' : 'text-slate-400 group-hover/sort:text-primary'}`} />
+                </button>
+            </th>
+        );
     };
 
     // Pagination logic
@@ -848,8 +866,8 @@ export default function ProductsClient({
                         <div className="overflow-visible">
                             <table className={`w-full border-collapse min-w-[900px] ${dir === 'rtl' ? 'text-end' : 'text-start'}`}>
                                 <thead>
-                                    <tr className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-white/10 text-[10px] sm:text-xs font-extrabold text-slate-700 dark:text-slate-200 uppercase tracking-wider">
-                                        <th className="p-3 sm:p-5 w-10 sm:w-12 text-center text-[0px]">
+                                    <tr className="sticky top-0 z-20 border-b-2 border-primary/20 bg-white/95 text-slate-700 shadow-[0_3px_8px_-6px_rgba(15,23,42,0.4)] backdrop-blur-sm dark:bg-slate-900/95 dark:text-slate-200">
+                                        <th scope="col" className="w-10 px-3 py-2.5 text-center sm:w-12 sm:px-4 sm:py-3">
                                             <input
                                                 className="rounded border-gray-300 text-primary focus:ring-primary size-3 sm:size-4 cursor-pointer"
                                                 type="checkbox"
@@ -864,70 +882,14 @@ export default function ProductsClient({
                                                 onChange={toggleSelectAll}
                                             />
                                         </th>
-                                        <th className={`p-3 sm:p-5 cursor-pointer select-none group`} onClick={() => handleSort('name')}>
-                                            <div className="flex items-center">
-                                                {t('admin.productName')}
-                                                <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                    <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'name' && sortConfig.direction === 'asc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                    <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'name' && sortConfig.direction === 'desc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                </span>
-                                            </div>
-                                        </th>
-                                        <th className={`p-3 sm:p-5 cursor-pointer select-none group`} onClick={() => handleSort('brand')}>
-                                            <div className="flex items-center">
-                                                {t('admin.brands')}
-                                                <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                    <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'brand' && sortConfig.direction === 'asc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                    <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'brand' && sortConfig.direction === 'desc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                </span>
-                                            </div>
-                                        </th>
-                                        <th className={`p-3 sm:p-5 cursor-pointer select-none group`} onClick={() => handleSort('category')}>
-                                            <div className="flex items-center">
-                                                {t('admin.categoryName')}
-                                                <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                    <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'category' && sortConfig.direction === 'asc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                    <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'category' && sortConfig.direction === 'desc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                </span>
-                                            </div>
-                                        </th>
-                                        <th className={`p-3 sm:p-5 cursor-pointer select-none group`} onClick={() => handleSort('price')}>
-                                            <div className="flex items-center">
-                                                {t('admin.priceValue')}
-                                                <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                    <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'price' && sortConfig.direction === 'asc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                    <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'price' && sortConfig.direction === 'desc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                </span>
-                                            </div>
-                                        </th>
-                                        <th className={`p-3 sm:p-5 cursor-pointer select-none group`} onClick={() => handleSort('stock')}>
-                                            <div className="flex items-center">
-                                                {t('admin.inventory')}
-                                                <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                    <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'stock' && sortConfig.direction === 'asc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                    <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'stock' && sortConfig.direction === 'desc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                </span>
-                                            </div>
-                                        </th>
-                                        <th className={`p-3 sm:p-5 cursor-pointer select-none group`} onClick={() => handleSort('isTrending')}>
-                                            <div className="flex items-center">
-                                                {t('admin.trending')}
-                                                <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                    <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'isTrending' && sortConfig.direction === 'asc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                    <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'isTrending' && sortConfig.direction === 'desc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                </span>
-                                            </div>
-                                        </th>
-                                        <th className={`p-3 sm:p-5 cursor-pointer select-none group`} onClick={() => handleSort('status')}>
-                                            <div className="flex items-center">
-                                                {t('admin.statusValue')}
-                                                <span className={`flex flex-col ms-1 ${dir === 'rtl' ? 'me-1 ms-0' : 'ms-1'}`}>
-                                                    <MdArrowUpward className={`w-2.5 h-2.5 -mb-0.5 ${sortConfig.key === 'status' && sortConfig.direction === 'asc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                    <MdArrowDownward className={`w-2.5 h-2.5 ${sortConfig.key === 'status' && sortConfig.direction === 'desc' ? 'text-primary' : 'text-gray-300'}`} />
-                                                </span>
-                                            </div>
-                                        </th>
-                                        <th className={`p-3 sm:p-5 ${dir === 'rtl' ? 'text-start' : 'text-end'}`}>{t('admin.actions')}</th>
+                                        {renderSortHeader(t('admin.productName'), 'name')}
+                                        {renderSortHeader(t('admin.brands'), 'brand')}
+                                        {renderSortHeader(t('admin.categoryName'), 'category')}
+                                        {renderSortHeader(t('admin.priceValue'), 'price')}
+                                        {renderSortHeader(t('admin.inventory'), 'stock')}
+                                        {renderSortHeader(t('admin.trending'), 'isTrending')}
+                                        {renderSortHeader(t('admin.statusValue'), 'status')}
+                                        <th scope="col" className={`px-3 py-2.5 text-[11px] font-bold sm:px-4 sm:py-3 ${dir === 'rtl' ? 'text-start' : 'text-end'}`}>{t('admin.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-black/[0.04] dark:divide-white/[0.04] dark:divide-gray-700">
