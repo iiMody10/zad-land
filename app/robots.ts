@@ -16,6 +16,7 @@ export default function robots(): MetadataRoute.Robots {
                     '/brands/*',
                     '/about-us',
                     '/shipping-returns',
+                    '/privacy-policy',
                 ],
                 disallow: [
                     '/admin/',

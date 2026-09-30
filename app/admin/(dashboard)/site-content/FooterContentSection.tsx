@@ -176,6 +176,24 @@ export default function FooterContentSection({
     const selectedCategories = [1, 2, 3, 4]
         .map((slot) => categories.find((category) => category.id === footerContent[`footerCategory${slot}Id`]))
         .filter((category): category is FooterCategoryOption => Boolean(category));
+    const companyLinks = [1, 2, 3].map((slot) => localized(
+        `footerCompanyLink${slot}Label`,
+        `footerCompanyLink${slot}LabelAr`,
+        [previewArabic ? 'من نحن' : 'About Us', previewArabic ? 'علاماتنا التجارية' : 'Our Brands', previewArabic ? 'تواصل معنا' : 'Contact Us'][slot - 1],
+    ));
+    const supportLinks = [1, 2, 3].flatMap((slot) => {
+        const label = localized(`footerSupportLink${slot}Label`, `footerSupportLink${slot}LabelAr`);
+        const href = footerContent[`footerSupportLink${slot}Url`];
+        return label && href && href !== '#' ? [{ label, href }] : [];
+    });
+    [
+        { en: 'Shipping & Returns', ar: 'الشحن والتوصيل', href: '/shipping-returns' },
+        { en: 'Privacy Policy', ar: 'سياسة الخصوصية', href: '/privacy-policy' },
+    ].forEach((fallback) => {
+        if (!supportLinks.some((link) => link.href.replace(/\/$/, '') === fallback.href)) {
+            supportLinks.push({ label: previewArabic ? fallback.ar : fallback.en, href: fallback.href });
+        }
+    });
 
     return (
         <div className="space-y-8">
@@ -193,7 +211,7 @@ export default function FooterContentSection({
                 </div>
                 <div dir={previewArabic ? 'rtl' : 'ltr'} className="relative overflow-hidden bg-[#073b2d] px-5 py-8 text-white md:px-8">
                     <div className="pointer-events-none absolute inset-0 bg-[url('/images/footer-bg.webp')] bg-cover bg-center opacity-25" />
-                    <div className="relative grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5">
+                    <div className="relative grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-6 lg:gap-5">
                         <div className="text-center lg:text-start">
                             <div className="mb-3 text-xl font-black text-amber-300">{localized('footerBrandTitle', 'footerBrandTitleAr', 'زاد لاند')}</div>
                             <p className="text-xs leading-6 text-white/75">{localized('footerBrandDescription', 'footerBrandDescriptionAr')}</p>
@@ -201,7 +219,8 @@ export default function FooterContentSection({
                                 {(['instagram', 'facebook', 'whatsapp'] as const).map((platform) => <span key={platform} className="flex size-7 items-center justify-center rounded-full border border-amber-300/40 text-amber-200"><PlatformIcon platform={platform} className="size-3.5" /></span>)}
                             </div>
                         </div>
-                        <PreviewColumn title={previewArabic ? 'روابط سريعة' : 'Quick Links'} items={previewArabic ? ['الرئيسية', 'من نحن', 'المنتجات', 'الشركات العالمية', 'تواصل معنا'] : ['Home', 'About Us', 'Products', 'Global Brands', 'Contact Us']} />
+                        <PreviewColumn title={localized('footerCompanyTitle', 'footerCompanyTitleAr', previewArabic ? 'عن الشركة' : 'Company')} items={companyLinks} />
+                        <PreviewColumn title={localized('footerSupportTitle', 'footerSupportTitleAr', previewArabic ? 'الدعم والسياسات' : 'Support & Policies')} items={supportLinks.map((link) => link.label)} />
                         <PreviewColumn title={localized('footerShopTitle', 'footerShopTitleAr', previewArabic ? 'المتجر' : 'Shop')} items={selectedCategories.length ? selectedCategories.map((category) => category.name) : [previewArabic ? 'جميع المنتجات' : 'All products']} />
                         <div className="text-center lg:text-start">
                             <h4 className="mb-3 text-sm font-extrabold text-amber-300">{localized('footerContactTitle', 'footerContactTitleAr', previewArabic ? 'معلومات التواصل' : 'Contact Information')}</h4>

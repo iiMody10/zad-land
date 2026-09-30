@@ -59,7 +59,42 @@ const Footer = async ({ t, language }: FooterProps) => {
             platform: 'whatsapp' as const,
             label: "WhatsApp",
         },
-    ].filter((link) => link.href);
+    ].filter((link) => link.href && link.href !== "#");
+
+    const isArabic = language === 'ar';
+    const companyTitle = getLocalizedValue(language, settings?.footerCompanyTitle, settings?.footerCompanyTitleAr) || (isArabic ? 'عن زاد لاند' : 'About Zad Land');
+    const companyDefaults = [
+        { en: 'About Us', ar: 'من نحن', href: '/about-us' },
+        { en: 'Our Brands', ar: 'علاماتنا التجارية', href: '/brands' },
+        { en: 'Contact Us', ar: 'تواصل معنا', href: '/contact' },
+    ];
+    const companyLinks = companyDefaults.map((fallback, index) => {
+        const slot = index + 1;
+        return {
+            label: getLocalizedValue(language, settings?.[`footerCompanyLink${slot}Label`], settings?.[`footerCompanyLink${slot}LabelAr`]) || (isArabic ? fallback.ar : fallback.en),
+            href: settings?.[`footerCompanyLink${slot}Url`] && settings[`footerCompanyLink${slot}Url`] !== '#'
+                ? settings[`footerCompanyLink${slot}Url`]
+                : fallback.href,
+        };
+    });
+
+    const supportTitle = getLocalizedValue(language, settings?.footerSupportTitle, settings?.footerSupportTitleAr) || (isArabic ? 'الدعم والسياسات' : 'Support & Policies');
+    const configuredSupportLinks = [1, 2, 3].flatMap((slot) => {
+        const href = settings?.[`footerSupportLink${slot}Url`];
+        const label = getLocalizedValue(language, settings?.[`footerSupportLink${slot}Label`], settings?.[`footerSupportLink${slot}LabelAr`]);
+        return href && href !== '#' && label ? [{ label, href }] : [];
+    });
+    const supportDefaults = [
+        { en: 'Shipping & Returns', ar: 'الشحن والتوصيل', href: '/shipping-returns' },
+        { en: 'Privacy Policy', ar: 'سياسة الخصوصية', href: '/privacy-policy' },
+    ];
+    const supportLinks = [...configuredSupportLinks];
+    supportDefaults.forEach((fallback) => {
+        const normalizedFallback = fallback.href.replace(/\/$/, '');
+        if (!supportLinks.some((link) => link.href.replace(/\/$/, '') === normalizedFallback)) {
+            supportLinks.push({ label: isArabic ? fallback.ar : fallback.en, href: fallback.href });
+        }
+    });
 
     const renderNavLink = (label: string, href: string) => {
         if (isExternalUrl(href)) {
@@ -76,15 +111,6 @@ const Footer = async ({ t, language }: FooterProps) => {
             </Link>
         );
     };
-
-    const isArabic = language === 'ar';
-    const quickLinks = [
-        { label: isArabic ? 'الرئيسية' : 'Home', href: '/' },
-        { label: isArabic ? 'من نحن' : 'About Us', href: '/about-us' },
-        { label: isArabic ? 'المنتجات' : 'Products', href: '/products' },
-        { label: isArabic ? 'الشركات العالمية' : 'Global Brands', href: '/brands' },
-        { label: isArabic ? 'تواصل معنا' : 'Contact Us', href: '/contact' },
-    ];
 
     const FOOTER_CAT_TRANSLATIONS: Record<string, string> = {
         'مشروبات باردة': 'Cold Beverages',
@@ -112,7 +138,7 @@ const Footer = async ({ t, language }: FooterProps) => {
 
             <div className="relative">
                 <div className="container-custom px-4 py-6 sm:py-8 md:py-8">
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.25fr_0.8fr_0.95fr_1.15fr_1fr] lg:gap-0">
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.15fr_0.9fr_0.85fr_0.9fr_1.1fr_0.8fr] lg:gap-0">
                         {/* Brand */}
                         <div className="flex flex-col items-center text-center sm:col-span-2 lg:col-span-1 lg:items-start lg:border-e lg:border-[var(--color-accent)]/25 lg:pe-10 lg:text-start">
                             <Link href="/" className="group mb-3 inline-flex">
@@ -149,11 +175,21 @@ const Footer = async ({ t, language }: FooterProps) => {
                         </div>
 
                         {/* Quick Links */}
-                        <div className="text-center lg:border-e lg:border-[var(--color-accent)]/25 lg:px-6">
-                            <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{isArabic ? 'روابط سريعة' : 'Quick Links'}</h5>
+                        <div className="text-center lg:border-e lg:border-[var(--color-accent)]/25 lg:px-5">
+                            <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{companyTitle}</h5>
                             <ul className="flex flex-col gap-2 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm">
-                                {quickLinks.map((link) => (
+                                {companyLinks.map((link) => (
                                     <li key={link.href}>{renderNavLink(link.label, link.href)}</li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Shipping and privacy policies */}
+                        <div className="text-center lg:border-e lg:border-[var(--color-accent)]/25 lg:px-5">
+                            <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{supportTitle}</h5>
+                            <ul className="flex flex-col gap-2 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm">
+                                {supportLinks.map((link) => (
+                                    <li key={`${link.href}-${link.label}`}>{renderNavLink(link.label, link.href)}</li>
                                 ))}
                             </ul>
                         </div>

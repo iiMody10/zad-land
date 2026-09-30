@@ -775,7 +775,7 @@
         "exchangeRateLabel": "Exchange Rate",
         "currencyHelpText": "Prices are displayed in US dollars only.",
         "categoriesCtaBanner": "Categories CTA Banner",
-        "categoriesCtaBannerDesc": "Control the Call To Action banner shown on the Categories landing page.",
+        "categoriesCtaBannerDesc": "This banner appears below the category list on the storefront page at /categories.",
         "bannerTitle": "Banner Title",
         "middleBanner1": "Middle Banner 1 (After Trending)",
         "middleBanner1Desc": "Control the banner that appears after the Trending Products section.",
@@ -793,7 +793,7 @@
         "featuredCollectionAllProductsUrl": "View products button link",
         "featuredCollectionProductManagementNote": "Manage the products in Admin → Products: newly added products appear under New Arrivals automatically; mark products as Trending to include them under Most Ordered.",
         "shippingSection": "Shipping & Delivery Policy",
-        "shippingSectionDesc": "Configure customer-facing shipping timeline details and inspection instructions.",
+        "shippingSectionDesc": "This content appears on /shipping-returns and is linked in the footer under Support & Policies. The Privacy Policy is also linked there.",
         "standardShippingTime": "Standard Shipping Timeline",
         "expressShippingTime": "Express Shipping Timeline",
         "shippingTitle": "Shipping Policy Title",
@@ -869,6 +869,21 @@
                 "description": "Fast, dependable distribution fleet ensuring fresh stock arrives on schedule."
             }
         }
+    },
+    "privacyPolicyPage": {
+        "title": "Privacy Policy",
+        "intro": "We respect our customers’ privacy and handle the information they share with us only as needed to support their orders and related communications.",
+        "informationTitle": "Information we collect",
+        "informationBody": "When you place an order, we may ask for the customer name, shop name, phone number, delivery address, and requested products. We also use the contact details you provide when you reach our team.",
+        "useTitle": "How we use information",
+        "useBody": "We use this information to review and prepare orders and to contact you about confirmation, delivery, or questions related to your order.",
+        "sharingTitle": "Access to order details",
+        "sharingBody": "Order details are available to team members handling the order. Necessary delivery details may be shared with the distribution team to complete delivery.",
+        "choicesTitle": "Request a data correction",
+        "choicesBody": "To correct your details or ask how they are used, contact Zad Land through our official contact page.",
+        "contactTitle": "Questions about privacy?",
+        "contactBody": "Send your question to the Zad Land team and we will help with matters related to your information and orders.",
+        "contactCta": "Contact us"
     },
     "shippingReturnsPage": {
         "title": "Wholesale Distribution & Logistics",
