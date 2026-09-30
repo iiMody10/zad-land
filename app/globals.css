@@ -358,3 +358,273 @@
   border-color: #4b5563 !important;
   opacity: 1 !important;
 }
+
+.order-print-sheet {
+  display: none;
+}
+
+@page orderSheet {
+  size: A4 portrait;
+  margin: 14mm;
+}
+
+@media print {
+  html:has(.order-print-sheet),
+  body:has(.order-print-sheet) {
+    min-width: 0 !important;
+    background: #fff !important;
+    color: #17211d !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  body:has(.order-print-sheet) * {
+    visibility: hidden !important;
+  }
+
+  body:has(.order-print-sheet) .order-details-overlay,
+  body:has(.order-print-sheet) .order-details-dialog,
+  body:has(.order-print-sheet) .order-print-sheet,
+  body:has(.order-print-sheet) .order-print-sheet * {
+    visibility: visible !important;
+  }
+
+  body:has(.order-print-sheet) .order-details-dialog,
+  body:has(.order-print-sheet) .order-details-dialog * {
+    display: none !important;
+  }
+
+  body:has(.order-print-sheet) .order-print-sheet {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 999999 !important;
+    width: 100% !important;
+    padding: 0 !important;
+    color: #17211d !important;
+    background: #fff !important;
+    direction: inherit;
+    font-family: Arial, "Noto Sans Arabic", sans-serif !important;
+    font-size: 10pt !important;
+    line-height: 1.5 !important;
+    page: orderSheet;
+  }
+
+  .order-print-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    padding-bottom: 18px !important;
+    border-bottom: 2px solid #174b3a !important;
+  }
+
+  .order-print-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .order-print-brand-mark {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    border: 2px solid #b88727 !important;
+    border-radius: 50% !important;
+    color: #174b3a !important;
+    font-size: 18pt !important;
+    font-weight: 800 !important;
+  }
+
+  .order-print-brand-name,
+  .order-print-brand-caption,
+  .order-print-title p,
+  .order-print-title h1,
+  .order-print-panel p,
+  .order-print-footnote {
+    margin: 0 !important;
+  }
+
+  .order-print-brand-name {
+    color: #174b3a !important;
+    font-size: 15pt !important;
+    font-weight: 800 !important;
+    letter-spacing: .06em !important;
+  }
+
+  .order-print-brand-caption,
+  .order-print-title p {
+    color: #66746d !important;
+    font-size: 8pt !important;
+  }
+
+  .order-print-title {
+    text-align: end !important;
+  }
+
+  .order-print-title h1 {
+    color: #174b3a !important;
+    font-size: 20pt !important;
+    font-weight: 800 !important;
+  }
+
+  .order-print-meta {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin: 18px 0 !important;
+    padding: 14px !important;
+    border: 1px solid #dce5df !important;
+    border-radius: 8px !important;
+    background: #f6f9f7 !important;
+  }
+
+  .order-print-meta div {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+  }
+
+  .order-print-meta span,
+  .order-print-panel h2,
+  .order-print-items h2,
+  .order-print-total span {
+    color: #66746d !important;
+    font-size: 8pt !important;
+    font-weight: 700 !important;
+  }
+
+  .order-print-meta strong {
+    overflow-wrap: anywhere !important;
+    color: #17211d !important;
+    font-size: 9pt !important;
+  }
+
+  .order-print-parties {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px !important;
+    margin-bottom: 22px !important;
+  }
+
+  .order-print-panel {
+    min-height: 105px !important;
+    padding: 14px !important;
+    border: 1px solid #dce5df !important;
+    border-radius: 8px !important;
+    break-inside: avoid !important;
+  }
+
+  .order-print-panel h2,
+  .order-print-items h2 {
+    margin: 0 0 9px !important;
+    color: #174b3a !important;
+    font-size: 10pt !important;
+  }
+
+  .order-print-panel p {
+    margin: 3px 0 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .order-print-strong {
+    font-weight: 700 !important;
+  }
+
+  .order-print-ltr {
+    text-align: start !important;
+    direction: ltr !important;
+  }
+
+  .order-print-notes {
+    margin-top: 10px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #e6ece8 !important;
+  }
+
+  .order-print-items h2 {
+    margin-bottom: 10px !important;
+  }
+
+  .order-print-items table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+  }
+
+  .order-print-items thead {
+    display: table-header-group !important;
+  }
+
+  .order-print-items th {
+    padding: 9px 8px !important;
+    border-block: 1px solid #dce5df !important;
+    background: #f1f5f2 !important;
+    color: #174b3a !important;
+    font-size: 8pt !important;
+    font-weight: 800 !important;
+    text-align: start !important;
+  }
+
+  .order-print-items th:nth-child(n+2),
+  .order-print-number {
+    width: 17% !important;
+    text-align: center !important;
+  }
+
+  .order-print-items td {
+    padding: 10px 8px !important;
+    border-bottom: 1px solid #e6ece8 !important;
+    vertical-align: top !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .order-print-items tr {
+    break-inside: avoid !important;
+  }
+
+  .order-print-items td strong,
+  .order-print-items td small {
+    display: block !important;
+  }
+
+  .order-print-items td small {
+    margin-top: 3px !important;
+    color: #66746d !important;
+  }
+
+  .order-print-total {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    margin-top: 18px !important;
+    padding: 14px 16px !important;
+    border-radius: 8px !important;
+    background: #174b3a !important;
+    color: #fff !important;
+    break-inside: avoid !important;
+  }
+
+  .order-print-total span {
+    color: #fff !important;
+    font-size: 10pt !important;
+  }
+
+  .order-print-total strong {
+    font-size: 17pt !important;
+    direction: ltr !important;
+  }
+
+  .order-print-footnote {
+    margin-top: 18px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #dce5df !important;
+    color: #7b8881 !important;
+    font-size: 8pt !important;
+    text-align: center !important;
+  }
+}

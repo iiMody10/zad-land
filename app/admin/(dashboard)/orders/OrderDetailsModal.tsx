@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/app/context/LanguageContext";
-import { X as MdClose, UserRound as MdPerson, MapPin as MdLocationOn, Package as MdInventory2, RefreshCw as MdSync, Trash2 as MdDelete } from 'lucide-react';
+import { X as MdClose, UserRound as MdPerson, MapPin as MdLocationOn, Package as MdInventory2, RefreshCw as MdSync, Trash2 as MdDelete, Printer as MdPrinter } from 'lucide-react';
 
 interface Order {
     id: string;
@@ -51,11 +51,22 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
     };
 
     const statusColor = getStatusColor(order.status);
+    const statusLabel = t(`admin.${order.status.toLowerCase()}`);
+    const orderDate = new Date(order.createdAt);
+    const formattedDate = new Intl.DateTimeFormat(dir === 'rtl' ? 'ar' : 'en', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(orderDate);
+    const currency = new Intl.NumberFormat(dir === 'rtl' ? 'ar' : 'en', {
+        style: 'currency',
+        currency: 'USD',
+    });
+    const printOrder = () => window.print();
 
     return (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+        <div className="order-details-overlay fixed inset-0 z-100 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-text-main/40 dark:bg-black/60 backdrop-blur-[2px]" onClick={onClose}></div>
-            <div className="relative bg-white dark:bg-surface-dark w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="order-details-dialog relative bg-white dark:bg-surface-dark w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
 
                 {/* Header */}
                 <div className="px-6 py-5 border-b border-black/[0.04] dark:border-white/[0.04] flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/20">
@@ -63,8 +74,8 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                         <h3 className="text-xl font-extrabold text-text-main dark:text-white tracking-tight">
                             {t('admin.orderDetails')}
                         </h3>
-                        <p className="text-xs text-text-sub dark:text-gray-400 font-medium">
-                            #{order.id.toUpperCase()} • {new Date(order.createdAt).toLocaleDateString()}
+                        <p className="text-xs text-text-sub dark:text-gray-400 font-medium" dir="auto">
+                            #{order.id.toUpperCase()} <span aria-hidden="true">•</span> {formattedDate}
                         </p>
                     </div>
                     <button
@@ -88,12 +99,12 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                                         statusColor === "red" ? "bg-red-50 text-red-600 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/50" :
                                             "bg-gray-50 text-gray-600 border-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-white/[0.04]"
                                 }`}>
-                                {order.status}
+                                {statusLabel === `admin.${order.status.toLowerCase()}` ? order.status : statusLabel}
                             </span>
                         </div>
                         <div className={`space-y-1 ${dir === 'rtl' ? 'text-start' : 'text-end'}`}>
                             <p className="text-[10px] font-bold uppercase tracking-wider text-text-sub dark:text-gray-500">{t('admin.totalAmount')}</p>
-                            <p className="text-2xl font-black text-primary" dir="ltr">${Number(order.totalAmount).toFixed(2)}</p>
+                            <p className="text-2xl font-black text-primary" dir="ltr">{currency.format(Number(order.totalAmount))}</p>
                         </div>
                     </div>
 
@@ -169,10 +180,10 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                                                 {item.quantity}
                                             </td>
                                             <td className={`p-3 text-xs font-medium text-text-sub dark:text-gray-400 ${dir === 'rtl' ? 'text-start' : 'text-end'}`}>
-                                                ${Number(item.price).toFixed(2)}
+                                                {currency.format(Number(item.price))}
                                             </td>
                                             <td className={`p-3 text-xs font-black text-text-main dark:text-white ${dir === 'rtl' ? 'text-start' : 'text-end'}`}>
-                                                ${(Number(item.price) * item.quantity).toFixed(2)}
+                                                {currency.format(Number(item.price) * item.quantity)}
                                             </td>
                                         </tr>
                                     ))}
@@ -183,7 +194,15 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                 </div>
 
                 {/* Footer */}
-                <div className={`px-6 py-4 bg-gray-50/50 dark:bg-black/20 border-t border-black/[0.04] dark:border-white/[0.04] flex items-center gap-3 ${dir === 'rtl' ? 'justify-start' : 'justify-end'}`}>
+                <div className={`order-details-actions px-6 py-4 bg-gray-50/50 dark:bg-black/20 border-t border-black/[0.04] dark:border-white/[0.04] flex flex-wrap items-center gap-3 ${dir === 'rtl' ? 'justify-start' : 'justify-end'}`}>
+                    <button
+                        type="button"
+                        onClick={printOrder}
+                        className="h-10 px-5 rounded-xl font-bold text-sm border border-slate-200 dark:border-white/10 text-slate-700 dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-all flex items-center gap-2"
+                    >
+                        <MdPrinter className="text-[18px]" />
+                        {t('admin.printOrder')}
+                    </button>
                     {canDelete && onDelete && (
                         <button
                             type="button"
@@ -207,6 +226,76 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                     </button>
                 </div>
             </div>
+
+            <article className="order-print-sheet" dir={dir} aria-label={t('admin.orderDetails')}>
+                <header className="order-print-header">
+                    <div className="order-print-brand">
+                        <span className="order-print-brand-mark" aria-hidden="true">Z</span>
+                        <div>
+                            <p className="order-print-brand-name">ZAD LAND</p>
+                            <p className="order-print-brand-caption">{dir === 'rtl' ? 'توريد وتوزيع للمتاجر والشركات' : 'Wholesale supply & distribution'}</p>
+                        </div>
+                    </div>
+                    <div className="order-print-title">
+                        <p>{t('admin.orderSheet')}</p>
+                        <h1>{t('admin.orderDetails')}</h1>
+                    </div>
+                </header>
+
+                <section className="order-print-meta">
+                    <div><span>{t('admin.orderId')}</span><strong dir="ltr">#{order.id.toUpperCase()}</strong></div>
+                    <div><span>{t('admin.orderDate')}</span><strong>{formattedDate}</strong></div>
+                    <div><span>{t('admin.currentStatus')}</span><strong>{statusLabel === `admin.${order.status.toLowerCase()}` ? order.status : statusLabel}</strong></div>
+                </section>
+
+                <section className="order-print-parties">
+                    <div className="order-print-panel">
+                        <h2>{t('admin.customerInformation')}</h2>
+                        {order.shopName && <p className="order-print-strong">{order.shopName}</p>}
+                        <p className="order-print-strong">{order.Name}</p>
+                        <p dir="ltr" className="order-print-ltr">{order.phone}</p>
+                    </div>
+                    <div className="order-print-panel">
+                        <h2>{t('admin.shippingAddress')}</h2>
+                        <p>{order.streetAddress}</p>
+                        <p>{order.city}</p>
+                        {order.notes && <p className="order-print-notes"><strong>{t('admin.orderNotes')}:</strong> {order.notes}</p>}
+                    </div>
+                </section>
+
+                <section className="order-print-items">
+                    <h2>{t('admin.itemsCount').replace('{count}', order.items.length.toString())}</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>{t('admin.product')}</th>
+                                <th>{t('admin.qty')}</th>
+                                <th>{t('admin.price')}</th>
+                                <th>{t('admin.total')}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {order.items.map((item, idx) => (
+                                <tr key={item.id || idx}>
+                                    <td>
+                                        <strong>{item.product?.name || (dir === 'rtl' ? 'منتج محذوف' : 'Deleted product')}</strong>
+                                        {item.options && <small>{item.options}</small>}
+                                    </td>
+                                    <td className="order-print-number">{item.quantity}</td>
+                                    <td className="order-print-number" dir="ltr">{currency.format(Number(item.price))}</td>
+                                    <td className="order-print-number" dir="ltr">{currency.format(Number(item.price) * item.quantity)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </section>
+
+                <footer className="order-print-total">
+                    <span>{t('admin.totalAmount')}</span>
+                    <strong dir="ltr">{currency.format(Number(order.totalAmount))}</strong>
+                </footer>
+                <p className="order-print-footnote">{dir === 'rtl' ? 'تم إنشاء كشف الطلب من لوحة إدارة زاد لاند.' : 'Order sheet generated from the Zad Land admin dashboard.'}</p>
+            </article>
         </div>
     );
 }
