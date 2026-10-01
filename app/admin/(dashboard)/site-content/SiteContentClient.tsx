@@ -425,7 +425,6 @@ export default function SiteContentClient({
         { id: "navigation", label: t('admin.tabNavigation') || "Header Navigation", icon: <ListOrdered className="text-lg" /> },
         { id: "business", label: language === "ar" ? "بيانات التواصل العامة" : "Global Contact Details", icon: <MdStorefront className="text-lg" /> },
         { id: "footer", label: t('admin.tabFooter') || "Footer", icon: <MdStorefront className="text-lg" /> },
-        { id: "banners", label: t('admin.tabBanners') || "Promo Banners", icon: <MdViewCarousel className="text-lg" /> },
         { id: "featured", label: t('admin.tabFeaturedCollection') || "Featured Collection", icon: <MdViewCarousel className="text-lg" /> },
         { id: "shipping", label: t('admin.tabShipping') || "Shipping & Policy", icon: <MdLocalShipping className="text-lg" /> },
         { id: "about", label: t('admin.tabAbout') || "About Us Story", icon: <MdInfoOutline className="text-lg" /> },

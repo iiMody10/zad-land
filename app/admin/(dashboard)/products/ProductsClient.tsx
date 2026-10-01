@@ -866,7 +866,7 @@ export default function ProductsClient({
                         <div className="overflow-visible">
                             <table className={`w-full border-collapse min-w-[900px] ${dir === 'rtl' ? 'text-end' : 'text-start'}`}>
                                 <thead>
-                                    <tr className="sticky top-0 z-20 border-b-2 border-primary/20 bg-white/95 text-slate-700 shadow-[0_3px_8px_-6px_rgba(15,23,42,0.4)] backdrop-blur-sm dark:bg-slate-900/95 dark:text-slate-200">
+                                    <tr className="border-b-2 border-primary/20 bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
                                         <th scope="col" className="w-10 px-3 py-2.5 text-center sm:w-12 sm:px-4 sm:py-3">
                                             <input
                                                 className="rounded border-gray-300 text-primary focus:ring-primary size-3 sm:size-4 cursor-pointer"
