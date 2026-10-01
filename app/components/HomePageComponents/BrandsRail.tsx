@@ -74,7 +74,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
         });
     };
 
-    const renderBrandCard = (brand: RailBrand, isCompact = false) => {
+    const renderBrandCard = (brand: RailBrand, isCompact = false, prioritizeImage = false) => {
         const brandLabel = getBrandLabel(brand);
 
         return (
@@ -92,7 +92,10 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                     <ResilientImage
                         src={brand.image}
                         alt=""
-                        showSkeleton={false}
+                        priority={prioritizeImage}
+                        loading={prioritizeImage ? 'eager' : 'lazy'}
+                        showSkeleton
+                        skeletonClassName="bg-[#f4f6f3] dark:bg-zinc-800"
                         sizes="(max-width: 768px) 140px, 160px"
                         className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
                     />
@@ -228,7 +231,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                 <div className="md:hidden">
                     <div className="-mx-4 px-4 overflow-x-auto scrollbar-hide py-1">
                         <div className="flex items-center gap-2.5 snap-x">
-                            {mobileBrands.map((brand) => {
+                            {mobileBrands.map((brand, index) => {
                                 const isMersin = brand.slug === 'mersin';
                                 return (
                                     <Link
@@ -240,7 +243,10 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                                             <ResilientImage
                                                 src={brand.image}
                                                 alt={brand.name}
-                                                showSkeleton={false}
+                                                priority={index < 5}
+                                                loading={index < 5 ? 'eager' : 'lazy'}
+                                                showSkeleton
+                                                skeletonClassName="bg-[#f4f6f3] dark:bg-zinc-800"
                                                 sizes="90px"
                                                 className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03]"
                                             />
@@ -273,7 +279,7 @@ export default function BrandsRail({ brands = [] }: BrandsRailProps) {
                         className="min-w-0 flex-1 snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth py-1 scrollbar-hide"
                     >
                         <div className="flex min-w-full gap-4">
-                            {desktopBrands.map((brand) => renderBrandCard(brand, true))}
+                            {desktopBrands.map((brand, index) => renderBrandCard(brand, true, index < 6))}
                         </div>
                     </div>
 

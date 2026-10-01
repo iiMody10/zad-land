@@ -32,6 +32,46 @@ interface HeroCarouselProps {
     banners: Banner[];
 }
 
+function HeroArtwork({
+    src,
+    alt,
+    priority,
+    sizes,
+    className,
+}: {
+    src: string;
+    alt: string;
+    priority: boolean;
+    sizes: string;
+    className: string;
+}) {
+    const [isLoaded, setIsLoaded] = React.useState(false);
+
+    return (
+        <>
+            <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-[radial-gradient(ellipse_at_18%_42%,rgba(197,157,65,0.2),transparent_34%),linear-gradient(135deg,#102522_0%,#1b4437_56%,#0d2028_100%)]"
+            />
+            <Image
+                src={src}
+                alt={alt}
+                fill
+                priority={priority}
+                loading={priority ? "eager" : "lazy"}
+                fetchPriority={priority ? "high" : "low"}
+                sizes={sizes}
+                onLoad={() => setIsLoaded(true)}
+                onError={() => setIsLoaded(false)}
+                className={`${className} transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+            />
+        </>
+    );
+}
+
+const isDefaultHeroArtwork = (image: string | null | undefined) =>
+    image === '/images/redesign/hero-bg.png' || image === '/images/redesign/hero-bg.webp';
+
 const HeroCarousel = ({ banners }: HeroCarouselProps) => {
     const { dir } = useLanguage();
     const isArabic = dir === 'rtl';
@@ -61,7 +101,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
 
     const sortedBanners = React.useMemo(() => {
         if (!banners || banners.length === 0) return [];
-        const hero = banners.find(b => b.image === '/images/redesign/hero-bg.png');
+        const hero = banners.find(b => isDefaultHeroArtwork(b.image));
         if (hero) {
             return [hero, ...banners.filter(b => b.id !== hero.id)];
         }
@@ -94,16 +134,14 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                 >
                     {displayBanners.map((banner, index) => {
                         const mobileImage = banner.imageMobile || banner.image;
-                        const isHeroBg = mobileImage === '/images/redesign/hero-bg.png';
+                        const isHeroBg = isDefaultHeroArtwork(mobileImage);
                         return (
                             <SwiperSlide key={`mob-${banner.id}`} className="h-full w-full relative">
                                 {/* Slide Image */}
-                                <Image
+                                <HeroArtwork
                                     src={mobileImage}
                                     alt={getBannerTitle(banner)}
-                                    fill
                                     priority={index === 0}
-                                    loading={index === 0 ? "eager" : "lazy"}
                                     sizes="100vw"
                                     className={`object-cover ${isHeroBg ? 'object-[72%_center]' : 'object-center'}`}
                                 />
@@ -219,13 +257,10 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                         {displayBanners.map((banner, index) => (
                             <SwiperSlide key={banner.id} className="h-full w-full">
                                 <div className="relative h-full w-full overflow-hidden">
-                                    <Image
+                                    <HeroArtwork
                                         src={banner.image}
                                         alt={getBannerTitle(banner)}
-                                        fill
                                         priority={index === 0}
-                                        loading={index === 0 ? "eager" : "lazy"}
-                                        fetchPriority={index === 0 ? "high" : "low"}
                                         sizes="100vw"
                                         className="object-cover object-center"
                                     />

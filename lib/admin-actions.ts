@@ -129,7 +129,20 @@ export async function getAdminSiteSettings(): Promise<any> {
 }
 
 export async function getActiveBanners() {
-    return (await homeData()).banners || [];
+    const banners = (await homeData()).banners || [];
+
+    // The seeded homepage artwork is a large PNG. Use its smaller WebP
+    // equivalent on the storefront, including rows that were seeded before
+    // the optimized asset was added.
+    return banners.map((banner) => ({
+        ...banner,
+        image: banner.image === "/images/redesign/hero-bg.png"
+            ? "/images/redesign/hero-bg.webp"
+            : banner.image,
+        imageMobile: banner.imageMobile === "/images/redesign/hero-bg.png"
+            ? "/images/redesign/hero-bg.webp"
+            : banner.imageMobile,
+    }));
 }
 
 export async function getMainCategoryBrands(): Promise<HomeBrand[]> {
