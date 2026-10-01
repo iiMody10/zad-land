@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import PlatformIcon from '@/app/components/PlatformIcon';
+import { toWhatsAppUrl } from '@/lib/business-contact';
 
 interface FooterCategoryOption {
     id: string;
@@ -176,6 +178,11 @@ export default function FooterContentSection({
     const selectedCategories = [1, 2, 3, 4]
         .map((slot) => categories.find((category) => category.id === footerContent[`footerCategory${slot}Id`]))
         .filter((category): category is FooterCategoryOption => Boolean(category));
+    const previewSocialLinks = ([
+        { platform: 'instagram' as const, href: footerContent.footerInstagramUrl, label: 'Instagram' },
+        { platform: 'facebook' as const, href: footerContent.footerFacebookUrl, label: 'Facebook' },
+        { platform: 'whatsapp' as const, href: footerContent.footerWhatsappUrl && footerContent.footerWhatsappUrl !== '#' ? footerContent.footerWhatsappUrl : toWhatsAppUrl(footerContent.footerPhone), label: 'WhatsApp' },
+    ]).filter((social) => social.href.trim() && social.href.trim() !== '#');
     const companyLinks = [1, 2, 3].map((slot) => localized(
         `footerCompanyLink${slot}Label`,
         `footerCompanyLink${slot}LabelAr`,
@@ -215,9 +222,19 @@ export default function FooterContentSection({
                         <div className="text-center lg:text-start">
                             <div className="mb-3 text-xl font-black text-amber-300">{localized('footerBrandTitle', 'footerBrandTitleAr', 'زاد لاند')}</div>
                             <p className="text-xs leading-6 text-white/75">{localized('footerBrandDescription', 'footerBrandDescriptionAr')}</p>
-                            <div className="mt-3 flex justify-center gap-2 lg:justify-start">
-                                {(['instagram', 'facebook', 'whatsapp'] as const).map((platform) => <span key={platform} className="flex size-7 items-center justify-center rounded-full border border-amber-300/40 text-amber-200"><PlatformIcon platform={platform} className="size-3.5" /></span>)}
-                            </div>
+                            {previewSocialLinks.length > 0 ? (
+                                <div className="mt-3 flex justify-center gap-2 lg:justify-start">
+                                    {previewSocialLinks.map((social) => <a key={social.platform} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.label} className="flex size-7 items-center justify-center rounded-full border border-amber-300/40 text-amber-200 transition-colors hover:bg-amber-300/15"><PlatformIcon platform={social.platform} className="size-3.5" /></a>)}
+                                </div>
+                            ) : (
+                                <p className="mt-3 text-[11px] text-white/65">
+                                    {previewArabic ? 'أضف روابط حساباتك من ' : 'Add your social links in '}
+                                    <Link href="/admin/site-content?tab=business" className="font-bold text-amber-200 underline underline-offset-2">
+                                        {previewArabic ? 'بيانات التواصل العامة' : 'Global Contact Details'}
+                                    </Link>
+                                    {previewArabic ? ' لتظهر للزوار.' : ' to display them to visitors.'}
+                                </p>
+                            )}
                         </div>
                         <PreviewColumn title={localized('footerCompanyTitle', 'footerCompanyTitleAr', previewArabic ? 'عن الشركة' : 'Company')} items={companyLinks} />
                         <PreviewColumn title={localized('footerSupportTitle', 'footerSupportTitleAr', previewArabic ? 'الدعم والسياسات' : 'Support & Policies')} items={supportLinks.map((link) => link.label)} />

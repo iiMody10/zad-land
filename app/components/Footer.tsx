@@ -3,6 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import PlatformIcon from '@/app/components/PlatformIcon';
 import { Mail as LuMail, MapPin as LuMapPin, Phone as LuPhone } from 'lucide-react';
+import { toWhatsAppUrl } from '@/lib/business-contact';
 import { getFooterCategories } from '@/lib/catalog';
 import { getSiteSettings } from '@/lib/admin-actions';
 
@@ -41,6 +42,9 @@ const Footer = async ({ t, language }: FooterProps) => {
     const contactPhone = settings?.footerPhone || '';
     const contactEmail = settings?.footerEmail || '';
     const whatsappLabel = getLocalizedValue(language, settings?.footerWhatsappLabel, settings?.footerWhatsappLabelAr);
+    const whatsappUrl = settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#'
+        ? settings.footerWhatsappUrl
+        : toWhatsAppUrl(contactPhone);
     const phoneHref = contactPhone.replace(/[^\d+]/g, '');
 
     const socialLinks = [
@@ -55,7 +59,7 @@ const Footer = async ({ t, language }: FooterProps) => {
             label: "Facebook",
         },
         {
-            href: settings?.footerWhatsappUrl || "#",
+            href: whatsappUrl,
             platform: 'whatsapp' as const,
             label: "WhatsApp",
         },
@@ -231,7 +235,7 @@ const Footer = async ({ t, language }: FooterProps) => {
                                     <LuMail className="shrink-0 text-[var(--color-accent-light)]" />
                                     <span>{contactEmail}</span>
                                 </a>}
-                                {settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#' && whatsappLabel && <a className="mt-1 inline-flex items-center gap-1.5 font-bold text-[var(--color-accent-light)] transition-colors hover:text-white" href={settings.footerWhatsappUrl} target="_blank" rel="noopener noreferrer">
+                                {whatsappUrl !== '#' && whatsappLabel && <a className="mt-1 inline-flex items-center gap-1.5 font-bold text-[var(--color-accent-light)] transition-colors hover:text-white" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
                                     <PlatformIcon platform="whatsapp" className="size-4" />
                                     <span>{whatsappLabel}</span>
                                 </a>}
