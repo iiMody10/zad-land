@@ -593,7 +593,7 @@ export default function ProductsClient({
             <AdminHeader title={t('admin.products')} onMenuClick={openSidebar} />
 
             <div className="flex-1 overflow-y-auto p-3 sm:p-5 md:p-8">
-                <div className="max-w-[1400px] mx-auto flex flex-col gap-6 md:gap-8 pb-10">
+                <div className="mx-auto flex w-full min-w-0 max-w-[1400px] flex-col gap-6 pb-10 md:gap-8">
 
                     {/* Page Heading & Header */}
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -863,7 +863,7 @@ export default function ProductsClient({
                         )}
 
                         {/* Table */}
-                        <div className="overflow-visible">
+                        <div className="w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain">
                             <table className={`w-full border-collapse min-w-[900px] ${dir === 'rtl' ? 'text-end' : 'text-start'}`}>
                                 <thead>
                                     <tr className="border-b-2 border-primary/20 bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">

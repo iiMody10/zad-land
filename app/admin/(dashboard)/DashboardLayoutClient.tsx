@@ -10,7 +10,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex h-screen w-full overflow-hidden">
             <AdminSidebar isOpen={isOpen} onClose={closeSidebar} />
-            <main className="flex-1 flex flex-col h-full overflow-hidden relative">
+            <main className="min-w-0 flex-1 flex flex-col h-full overflow-hidden relative">
                 <div className="flex-1 flex flex-col overflow-hidden">
                     {children}
                 </div>
