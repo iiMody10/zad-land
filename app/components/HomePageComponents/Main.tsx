@@ -1,6 +1,6 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
-import type { HomeBrand, RailBrand } from '@/lib/admin-actions';
+import type { HomeBrand, HomepageBanner, RailBrand } from '@/lib/admin-actions';
 import BrandsRail from './BrandsRail';
 
 import FeaturedCollection from './FeaturedCollection';
@@ -13,19 +13,6 @@ import ScrollReveal from '../ScrollReveal';
 import { getI18n } from '@/lib/i18n';
 
 import HeroCarousel from './HeroCarousel';
-
-interface Banner {
-    id: string;
-    title: string | null;
-    subtitle: string | null;
-    titleAr: string | null;
-    subtitleAr: string | null;
-    image: string;
-    buttonText: string | null;
-    link: string | null;
-    badge: string | null;
-    isActive: boolean;
-}
 
 interface Product {
     id: string;
@@ -68,7 +55,7 @@ interface FeaturedCategory {
 }
 
 interface MainProps {
-    banners: Banner[];
+    banners: HomepageBanner[];
     mainBrands: HomeBrand[];
     railBrands: RailBrand[];
     mainCategories: HomeMainCategory[];

@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/app/context/LanguageContext';
+import type { HomepageBanner } from '@/lib/admin-actions';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import Image from 'next/image';
@@ -12,24 +13,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-interface Banner {
-    id: string;
-    title: string | null;
-    subtitle: string | null;
-    titleAr: string | null;
-    subtitleAr: string | null;
-    image: string;
-    imageMobile?: string | null;
-    buttonText: string | null;
-    buttonTextAr?: string | null;
-    link: string | null;
-    badge: string | null;
-    badgeAr?: string | null;
-    isActive: boolean;
-}
-
 interface HeroCarouselProps {
-    banners: Banner[];
+    banners: HomepageBanner[];
 }
 
 function HeroArtwork({
@@ -77,22 +62,22 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
     const isArabic = dir === 'rtl';
     const wrapperRef = React.useRef<HTMLElement>(null);
     
-    const getBannerTitle = (banner: Banner): string => {
+    const getBannerTitle = (banner: HomepageBanner): string => {
         return isArabic ? (banner.titleAr || banner.title || 'نصل بالعلامات العالمية إلى كل سوق') : (banner.title || banner.titleAr || 'Connecting Global Brands to Every Market');
     };
 
-    const getBannerSubtitle = (banner: Banner): string => {
+    const getBannerSubtitle = (banner: HomepageBanner): string => {
         return isArabic ? (banner.subtitleAr || banner.subtitle || 'زاد لاند شركة توزيع رائدة\nالوكيل الرسمي لمنتجات عالمية\nوطنية في سوريا - حمص') : (banner.subtitle || banner.subtitleAr || '');
     };
 
-    const getBannerButtonText = (banner: Banner): string => {
+    const getBannerButtonText = (banner: HomepageBanner): string => {
         if (isArabic) {
             return banner.buttonTextAr || banner.buttonText || 'اكتشف المزيد';
         }
         return banner.buttonText || banner.buttonTextAr || 'Discover More';
     };
 
-    const getBannerBadge = (banner: Banner): string => {
+    const getBannerBadge = (banner: HomepageBanner): string => {
         if (isArabic) {
             return banner.badgeAr || banner.badge || 'توزيع جملة معتمد';
         }

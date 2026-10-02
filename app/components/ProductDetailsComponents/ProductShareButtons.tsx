@@ -18,7 +18,7 @@ export default function ProductShareButtons({
     const { language } = useLanguage();
     const isArabic = language === 'ar';
     const [copied, setCopied] = useState(false);
-    const configuredOrigin = (process.env.NEXT_PUBLIC_SITE_URL || 'https://zadland.com').replace(/\/+$/, '');
+    const configuredOrigin = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.zad-land.com').replace(/\/+$/, '');
     const [shareOrigin, setShareOrigin] = useState(configuredOrigin);
 
     useEffect(() => {

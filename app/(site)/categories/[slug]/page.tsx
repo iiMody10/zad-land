@@ -22,7 +22,7 @@ export async function generateMetadata(
     const description = category.description 
         ? `${category.name} (${category.description}). تسوق منتجات القسم بأسعار الجملة المعتمدة لدى شركة زاد لاند.`
         : `تصفح تشكيلة ${category.name} بأسعار الجملة المعتمدة لدى شركة زاد لاند لتجارة وتوزيع المواد الغذائية.`;
-    const image = category.image || '/og-image.jpg';
+    const image = category.image || '/logo.png';
 
     return {
         title,
@@ -38,8 +38,6 @@ export async function generateMetadata(
             images: [
                 {
                     url: image,
-                    width: 1200,
-                    height: 630,
                     alt: category.name,
                 },
             ],

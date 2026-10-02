@@ -19,7 +19,7 @@ export async function generateMetadata(
 
     const title = `${brand.name} | Zad Land - زاد لاند`;
     const description = brand.description || `تصفح كتالوج منتجات ${brand.name} بأسعار الجملة المعتمدة لدى شركة زاد لاند لتجارة وتوزيع المواد الغذائية.`;
-    const image = brand.image || '/og-image.jpg';
+    const image = brand.image || '/logo.png';
 
     return {
         title,
@@ -35,8 +35,6 @@ export async function generateMetadata(
             images: [
                 {
                     url: image,
-                    width: 1200,
-                    height: 630,
                     alt: brand.name,
                 },
             ],

@@ -1,4 +1,5 @@
 import Main from "../components/HomePageComponents/Main";
+import type { Metadata } from "next";
 import {
     getActiveBanners,
     getMainCategoryBrands,
@@ -13,6 +14,17 @@ import {
 
 // Keep the homepage fresh enough to recover after transient data-source failures.
 export const revalidate = 300;
+
+export const metadata: Metadata = {
+    alternates: {
+        canonical: "/",
+        languages: {
+            "ar-SY": "/",
+            "en-US": "/?lang=en",
+            "x-default": "/",
+        },
+    },
+};
 
 async function loadHomeSection<T>(name: string, load: () => Promise<T>, fallback: T): Promise<T> {
     try {

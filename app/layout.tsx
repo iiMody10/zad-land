@@ -6,7 +6,7 @@ import { canViewWholesalePrices } from "@/lib/price-visibility";
 
 const metadataBase =
   process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://zadland.com";
+  "https://www.zad-land.com";
 
 export const viewport: Viewport = {
   themeColor: "#072835",
@@ -19,10 +19,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(metadataBase),
   title: {
     default: "Zad Land | Wholesale Food & Goods Trading - زاد لاند لتجارة وتوزيع المواد الغذائية",
-    template: "%s | Zad Land - زاد لاند",
+    template: "%s",
   },
   description:
-    "شركة زاد لاند - المنصة الرائدة في استيراد وتوزيع المواد الغذائية والمنتجات الاستهلاكية بالجملة. موزعون معتمدون لكبرى العلامات العالمية (أمريكانا، تات، دي سيكو، سانتي، علي كافيه). توريد مباشر، جودة عالية، وأفضل أسعار الجملة.",
+    "شركة زاد لاند لتجارة وتوزيع المواد الغذائية بالجملة في سوريا. توريد معتمد من علامات عالمية للمتاجر وأصحاب الأعمال.",
   keywords: [
     "Zad Land",
     "زاد لاند",
@@ -54,14 +54,6 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  alternates: {
-    canonical: "/",
-    languages: {
-      "ar-SY": "/",
-      "en-US": "/?lang=en",
-      "x-default": "/",
-    },
-  },
   openGraph: {
     type: "website",
     locale: "ar_SY",
@@ -69,23 +61,24 @@ export const metadata: Metadata = {
     siteName: "Zad Land | زاد لاند",
     title: "Zad Land | Wholesale Food & Goods Trading - زاد لاند",
     description:
-      "شركة زاد لاند لتجارة وتوزيع المواد الغذائية بالجملة. توريد مباشر من كبرى الشركات العالمية بأفضل الأسعار المعتمدة.",
+      "شركة زاد لاند لتجارة وتوزيع المواد الغذائية بالجملة في سوريا، وتوريد معتمد للمتاجر وأصحاب الأعمال.",
     url: metadataBase,
     images: [
       {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Zad Land Wholesale Food & Goods Distribution",
+        url: "/logo.png",
+        width: 400,
+        height: 267,
+        type: "image/png",
+        alt: "Zad Land logo | شعار زاد لاند",
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     title: "Zad Land | Wholesale Food & Goods Trading - زاد لاند",
     description:
-      "شركة زاد لاند لتجارة وتوزيع المواد الغذائية بالجملة. توريد مباشر من كبرى الشركات العالمية بأفضل الأسعار المعتمدة.",
-    images: ["/og-image.jpg"],
+      "شركة زاد لاند لتجارة وتوزيع المواد الغذائية بالجملة في سوريا، وتوريد معتمد للمتاجر وأصحاب الأعمال.",
+    images: ["/logo.png"],
   },
   robots: {
     index: true,
@@ -128,8 +121,8 @@ export default async function RootLayout({
     "@type": "WholesaleStore",
     "name": "Zad Land - زاد لاند",
     "url": metadataBase,
-    "logo": `${metadataBase}/logo.jpeg`,
-    "image": `${metadataBase}/og-image.jpg`,
+    "logo": `${metadataBase}/logo.png`,
+    "image": `${metadataBase}/logo.png`,
     "description": "شركة زاد لاند لتجارة وتوزيع المواد الغذائية والمنتجات الاستهلاكية بالجملة.",
     "currenciesAccepted": "USD",
     "paymentAccepted": "Cash, Bank Transfer",

@@ -18,18 +18,19 @@ export const metadata: Metadata = {
         url: "/categories",
         images: [
             {
-                url: "/og-image.jpg",
-                width: 1200,
-                height: 630,
-                alt: "Zad Land Food Categories",
+                url: "/logo.png",
+                width: 400,
+                height: 267,
+                type: "image/png",
+                alt: "Zad Land logo | شعار زاد لاند",
             },
         ],
     },
     twitter: {
-        card: "summary_large_image",
+        card: "summary",
         title: "فئات وأقسام المنتجات | Zad Land",
         description: "استعرض كافة فئات المواد الغذائية والاستهلاكية بالجملة لدى شركة زاد لاند.",
-        images: ["/og-image.jpg"],
+        images: ["/logo.png"],
     },
 };
 

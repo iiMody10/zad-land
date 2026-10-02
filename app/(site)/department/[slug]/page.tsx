@@ -19,7 +19,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 
     const title = `${department.name} | Zad Land - زاد لاند`;
     const description = department.description || `تصفح منتجات قسم ${department.name} بأسعار الجملة المعتمدة لدى شركة زاد لاند لتجارة وتوزيع المواد الغذائية.`;
-    const image = department.image || '/og-image.jpg';
+    const image = department.image || '/logo.png';
 
     return {
         title,
@@ -35,8 +35,6 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
             images: [
                 {
                     url: image,
-                    width: 1200,
-                    height: 630,
                     alt: department.name,
                 },
             ],

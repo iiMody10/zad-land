@@ -47,7 +47,7 @@ export async function generateMetadata(
         ? `${product.name} من ${brandName}. متوفر للطلب والبيع بالجملة مع شحن موثوق عبر منصة زاد لاند. ${product.description.slice(0, 120)}`
         : `اشترِ ${product.name} من ${brandName} بأفضل أسعار الجملة المعتمدة من شركة زاد لاند لتجارة وتوزيع المواد الغذائية.`;
 
-    const mainImage = productImages(product.images)[0] || '/logo.jpeg';
+    const mainImage = productImages(product.images)[0] || '/logo.png';
 
     return {
         title,
@@ -63,8 +63,6 @@ export async function generateMetadata(
             images: [
                 {
                     url: mainImage,
-                    width: 1200,
-                    height: 630,
                     alt: product.name,
                 },
             ],
@@ -114,7 +112,7 @@ const ProductPage = async (props: { params: Promise<{ slug: string }> }) => {
         },
         ...(canViewPrices && product.price != null && !product.pricingNeedsReview ? { "offers": {
             "@type": "Offer",
-            "url": `https://zadland.com/products/${product.slug}`,
+            "url": `https://www.zad-land.com/products/${product.slug}`,
             "priceCurrency": "USD",
             "price": Number(product.discountPrice || product.price),
             ...(product.stock == null ? {} : { "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" }),

@@ -20,18 +20,19 @@ export const metadata: Metadata = {
         url: "/products",
         images: [
             {
-                url: "/og-image.jpg",
-                width: 1200,
-                height: 630,
-                alt: "Zad Land Product Catalog",
+                url: "/logo.png",
+                width: 400,
+                height: 267,
+                type: "image/png",
+                alt: "Zad Land logo | شعار زاد لاند",
             },
         ],
     },
     twitter: {
-        card: "summary_large_image",
+        card: "summary",
         title: "كتالوج المنتجات وعروض الجملة | Zad Land",
         description: "تصفح كافة منتجات المواد الغذائية والاستهلاكية بأسعار الجملة المعتمدة لدى شركة زاد لاند.",
-        images: ["/og-image.jpg"],
+        images: ["/logo.png"],
     },
 };
 

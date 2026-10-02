@@ -4,7 +4,7 @@ import { laravelJson } from '@/lib/laravel-server';
 export const revalidate = 3600; // Revalidate sitemap hourly
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zadland.com';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.zad-land.com';
 
     try {
         // 1. Static high-priority routes

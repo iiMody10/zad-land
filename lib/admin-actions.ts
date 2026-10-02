@@ -47,6 +47,21 @@ export interface HomeMainCategory {
     image: string;
 }
 export interface RailBrand { id: string; name: string; nameAr: string; fullName: string; slug: string; image: string; productCount?: number }
+export interface HomepageBanner {
+    id: string;
+    title: string | null;
+    subtitle: string | null;
+    titleAr: string | null;
+    subtitleAr: string | null;
+    image: string;
+    imageMobile?: string | null;
+    buttonText: string | null;
+    buttonTextAr?: string | null;
+    link: string | null;
+    badge: string | null;
+    badgeAr?: string | null;
+    isActive: boolean;
+}
 
 export interface DashboardStats {
     totalRevenue: number; totalOrders: number; totalProducts: number; totalCategories: number; averageOrderValue: number;
@@ -129,7 +144,7 @@ export async function getAdminSiteSettings(): Promise<any> {
 }
 
 export async function getActiveBanners() {
-    const banners = (await homeData()).banners || [];
+    const banners = ((await homeData()).banners || []) as HomepageBanner[];
 
     // The seeded homepage artwork is a large PNG. Use its smaller WebP
     // equivalent on the storefront, including rows that were seeded before

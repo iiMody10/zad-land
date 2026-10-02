@@ -17,18 +17,19 @@ export const metadata: Metadata = {
         url: "/shipping-returns",
         images: [
             {
-                url: "/og-image.jpg",
-                width: 1200,
-                height: 630,
-                alt: "Zad Land Shipping & Returns",
+                url: "/logo.png",
+                width: 400,
+                height: 267,
+                type: "image/png",
+                alt: "Zad Land logo | شعار زاد لاند",
             },
         ],
     },
     twitter: {
-        card: "summary_large_image",
+        card: "summary",
         title: "الشحن والتوصيل وسياسة التوريد | Zad Land",
         description: "تعرف على شروط الشحن والتوريد المباشر وسياسة الاستلام المعتمدة لدى شركة زاد لاند.",
-        images: ["/og-image.jpg"],
+        images: ["/logo.png"],
     },
 };
 

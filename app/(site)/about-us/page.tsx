@@ -26,18 +26,19 @@ export async function generateMetadata(): Promise<Metadata> {
             url: "/about-us",
             images: [
                 {
-                    url: "/og-image.jpg",
-                    width: 1200,
-                    height: 630,
+                    url: "/logo.png",
+                    width: 400,
+                    height: 267,
+                    type: "image/png",
                     alt: isEnglish ? "About Zad Land" : "من نحن في زاد لاند",
                 },
             ],
         },
         twitter: {
-            card: "summary_large_image",
+            card: "summary",
             title,
             description,
-            images: ["/og-image.jpg"],
+            images: ["/logo.png"],
         },
     };
 }

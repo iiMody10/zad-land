@@ -13,18 +13,19 @@ export const metadata = {
         url: "/brands",
         images: [
             {
-                url: "/og-image.jpg",
-                width: 1200,
-                height: 630,
-                alt: "Zad Land Partner Brands",
+                url: "/logo.png",
+                width: 400,
+                height: 267,
+                type: "image/png",
+                alt: "Zad Land logo | شعار زاد لاند",
             },
         ],
     },
     twitter: {
-        card: "summary_large_image",
+        card: "summary",
         title: "العلامات التجارية المعتمدة | Zad Land",
         description: "استكشف العلامات التجارية والشركات العالمية الموزعة عبر شركة زاد لاند لتجارة المواد الغذائية.",
-        images: ["/og-image.jpg"],
+        images: ["/logo.png"],
     },
 };
 
