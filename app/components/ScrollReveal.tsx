@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface ScrollRevealProps {
     children: React.ReactNode;
@@ -21,56 +21,55 @@ export default function ScrollReveal({
     direction = 'up',
     distance = 30,
     once = true,
+    margin = '50px',
 }: ScrollRevealProps) {
     const ref = useRef<HTMLDivElement>(null);
-    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         const el = ref.current;
-        if (!el) return;
+        if (!el || typeof IntersectionObserver === 'undefined' || typeof el.animate !== 'function'
+            || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-        if (typeof IntersectionObserver === 'undefined') {
-            setIsVisible(true);
-            return;
-        }
+        const offset = {
+            up: `translateY(${distance}px)`,
+            down: `translateY(-${distance}px)`,
+            left: `translateX(${distance}px)`,
+            right: `translateX(-${distance}px)`,
+            none: 'none',
+        }[direction];
+        let animation: Animation | undefined;
 
+        // The server-rendered content stays visible. Motion only enhances it
+        // once browser code is running; it never gates access to the section.
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
-                    setIsVisible(true);
+                    animation?.cancel();
+                    animation = el.animate([
+                        { opacity: 0.65, transform: offset },
+                        { opacity: 1, transform: 'none' },
+                    ], {
+                        duration: Math.max(0, duration * 1000),
+                        delay: Math.max(0, delay * 1000),
+                        easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                    });
                     if (once) observer.unobserve(el);
-                } else if (!once) {
-                    setIsVisible(false);
                 }
             },
-            { rootMargin: '50px' }
+            { rootMargin: margin }
         );
 
         observer.observe(el);
-        return () => observer.disconnect();
-    }, [once]);
-
-    const getTransform = () => {
-        if (isVisible) return 'none';
-        switch (direction) {
-            case 'up': return `translateY(${distance}px)`;
-            case 'down': return `translateY(-${distance}px)`;
-            case 'left': return `translateX(${distance}px)`;
-            case 'right': return `translateX(-${distance}px)`;
-            case 'none': return 'none';
-        }
-    };
+        return () => {
+            observer.disconnect();
+            animation?.cancel();
+        };
+    }, [delay, direction, distance, duration, margin, once]);
 
     return (
         <div
             ref={ref}
             className={className}
-            style={{
-                opacity: isVisible ? 1 : 0,
-                transform: getTransform(),
-                transition: `opacity ${duration}s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, transform ${duration}s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,
-                willChange: isVisible ? 'auto' : 'opacity, transform',
-            }}
         >
             {children}
         </div>

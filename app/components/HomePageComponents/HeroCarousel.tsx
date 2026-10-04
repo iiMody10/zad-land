@@ -30,7 +30,7 @@ function HeroArtwork({
     sizes: string;
     className: string;
 }) {
-    const [isLoaded, setIsLoaded] = React.useState(false);
+    const [failedSource, setFailedSource] = React.useState<string | null>(null);
 
     return (
         <>
@@ -46,9 +46,9 @@ function HeroArtwork({
                 loading={priority ? "eager" : "lazy"}
                 fetchPriority={priority ? "high" : "low"}
                 sizes={sizes}
-                onLoad={() => setIsLoaded(true)}
-                onError={() => setIsLoaded(false)}
-                className={`${className} transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                onLoad={() => setFailedSource(null)}
+                onError={() => setFailedSource(src)}
+                className={`${className}${failedSource === src ? ' invisible' : ''}`}
             />
         </>
     );
