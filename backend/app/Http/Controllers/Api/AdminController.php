@@ -416,6 +416,37 @@ class AdminController extends Controller
                     $rules[$key] = ['required', 'boolean'];
                 } elseif ($column === 'featured_collection_all_products_url') {
                     $rules[$key] = ['nullable', 'string', 'max:2000'];
+                } elseif ($column === 'company_contacts') {
+                    $rules[$key] = ['required', 'string', 'max:30000', function ($attribute, $value, $fail) {
+                        try {
+                            $contacts = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+                        } catch (\JsonException) {
+                            $fail('The company contacts must be valid JSON.');
+                            return;
+                        }
+                        if (! str_starts_with(ltrim($value), '[') || ! is_array($contacts) || ! array_is_list($contacts) || count($contacts) > 20) {
+                            $fail('Company contacts must be a list of up to 20 entries.');
+                            return;
+                        }
+                        $seen = [];
+                        foreach ($contacts as $contact) {
+                            if (! is_array($contact) || ! is_bool($contact['enabled'] ?? null)) {
+                                $fail('Each contact needs names, roles, a phone number, and a visibility setting.');
+                                return;
+                            }
+                            foreach (['id', 'nameAr', 'nameEn', 'roleAr', 'roleEn', 'phone'] as $field) {
+                                if (! isset($contact[$field]) || ! is_string($contact[$field]) || mb_strlen($contact[$field]) > ($field === 'phone' ? 40 : 150)) {
+                                    $fail('Contact fields must be text within the allowed length.');
+                                    return;
+                                }
+                            }
+                            if ($contact['id'] === '' || isset($seen[$contact['id']])) {
+                                $fail('Each contact must have a unique ID.');
+                                return;
+                            }
+                            $seen[$contact['id']] = true;
+                        }
+                    }];
                 } elseif ($column === 'header_nav_items') {
                     $rules[$key] = ['nullable', 'string', 'max:20000', function ($attribute, $value, $fail) {
                         if ($value === null || $value === '') {

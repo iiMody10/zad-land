@@ -14,6 +14,7 @@ import ContactContentSection from "./ContactContentSection";
 import BusinessContactSection from "./BusinessContactSection";
 import type { HeaderNavItemRef } from "@/lib/header-navigation";
 import { parseContactPageContent, type ContactPageContent } from "@/lib/contact-page-content";
+import { parseCompanyContacts } from "@/lib/business-contact";
 
 interface FooterCategoryOption {
     id: string;
@@ -22,6 +23,7 @@ interface FooterCategoryOption {
 
 interface SiteSettings {
     id: string;
+    companyContacts: string | null;
     contactPageContent: string | null;
     headerNavItems: string | null;
     categoriesCtaTitle: string | null;
@@ -215,6 +217,7 @@ export default function SiteContentClient({
 
     // Site Settings State - Footer Content
     const [footerContent, setFooterContent] = useState({
+        companyContacts: JSON.stringify(parseCompanyContacts(initialSettings?.companyContacts)),
         footerBrandTitle: initialSettings?.footerBrandTitle || "",
         footerBrandTitleAr: initialSettings?.footerBrandTitleAr || "",
         footerBrandDescription: initialSettings?.footerBrandDescription || "",
@@ -527,6 +530,7 @@ export default function SiteContentClient({
                     {activeTab === "business" && (
                         <BusinessContactSection
                             value={{
+                                companyContacts: footerContent.companyContacts,
                                 footerPhone: footerContent.footerPhone,
                                 footerEmail: footerContent.footerEmail,
                                 footerWhatsappUrl: footerContent.footerWhatsappUrl,

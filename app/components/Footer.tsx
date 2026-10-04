@@ -3,7 +3,8 @@ import React from 'react';
 import Image from 'next/image';
 import PlatformIcon from '@/app/components/PlatformIcon';
 import { Mail as LuMail, MapPin as LuMapPin, Phone as LuPhone } from 'lucide-react';
-import { toWhatsAppUrl } from '@/lib/business-contact';
+import { parseCompanyContacts, toWhatsAppUrl } from '@/lib/business-contact';
+import CompanyContacts from './CompanyContacts';
 import { getFooterCategories } from '@/lib/catalog';
 import { getSiteSettings } from '@/lib/admin-actions';
 
@@ -40,6 +41,7 @@ const Footer = async ({ t, language }: FooterProps) => {
     const contactTitle = getLocalizedValue(language, settings?.footerContactTitle, settings?.footerContactTitleAr) || (language === 'ar' ? 'معلومات التواصل' : 'Contact Information');
     const contactAddress = getLocalizedValue(language, settings?.footerAddress, settings?.footerAddressAr);
     const contactPhone = settings?.footerPhone || '';
+    const companyContacts = parseCompanyContacts(settings?.companyContacts);
     const contactEmail = settings?.footerEmail || '';
     const whatsappLabel = getLocalizedValue(language, settings?.footerWhatsappLabel, settings?.footerWhatsappLabelAr);
     const whatsappUrl = settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#'
@@ -223,6 +225,7 @@ const Footer = async ({ t, language }: FooterProps) => {
                         <div className="text-center lg:border-e lg:border-[var(--color-accent)]/25 lg:px-6">
                             <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{contactTitle}</h5>
                             <div className="flex flex-col items-center gap-3 text-xs text-[var(--color-text-main-dark)]/90 sm:text-sm">
+                                <CompanyContacts contacts={companyContacts} language={language} compact />
                                 {contactAddress && <div className="flex items-center gap-2">
                                     <LuMapPin className="shrink-0 text-[var(--color-accent-light)]" />
                                     <span>{contactAddress}</span>

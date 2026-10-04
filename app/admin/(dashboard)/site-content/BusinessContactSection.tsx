@@ -3,8 +3,10 @@
 import { Mail, MessageCircle, Phone } from "lucide-react";
 import PlatformIcon from "@/app/components/PlatformIcon";
 import { useLanguage } from "@/app/context/LanguageContext";
+import CompanyContactsEditor from "./CompanyContactsEditor";
 
 export type BusinessContactValues = {
+    companyContacts: string;
     footerPhone: string;
     footerEmail: string;
     footerWhatsappUrl: string;
@@ -29,6 +31,7 @@ export default function BusinessContactSection({ value, onChange }: {
     );
 
     return <div className="space-y-6" dir={ar ? "rtl" : "ltr"}>
+        <CompanyContactsEditor value={value.companyContacts} onChange={(next) => onChange("companyContacts", next)} language={ar ? "ar" : "en"} />
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)] md:p-8">
             <div className="mb-6 flex items-start gap-3">
                 <span className="rounded-xl bg-emerald-50 p-3 text-[var(--color-brand)] dark:bg-emerald-950/40 dark:text-emerald-200"><Phone className="size-5" /></span>

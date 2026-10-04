@@ -4,7 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import PlatformIcon from '@/app/components/PlatformIcon';
-import { toWhatsAppUrl } from '@/lib/business-contact';
+import { parseCompanyContacts, toWhatsAppUrl } from '@/lib/business-contact';
+import CompanyContacts from '@/app/components/CompanyContacts';
 
 interface FooterCategoryOption {
     id: string;
@@ -243,6 +244,7 @@ export default function FooterContentSection({
                             <h4 className="mb-3 text-sm font-extrabold text-amber-300">{localized('footerContactTitle', 'footerContactTitleAr', previewArabic ? 'معلومات التواصل' : 'Contact Information')}</h4>
                             <div className="space-y-2.5 text-xs text-white/85">
                                 {localized('footerAddress', 'footerAddressAr') && <p className="flex items-center justify-center gap-2 lg:justify-start"><MapPin className="size-3.5 shrink-0 text-amber-300" />{localized('footerAddress', 'footerAddressAr')}</p>}
+                                <CompanyContacts contacts={parseCompanyContacts(footerContent.companyContacts)} language={previewArabic ? 'ar' : 'en'} compact />
                                 {footerContent.footerPhone && <p className="flex items-center justify-center gap-2 lg:justify-start"><Phone className="size-3.5 shrink-0 text-amber-300" /><span dir="ltr">{footerContent.footerPhone}</span></p>}
                                 {footerContent.footerEmail && <p className="flex items-center justify-center gap-2 lg:justify-start"><Mail className="size-3.5 shrink-0 text-amber-300" />{footerContent.footerEmail}</p>}
                                 {footerContent.footerWhatsappUrl && footerContent.footerWhatsappUrl !== '#' && <p className="pt-1 font-bold text-amber-200">{localized('footerWhatsappLabel', 'footerWhatsappLabelAr', previewArabic ? 'تواصل معنا عبر واتساب' : 'Chat on WhatsApp')}</p>}

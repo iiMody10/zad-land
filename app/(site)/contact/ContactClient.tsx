@@ -5,6 +5,8 @@ import PlatformIcon from '@/app/components/PlatformIcon';
 import { Phone as LuPhone, Mail as LuMail, MapPin as LuMapPin, Clock as LuClock, Send as LuSend, CircleCheck as IoCheckmarkCircle } from 'lucide-react';
 import type { ContactPageContent } from '@/lib/contact-page-content';
 import { useBusinessContact } from '@/app/context/BusinessContactContext';
+import CompanyContacts from '@/app/components/CompanyContacts';
+import { parseCompanyContacts } from '@/lib/business-contact';
 
 interface ContactClientProps {
     language: 'ar' | 'en';
@@ -14,6 +16,7 @@ interface ContactClientProps {
         footerWhatsappUrl?: string | null;
         footerFacebookUrl?: string | null;
         footerInstagramUrl?: string | null;
+        companyContacts?: string | null;
         footerEmail?: string | null;
     } | null;
 }
@@ -21,6 +24,7 @@ interface ContactClientProps {
 export default function ContactClient({ language, dir, content, settings }: ContactClientProps) {
     const { whatsappUrl } = useBusinessContact();
     const isAr = language === 'ar';
+    const companyContacts = parseCompanyContacts(settings?.companyContacts);
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({ name: '', businessName: '', phone: '', message: '' });
@@ -61,7 +65,8 @@ export default function ContactClient({ language, dir, content, settings }: Cont
                             </div>
                         </a>}
 
-                        {content.contactInfoEnabled && (content.addressEnabled || content.hoursEnabled || content.emailEnabled) && <div className="space-y-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                        {content.contactInfoEnabled && (companyContacts.some((contact) => contact.enabled) || content.addressEnabled || content.hoursEnabled || content.emailEnabled) && <div className="space-y-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                            <CompanyContacts contacts={companyContacts} language={language} />
                             {content.addressEnabled && <InfoItem icon={<LuMapPin />} title={copy('addressTitle')} primary={copy('addressLine')} secondary={copy('addressDescription')} />}
                             {content.hoursEnabled && <InfoItem icon={<LuClock />} title={copy('hoursTitle')} primary={copy('hoursLine')} secondary={copy('hoursDescription')} />}
                             {content.emailEnabled && <InfoItem icon={<LuMail />} title={copy('emailTitle')} primary={settings?.footerEmail || ''} />}
