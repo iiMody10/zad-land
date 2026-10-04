@@ -15,7 +15,7 @@ export default function CompanyContacts({ contacts, language, compact = false }:
             const name = ar ? contact.nameAr || contact.nameEn : contact.nameEn || contact.nameAr;
             const role = ar ? contact.roleAr || contact.roleEn : contact.roleEn || contact.roleAr;
             return <li key={contact.id} className={compact
-                ? "rounded-lg border border-white/10 bg-black/10 px-3 py-2.5 text-start"
+                ? "border-b border-white/10 pb-2 last:border-0 last:pb-0 text-start"
                 : "rounded-xl border border-slate-100 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5"}>
                 <p className="font-bold leading-snug">{name}</p>
                 <p className={`mt-0.5 text-xs ${compact ? "text-white/65" : "text-slate-500 dark:text-slate-400"}`}>{role}</p>

@@ -144,7 +144,7 @@ const Footer = async ({ t, language }: FooterProps) => {
 
             <div className="relative">
                 <div className="container-custom px-4 py-6 sm:py-8 md:py-8">
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.15fr_0.9fr_0.85fr_0.9fr_1.1fr_0.8fr] lg:gap-0">
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.95fr_0.9fr_0.95fr_1.2fr] lg:gap-0">
                         {/* Brand */}
                         <div className="flex flex-col items-center text-center sm:col-span-2 lg:col-span-1 lg:items-start lg:border-e lg:border-[var(--color-accent)]/25 lg:pe-10 lg:text-start">
                             <Link href="/" className="group mb-3 inline-flex">
@@ -249,16 +249,6 @@ const Footer = async ({ t, language }: FooterProps) => {
                             </div>
                         </div>
 
-                        {/* Quality message */}
-                        <div className="flex flex-col items-center justify-center text-center lg:items-start lg:justify-self-end lg:ps-8 lg:text-start">
-                            <span className="mb-2 text-base font-extrabold text-[var(--color-accent-light)] sm:text-lg">
-                                {isArabic ? 'جودة عالمية' : 'Global Quality'}
-                            </span>
-                            <p className="max-w-[180px] text-xs leading-relaxed text-[var(--color-text-main-dark)]/85 sm:text-sm">
-                                {isArabic ? 'في خدمة السوق السوري' : 'Serving the Syrian market'}
-                            </p>
-                            <div className="mt-4 h-px w-20 bg-gradient-to-r from-transparent via-[var(--color-accent-light)] to-transparent" />
-                        </div>
                     </div>
                 </div>
 
