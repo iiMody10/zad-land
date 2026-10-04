@@ -149,10 +149,10 @@ const Footer = async ({ t, language }: FooterProps) => {
                         <div className="flex flex-col items-center text-center sm:col-span-2 lg:col-span-1 lg:items-start lg:border-e lg:border-[var(--color-accent)]/25 lg:pe-10 lg:text-start">
                             <Link href="/" className="group mb-3 inline-flex">
                                 <Image
-                                    src="/images/logo.png"
+                                    src="/images/zad-land-white-logo.webp"
                                     alt={brandTitle}
-                                    width={150}
-                                    height={90}
+                                    width={1535}
+                                    height={1025}
                                     className="h-auto w-32 object-contain sm:w-36"
                                 />
                             </Link>
