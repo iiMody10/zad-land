@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { LayoutDashboard as MdDashboard, ShoppingBag as MdShoppingBag, Store as MdStorefront, Shapes as MdCategory, GalleryHorizontalEnd as MdViewCarousel, Package as MdInventory2, Tag as MdLocalOffer, FilePenLine as MdEditNote, Users as MdGroup, Settings as MdSettings, X as MdClose, LogOut as MdLogout, GitBranch as MdAccountTree } from 'lucide-react';
+import { LayoutDashboard as MdDashboard, ShoppingBag as MdShoppingBag, Store as MdStorefront, Shapes as MdCategory, GalleryHorizontalEnd as MdViewCarousel, Package as MdInventory2, Tag as MdLocalOffer, FilePenLine as MdEditNote, Users as MdGroup, Settings as MdSettings, X as MdClose, LogOut as MdLogout, GitBranch as MdAccountTree, Phone as MdPhone } from 'lucide-react';
 import { usePathname } from "next/navigation";
 import { signOutAdmin, useAdminSession } from "../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
@@ -69,6 +69,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             title: t('admin.storeAndSystem') || "Store & System",
             items: [
                 { href: "/admin/banners", icon: MdViewCarousel, label: t('admin.banners'), permission: "canManageBanners" },
+                { href: "/admin/site-content?tab=business", icon: MdPhone, label: isArabic ? "التواصل والسوشيال ميديا" : "Contact & Social", superAdminOnly: true },
                 { href: "/admin/site-content", icon: MdEditNote, label: t('admin.siteContent'), superAdminOnly: true },
                 { href: "/admin/users", icon: MdGroup, label: t('admin.users'), superAdminOnly: true },
                 { href: "/admin/settings", icon: MdSettings, label: t('admin.settings'), superAdminOnly: true }

@@ -24,7 +24,7 @@ class CatalogController extends Controller
         ]);
         $limit = min((int) ($data['limit'] ?? 32), 32);
         $page = (int) ($data['page'] ?? 1);
-        $query = Product::query()->whereHas('brand', fn ($q) => $q->where('is_active', true))
+        $query = Product::query()->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))
             ->with(['brand:id,name,slug,group', 'category:id,name']);
         $categoryIds = $this->csvIds($data['categoryIds'] ?? '');
         $brandIds = $this->csvIds($data['brandIds'] ?? '');
@@ -78,14 +78,14 @@ class CatalogController extends Controller
 
     public function trending()
     {
-        $products = Product::with('category')->where('is_trending', true)->get();
+        $products = Product::with('category')->where('is_active', true)->where('is_trending', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))->get();
 
         return response()->json(ApiJson::camel($products))->header('Cache-Control', 'private, no-store');
     }
 
     public function product(string $slug)
     {
-        $product = Product::with(['brand', 'category', 'mainCategory'])->where('slug', $slug)->whereHas('brand', fn ($q) => $q->where('is_active', true))->firstOrFail();
+        $product = Product::with(['brand', 'category', 'mainCategory'])->where('slug', $slug)->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))->firstOrFail();
 
         return response()->json(ApiJson::camel($product))->header('Cache-Control', 'private, no-store');
     }
@@ -93,11 +93,11 @@ class CatalogController extends Controller
     public function home()
     {
         $banners = Banner::where('is_active', true)->orderByDesc('created_at')->get();
-        $homeCategories = Category::whereHas('products')->whereHas('brand', fn ($q) => $q->where('is_active', true))
-            ->with('brand:id,name,slug')->withCount('products')
+        $homeCategories = Category::whereHas('products', fn ($q) => $q->where('is_active', true))->whereHas('brand', fn ($q) => $q->where('is_active', true))
+            ->with('brand:id,name,slug')->withCount(['products' => fn ($q) => $q->where('is_active', true)])
             ->orderByDesc('is_featured')->orderByDesc('products_count')->orderBy('name')->take(8)->get();
         $featuredCategories = $homeCategories->map(function (Category $category): array {
-            $product = Product::where('category_id', $category->id)->whereHas('brand', fn ($q) => $q->where('is_active', true))->orderByDesc('is_trending')->orderByDesc('created_at')->first();
+            $product = Product::where('category_id', $category->id)->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))->orderByDesc('is_trending')->orderByDesc('created_at')->first();
             $image = $category->image ?: (is_string($product?->images) ? (explode(',', $product->images)[0] ?? null) : null);
 
             return [
@@ -114,13 +114,13 @@ class CatalogController extends Controller
 
         $sections = $homeCategories->take(6)
             ->map(function (Category $category): ?array {
-                $products = Product::where('category_id', $category->id)->whereHas('brand', fn ($q) => $q->where('is_active', true))
+                $products = Product::where('category_id', $category->id)->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))
                     ->with('brand:id,name,slug,group')->orderByDesc('is_trending')->orderByDesc('created_at')->take(18)->get();
                 if ($products->isEmpty()) {
                     return null;
                 }
 
-                return ['category' => ['id' => $category->id, 'name' => trim($category->name), 'slug' => $category->slug, 'description' => $category->description ? trim($category->description) : null, 'image' => $category->image, 'productCount' => Product::where('category_id', $category->id)->whereHas('brand', fn ($q) => $q->where('is_active', true))->count()],
+                return ['category' => ['id' => $category->id, 'name' => trim($category->name), 'slug' => $category->slug, 'description' => $category->description ? trim($category->description) : null, 'image' => $category->image, 'productCount' => Product::where('category_id', $category->id)->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))->count()],
                     'products' => $products->map(fn (Product $p) => ['id' => $p->id, 'slug' => $p->slug, 'name' => $p->name, 'description' => $p->description, 'price' => $p->price !== null ? (float) $p->price : null, 'discountPrice' => $p->discount_price !== null ? (float) $p->discount_price : null, 'images' => $p->images, 'categoryId' => $p->category_id, 'stock' => $p->stock, 'minOrder' => $p->min_order, 'packaging' => $p->packaging, 'itemsPerPackage' => $p->items_per_package, 'pricingNeedsReview' => $p->pricing_needs_review, 'isTrending' => $p->is_trending, 'brand' => $p->brand ? ApiJson::camel($p->brand->only(['id', 'name', 'slug', 'group'])) : null])->values()];
             })->filter()->values();
 
@@ -131,7 +131,7 @@ class CatalogController extends Controller
     public function categories(Request $request)
     {
         $data = $request->validate(['limit' => ['nullable', 'integer', 'min:1', 'max:1000'], 'brandId' => ['nullable', 'string', 'max:191']]);
-        $query = Category::query()->whereHas('brand', fn ($q) => $q->where('is_active', true))->with('brand:id,name,slug,group')->orderByDesc('is_featured')->orderBy('name');
+        $query = Category::query()->whereHas('brand', fn ($q) => $q->where('is_active', true))->whereHas('products', fn ($q) => $q->where('is_active', true))->with('brand:id,name,slug,group')->orderByDesc('is_featured')->orderBy('name');
         if (! empty($data['brandId'])) {
             $query->where('brand_id', $data['brandId']);
         }
@@ -154,7 +154,7 @@ class CatalogController extends Controller
         // rendered. Return all active departments here so admins can add one
         // even before its legacy show_in_nav flag has been enabled.
         $mainCategories = MainCategory::where('is_active', true)->orderBy('nav_order')
-            ->with(['brands' => fn ($q) => $q->where('is_active', true)->orderBy('name'), 'categories' => fn ($q) => $q->where('show_in_nav', true)->whereHas('brand', fn ($brand) => $brand->where('is_active', true))->with('brand')->orderBy('nav_order')->orderBy('name')->take(100), 'products' => fn ($q) => $q->with('brand')->orderByDesc('created_at')->take(40)])
+            ->with(['brands' => fn ($q) => $q->where('is_active', true)->orderBy('name'), 'categories' => fn ($q) => $q->where('show_in_nav', true)->whereHas('products', fn ($product) => $product->where('is_active', true))->whereHas('brand', fn ($brand) => $brand->where('is_active', true))->with('brand')->orderBy('nav_order')->orderBy('name')->take(100), 'products' => fn ($q) => $q->where('is_active', true)->whereHas('brand', fn ($brand) => $brand->where('is_active', true))->with('brand')->orderByDesc('created_at')->take(40)])
             ->get();
         $data = $mainCategories->map(function (MainCategory $main): array {
             $brands = collect();
@@ -189,7 +189,7 @@ class CatalogController extends Controller
 
     public function brands(Request $request)
     {
-        $query = Brand::where('is_active', true)->with(['mainCategory:id,name,slug'])->withCount(['products', 'categories'])->orderBy('name');
+        $query = Brand::where('is_active', true)->with(['mainCategory:id,name,slug'])->withCount(['products' => fn ($q) => $q->where('is_active', true), 'categories'])->orderBy('name');
         if ($request->filled('mainCategoryId')) {
             $query->where(fn ($q) => $q->where('main_category_id', $request->string('mainCategoryId'))->orWhereHas('categories', fn ($c) => $c->where('main_category_id', $request->string('mainCategoryId'))));
         }
@@ -200,7 +200,7 @@ class CatalogController extends Controller
     public function sitemap()
     {
         return response()->json([
-            'products' => ApiJson::camel(Product::whereHas('brand', fn ($q) => $q->where('is_active', true))->get(['slug', 'updated_at'])),
+            'products' => ApiJson::camel(Product::where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))->get(['slug', 'updated_at'])),
             'departments' => ApiJson::camel(MainCategory::where('is_active', true)->get(['slug', 'updated_at'])),
             'brands' => ApiJson::camel(Brand::where('is_active', true)->get(['slug', 'updated_at'])),
             'categories' => ApiJson::camel(Category::whereHas('brand', fn ($q) => $q->where('is_active', true))->get(['slug', 'updated_at'])),

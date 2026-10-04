@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import AdminHeader from "../../components/AdminHeader";
 import AddProductModal from "./AddProductModal";
-import { deleteProduct, toggleProductTrending, bulkToggleTrending, bulkCreateProducts, bulkRemoveSale, bulkDeleteProducts } from "../../../../lib/admin-actions";
+import { deleteProduct, toggleProductTrending, toggleProductActive, bulkToggleTrending, bulkCreateProducts, bulkRemoveSale, bulkDeleteProducts } from "../../../../lib/admin-actions";
 import { toast } from "react-hot-toast";
 import { useAdminSession } from "../../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
@@ -39,6 +39,7 @@ interface Product {
     options?: string | null;
     images: string;
     isTrending: boolean;
+    isActive: boolean;
     brandId: string;
     brand: {
         id: string;
@@ -111,6 +112,7 @@ export default function ProductsClient({
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+    const [activeLoadingMap, setActiveLoadingMap] = useState<Record<string, boolean>>({});
     const [isSubmittingBulk, setIsSubmittingBulk] = useState(false);
     const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
     const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'name', direction: 'asc' });
@@ -230,9 +232,8 @@ export default function ProductsClient({
                 const valB = String(b.brand?.name || '').toLowerCase();
                 comparison = valA.localeCompare(valB);
             } else if (key === 'status') {
-                // Determine status value: stock > 0 => 1 (active), stock <= 0 => 0 (draft/inactive)
-                const valA = Number(a.stock) > 0 ? 1 : 0;
-                const valB = Number(b.stock) > 0 ? 1 : 0;
+                const valA = a.isActive ? 1 : 0;
+                const valB = b.isActive ? 1 : 0;
                 comparison = valA - valB;
             } else {
                 // Default string comparison for name, etc.
@@ -275,6 +276,24 @@ export default function ProductsClient({
     const startIndex = (currentPage - 1) * itemsPerPage;
     const currentItems = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
     const allFilteredProductsSelected = filteredProducts.length > 0 && filteredProducts.every(product => selectedIds.has(product.id));
+    const hasActiveFilters = Boolean(
+        searchQuery ||
+        (selectedBrand !== "All Brands" && selectedBrand !== t('admin.allBrands')) ||
+        (selectedCategory !== "All Categories" && selectedCategory !== t('admin.allCategories')) ||
+        (selectedStockStatus !== "Stock Status" && selectedStockStatus !== t('admin.stockStatus')) ||
+        showTrendingOnly ||
+        showOnSaleOnly
+    );
+
+    const clearFilters = () => {
+        setSearchQuery("");
+        setSelectedBrand(t('admin.allBrands'));
+        setSelectedCategory(t('admin.allCategories'));
+        setSelectedStockStatus(t('admin.stockStatus'));
+        setShowTrendingOnly(false);
+        setShowOnSaleOnly(false);
+        setCurrentPage(1);
+    };
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -419,6 +438,26 @@ export default function ProductsClient({
             toast.error("An unexpected error occurred");
         } finally {
             setLoadingMap(prev => ({ ...prev, [id]: false }));
+        }
+    };
+
+    const handleToggleActive = async (id: string, currentStatus: boolean) => {
+        setActiveLoadingMap(prev => ({ ...prev, [id]: true }));
+        try {
+            const result = await toggleProductActive(id, !currentStatus);
+            if (result.success) {
+                toast.success(isArabic
+                    ? (!currentStatus ? 'تم تفعيل المنتج وسيظهر للعملاء' : 'تم تحويل المنتج إلى مسودة')
+                    : (!currentStatus ? 'Product is now active and visible to customers' : 'Product moved to drafts'));
+                router.refresh();
+            } else {
+                toast.error(result.error || (isArabic ? 'تعذر تحديث حالة المنتج' : 'Failed to update product status'));
+            }
+        } catch (error) {
+            console.error('Error toggling product publication status:', error);
+            toast.error(isArabic ? 'تعذر تحديث حالة المنتج' : 'Failed to update product status');
+        } finally {
+            setActiveLoadingMap(prev => ({ ...prev, [id]: false }));
         }
     };
 
@@ -802,6 +841,16 @@ export default function ProductsClient({
                             </div>
                         </div>
 
+                        {hasActiveFilters && <div className="flex justify-end">
+                            <button
+                                type="button"
+                                onClick={clearFilters}
+                                className="rounded-lg border border-[var(--color-accent)]/40 px-3 py-1.5 text-xs font-bold text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)]/10 dark:text-[var(--color-accent-light)]"
+                            >
+                                {isArabic ? 'مسح عوامل التصفية' : 'Clear filters'}
+                            </button>
+                        </div>}
+
                         {/* Bulk Actions Bar */}
                         {selectedIds.size > 0 && (
                             <div className="bg-primary/5 dark:bg-primary/10 border-b border-black/[0.04] dark:border-white/[0.04] dark:border-white/[0.04] px-5 py-4 flex items-center justify-between animate-in slide-in-from-top duration-300">
@@ -980,13 +1029,21 @@ export default function ProductsClient({
                                                     </button>
                                                 </td>
                                                 <td className="p-3 sm:p-5">
-                                                    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium border ${product.stock == null ? 'bg-gray-50 text-gray-500 border-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-white/[0.04]' : Number(product.stock) > 0
-                                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-800/50'
-                                                        : 'bg-gray-50 text-gray-700 border-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-white/[0.04]'
-                                                        }`}>
-                                                        <span className={`size-1 sm:size-1.5 rounded-full ${product.stock == null ? 'bg-gray-400' : Number(product.stock) > 0 ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
-                                                        {product.stock == null ? (language === 'ar' ? 'غير متتبع' : 'Not tracked') : Number(product.stock) > 0 ? t('admin.active') : t('admin.draft')}
-                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleToggleActive(product.id, product.isActive)}
+                                                        disabled={!canEdit || activeLoadingMap[product.id]}
+                                                        title={isArabic
+                                                            ? (product.isActive ? 'إيقاف ظهور المنتج وتحويله إلى مسودة' : 'تفعيل المنتج وإظهاره للعملاء')
+                                                            : (product.isActive ? 'Unpublish product and move to drafts' : 'Publish product and show it to customers')}
+                                                        className={`inline-flex cursor-pointer items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium border transition-colors disabled:cursor-default ${product.isActive
+                                                            ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100 dark:bg-emerald-900/10 dark:text-emerald-400 dark:border-emerald-800/50 dark:hover:bg-emerald-900/20'
+                                                            : 'bg-gray-50 text-gray-700 border-gray-100 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-white/[0.04] dark:hover:bg-gray-700'
+                                                            }`}
+                                                    >
+                                                        <span className={`size-1 sm:size-1.5 rounded-full ${product.isActive ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
+                                                        {activeLoadingMap[product.id] ? <MdSync className="size-3 animate-spin" /> : product.isActive ? t('admin.active') : t('admin.draft')}
+                                                    </button>
                                                 </td>
                                                 <td className={`p-3 sm:p-5 ${dir === 'rtl' ? 'text-start' : 'text-end'}`}>
                                                     <div className={`flex items-center ${dir === 'rtl' ? 'justify-start' : 'justify-end'} gap-1 sm:gap-2 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity`}>
@@ -1050,8 +1107,20 @@ export default function ProductsClient({
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={9} className="p-10 text-center text-text-sub dark:text-gray-500 italic">
-                                                {t('admin.noProductsMatch')}
+                                            <td colSpan={9} className="p-10 text-center text-text-sub dark:text-gray-500">
+                                                <div className="flex flex-col items-center gap-3">
+                                                    <span>{hasActiveFilters
+                                                        ? (isArabic ? 'لا توجد منتجات تطابق عوامل التصفية الحالية.' : 'No products match the current filters.')
+                                                        : t('admin.noProductsMatch')}
+                                                    </span>
+                                                    {hasActiveFilters && <button
+                                                        type="button"
+                                                        onClick={clearFilters}
+                                                        className="rounded-lg border border-[var(--color-accent)]/40 px-3 py-1.5 text-xs font-bold text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)]/10 dark:text-[var(--color-accent-light)]"
+                                                    >
+                                                        {isArabic ? 'مسح عوامل التصفية وعرض كل المنتجات' : 'Clear filters and show all products'}
+                                                    </button>}
+                                                </div>
                                             </td>
                                         </tr>
                                     )}

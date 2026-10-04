@@ -96,7 +96,7 @@ class OrderController extends Controller
                 $qtyByProduct = [];
                 foreach ($lines as $line) {
                     $product = $products->get($line['productId']);
-                    if (! $product || ! $product->brand?->is_active) {
+                    if (! $product || ! $product->is_active || ! $product->brand?->is_active) {
                         throw new HttpException(409, 'A product in your cart is no longer available.');
                     }
                     if ($product->pricing_needs_review || $product->price === null) {

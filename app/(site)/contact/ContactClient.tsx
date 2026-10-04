@@ -13,10 +13,11 @@ interface ContactClientProps {
     dir: 'rtl' | 'ltr';
     content: ContactPageContent;
     settings: {
+        companyContacts?: string | null;
         footerWhatsappUrl?: string | null;
         footerFacebookUrl?: string | null;
         footerInstagramUrl?: string | null;
-        companyContacts?: string | null;
+        footerPhone?: string | null;
         footerEmail?: string | null;
     } | null;
 }
@@ -65,11 +66,12 @@ export default function ContactClient({ language, dir, content, settings }: Cont
                             </div>
                         </a>}
 
-                        {content.contactInfoEnabled && (companyContacts.some((contact) => contact.enabled) || content.addressEnabled || content.hoursEnabled || content.emailEnabled) && <div className="space-y-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
+                        {content.contactInfoEnabled && (companyContacts.some((contact) => contact.enabled) || content.addressEnabled || content.hoursEnabled || content.emailEnabled || settings?.footerPhone) && <div className="space-y-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
                             <CompanyContacts contacts={companyContacts} language={language} />
                             {content.addressEnabled && <InfoItem icon={<LuMapPin />} title={copy('addressTitle')} primary={copy('addressLine')} secondary={copy('addressDescription')} />}
                             {content.hoursEnabled && <InfoItem icon={<LuClock />} title={copy('hoursTitle')} primary={copy('hoursLine')} secondary={copy('hoursDescription')} />}
-                            {content.emailEnabled && <InfoItem icon={<LuMail />} title={copy('emailTitle')} primary={settings?.footerEmail || ''} />}
+                            {settings?.footerPhone && <InfoItem icon={<LuPhone />} title={isAr ? 'الهاتف' : 'Phone'} primary={settings.footerPhone} href={`tel:${settings.footerPhone.replace(/[^\d+]/g, '')}`} />}
+                            {content.emailEnabled && settings?.footerEmail && <InfoItem icon={<LuMail />} title={copy('emailTitle')} primary={settings.footerEmail} href={`mailto:${settings.footerEmail}`} />}
                         </div>}
 
                         {content.socialEnabled && (showFacebook || showInstagram) && <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)]">
@@ -112,10 +114,10 @@ export default function ContactClient({ language, dir, content, settings }: Cont
 
 const inputClass = "w-full rounded-xl border border-gray-200 bg-[var(--color-canvas)] px-3.5 py-2.5 text-sm text-[var(--color-brand)] outline-none transition-all focus:border-[var(--color-accent)] focus:ring-2 focus:ring-[var(--color-accent)]/20 dark:border-white/10 dark:bg-zinc-800 dark:text-white";
 
-function InfoItem({ icon, title, primary, secondary }: { icon: React.ReactNode; title: string; primary: string; secondary?: string }) {
+function InfoItem({ icon, title, primary, secondary, href }: { icon: React.ReactNode; title: string; primary: string; secondary?: string; href?: string }) {
     return <div className="flex items-start gap-3.5">
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-lg text-[var(--color-accent)] dark:bg-white/5 dark:text-[var(--color-accent-light)]">{icon}</div>
-        <div><h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">{title}</h3><p className="mt-0.5 text-sm font-semibold text-[var(--color-brand)] dark:text-white">{primary}</p>{secondary && <p className="mt-0.5 text-xs text-slate-500 dark:text-zinc-400">{secondary}</p>}</div>
+        <div><h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">{title}</h3>{href ? <a href={href} className="mt-0.5 block text-sm font-semibold text-[var(--color-brand)] hover:underline dark:text-white">{primary}</a> : <p className="mt-0.5 text-sm font-semibold text-[var(--color-brand)] dark:text-white">{primary}</p>}{secondary && <p className="mt-0.5 text-xs text-slate-500 dark:text-zinc-400">{secondary}</p>}</div>
     </div>;
 }
 

@@ -17,7 +17,7 @@ class WishlistController extends Controller
         if ($request->boolean('idsOnly')) {
             return response()->json(['wishlistIds' => $items->pluck('product_id')])->header('Cache-Control', 'private, no-store');
         }
-        $products = $items->filter(fn ($item) => $item->product?->brand?->is_active)->pluck('product')->values();
+        $products = $items->filter(fn ($item) => $item->product?->is_active && $item->product?->brand?->is_active)->pluck('product')->values();
 
         return response()->json(['products' => ApiJson::camel($products)])->header('Cache-Control', 'private, no-store');
     }
@@ -25,7 +25,7 @@ class WishlistController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate(['productId' => ['required', 'string', 'max:191']]);
-        $product = Product::whereKey($data['productId'])->whereHas('brand', fn ($q) => $q->where('is_active', true))->first();
+        $product = Product::whereKey($data['productId'])->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))->first();
         if (! $product) {
             return response()->json(['error' => 'Product not found'], 404);
         }

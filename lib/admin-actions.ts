@@ -243,6 +243,7 @@ export async function getAdminProducts(): Promise<any[]> {
         discountValue: product.discountValue == null ? null : Number(product.discountValue),
         stock: Number(product.stock ?? 0),
         minOrder: Number(product.minOrder ?? 1),
+        isActive: product.isActive !== false,
     }));
 }
 export async function getAdminCategories(page = 1, limit = 500) {
@@ -272,6 +273,7 @@ export async function deleteCategory(id: string) { return mutation(`/admin/categ
 export async function toggleCategoryFeatured(id: string, isFeatured: boolean) { return mutation(`/admin/categories/${encodeURIComponent(id)}`, "PATCH", { isFeatured }); }
 
 export async function toggleProductTrending(id: string, isTrending: boolean) { return mutation(`/admin/products/${encodeURIComponent(id)}`, "PATCH", { isTrending }); }
+export async function toggleProductActive(id: string, isActive: boolean) { return mutation(`/admin/products/${encodeURIComponent(id)}`, "PATCH", { isActive }); }
 export async function getTrendingProducts() { return publicProducts("page=1&limit=32&isTrending=true"); }
 export async function getCategoriesForCleanup() { return getAdminCategories(1, 1000).then((result) => result.categories); }
 export async function bulkFixCategoryNames(mapping: { id: string; newName: string }[]) {

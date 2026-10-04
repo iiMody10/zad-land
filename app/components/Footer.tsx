@@ -222,22 +222,26 @@ const Footer = async ({ t, language }: FooterProps) => {
                         </div>
 
                         {/* Contact */}
-                        <div className="text-center lg:border-e lg:border-[var(--color-accent)]/25 lg:px-6">
-                            <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{contactTitle}</h5>
-                            <div className="flex flex-col items-center gap-3 text-xs text-[var(--color-text-main-dark)]/90 sm:text-sm">
+                        <div className="text-start lg:border-e lg:border-[var(--color-accent)]/25 lg:px-6">
+                            <h5 className="mb-3 text-sm font-extrabold text-[var(--color-accent-light)]">{contactTitle}</h5>
+                            <div className="flex w-full flex-col gap-3 text-xs text-[var(--color-text-main-dark)]/90 sm:text-sm">
                                 <CompanyContacts contacts={companyContacts} language={language} compact />
-                                {contactAddress && <div className="flex items-center gap-2">
-                                    <LuMapPin className="shrink-0 text-[var(--color-accent-light)]" />
-                                    <span>{contactAddress}</span>
-                                </div>}
-                                {contactPhone && <a className="flex items-center gap-2 transition-colors hover:text-[var(--color-accent-light)]" href={`tel:${phoneHref}`}>
-                                    <LuPhone className="shrink-0 text-[var(--color-accent-light)]" />
-                                    <span dir="ltr">{contactPhone}</span>
-                                </a>}
-                                {contactEmail && <a className="flex items-center gap-2 transition-colors hover:text-[var(--color-accent-light)]" href={`mailto:${contactEmail}`}>
-                                    <LuMail className="shrink-0 text-[var(--color-accent-light)]" />
-                                    <span>{contactEmail}</span>
-                                </a>}
+                                {(contactAddress || contactPhone || contactEmail) && (
+                                    <div className="flex w-full flex-col gap-2 border-t border-white/10 pt-3">
+                                        {contactAddress && <div className="flex min-w-0 items-start gap-2">
+                                            <LuMapPin className="shrink-0 text-[var(--color-accent-light)]" />
+                                            <span className="min-w-0">{contactAddress}</span>
+                                        </div>}
+                                        {contactPhone && <a className="flex min-w-0 items-center gap-2 transition-colors hover:text-[var(--color-accent-light)]" href={`tel:${phoneHref}`}>
+                                            <LuPhone className="shrink-0 text-[var(--color-accent-light)]" />
+                                            <span dir="ltr" className="min-w-0 whitespace-nowrap">{contactPhone}</span>
+                                        </a>}
+                                        {contactEmail && <a className="flex min-w-0 items-start gap-2 transition-colors hover:text-[var(--color-accent-light)]" href={`mailto:${contactEmail}`}>
+                                            <LuMail className="shrink-0 text-[var(--color-accent-light)]" />
+                                            <span className="min-w-0 break-all">{contactEmail}</span>
+                                        </a>}
+                                    </div>
+                                )}
                                 {whatsappUrl !== '#' && whatsappLabel && <a className="mt-1 inline-flex items-center gap-1.5 font-bold text-[var(--color-accent-light)] transition-colors hover:text-white" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
                                     <PlatformIcon platform="whatsapp" className="size-4" />
                                     <span>{whatsappLabel}</span>

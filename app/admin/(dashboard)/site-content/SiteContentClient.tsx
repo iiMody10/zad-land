@@ -195,15 +195,17 @@ export default function SiteContentClient({
     categories,
     mainCategories,
     initialHeaderNavItems,
+    initialTab,
 }: { 
     initialSettings: SiteSettings | null;
     categories: FooterCategoryOption[];
     mainCategories: Array<FooterCategoryOption & { nameEn?: string }>;
     initialHeaderNavItems: HeaderNavItemRef[];
+    initialTab?: TabType;
 }) {
     const { t, dir, language } = useLanguage();
     const { openSidebar } = useAdminSidebar();
-    const [activeTab, setActiveTab] = useState<TabType>("currency");
+    const [activeTab, setActiveTab] = useState<TabType>(initialTab || "currency");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [headerNavItems, setHeaderNavItems] = useState<HeaderNavItemRef[]>(initialHeaderNavItems);
     const [contactContent, setContactContent] = useState<ContactPageContent>(() => parseContactPageContent(initialSettings?.contactPageContent));

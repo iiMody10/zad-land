@@ -29,7 +29,7 @@ class AdminController extends Controller
         'brands' => [Brand::class, 'brands', ['name', 'slug', 'description', 'image', 'group', 'is_active', 'is_featured', 'main_category_id']],
         'main-categories' => [MainCategory::class, 'main_categories', ['name', 'slug', 'description', 'image', 'is_active', 'show_in_nav', 'nav_order', 'is_featured']],
         'categories' => [Category::class, 'categories', ['name', 'slug', 'description', 'image', 'brand_id', 'main_category_id', 'is_featured', 'show_in_nav', 'nav_order']],
-        'products' => [Product::class, 'products', ['name', 'name_ar', 'name_en', 'slug', 'images', 'is_trending', 'description', 'description_ar', 'description_en', 'price', 'discount_price', 'discount_type', 'discount_value', 'stock', 'min_order', 'packaging', 'items_per_package', 'pricing_needs_review', 'options', 'category_id', 'sku', 'brand_id', 'main_category_id']],
+        'products' => [Product::class, 'products', ['name', 'name_ar', 'name_en', 'slug', 'images', 'is_trending', 'is_active', 'description', 'description_ar', 'description_en', 'price', 'discount_price', 'discount_type', 'discount_value', 'stock', 'min_order', 'packaging', 'items_per_package', 'pricing_needs_review', 'options', 'category_id', 'sku', 'brand_id', 'main_category_id']],
         'banners' => [Banner::class, 'banners', ['title', 'subtitle', 'title_ar', 'subtitle_ar', 'image', 'image_mobile', 'button_text', 'button_text_ar', 'link', 'badge', 'badge_ar', 'is_active']],
         'promo-codes' => [PromoCode::class, 'promo_codes', ['code', 'discount_percentage', 'delegate_name', 'is_active']],
     ];
