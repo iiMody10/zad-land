@@ -52,7 +52,12 @@ export default function ContactClient({ language, dir, content, settings }: Cont
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                const message = data?.message || data?.error || (isAr ? 'حدث خطأ أثناء إرسال الرسالة، يرجى المحاولة مرة أخرى.' : 'Failed to send message, please try again.');
+                let message = data?.message || data?.error;
+                if (!message || message === 'Server Error' || message === 'Internal Server Error') {
+                    message = isAr 
+                        ? 'تعذر إرسال الرسالة حالياً، يرجى المحاولة مرة أخرى أو التواصل مباشرة عبر واتساب.' 
+                        : 'Failed to send message, please try again or contact us via WhatsApp.';
+                }
                 throw new Error(message);
             }
             setSubmitted(true);

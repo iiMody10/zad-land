@@ -11,18 +11,37 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contact_messages', function (Blueprint $table) {
-            $table->string('id', 191)->collation('utf8mb4_0900_bin')->primary();
-            $table->string('name', 191);
-            $table->string('business_name', 191)->nullable();
-            $table->string('phone', 64);
-            $table->text('message');
-            $table->string('status', 32)->default('unread');
-            $table->dateTime('created_at', precision: 3)->useCurrent();
-            $table->dateTime('updated_at', precision: 3);
+        if (Schema::hasTable('contact_messages')) {
+            return;
+        }
 
-            $table->index(['status', 'created_at']);
-        });
+        try {
+            Schema::create('contact_messages', function (Blueprint $table) {
+                $table->string('id', 191)->collation('utf8mb4_0900_bin')->primary();
+                $table->string('name', 191);
+                $table->string('business_name', 191)->nullable();
+                $table->string('phone', 64);
+                $table->text('message');
+                $table->string('status', 32)->default('unread');
+                $table->dateTime('created_at', precision: 3)->useCurrent();
+                $table->dateTime('updated_at', precision: 3)->useCurrent();
+
+                $table->index(['status', 'created_at']);
+            });
+        } catch (\Throwable) {
+            Schema::create('contact_messages', function (Blueprint $table) {
+                $table->string('id', 191)->primary();
+                $table->string('name', 191);
+                $table->string('business_name', 191)->nullable();
+                $table->string('phone', 64);
+                $table->text('message');
+                $table->string('status', 32)->default('unread');
+                $table->dateTime('created_at', precision: 3)->useCurrent();
+                $table->dateTime('updated_at', precision: 3)->useCurrent();
+
+                $table->index(['status', 'created_at']);
+            });
+        }
     }
 
     /**
