@@ -20,11 +20,14 @@ class UploadController extends Controller
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
         $permission = match ($folder) {
-            'products' => 'can_manage_products', 'brands' => 'can_manage_brands',
-            'categories', 'main-categories' => 'can_manage_categories', 'banners' => 'can_manage_banners',
+            'products' => 'can_manage_products',
+            'brands' => 'can_manage_brands',
+            'categories', 'main-categories' => 'can_manage_categories',
+            'banners' => 'can_manage_banners',
+            'about', 'general', 'settings', 'shipping', 'site-content' => true,
             default => null,
         };
-        if ($user->role !== 'SUPER_ADMIN' && (! $permission || ! $user->{$permission})) {
+        if ($user->role !== 'SUPER_ADMIN' && (! $permission || ($permission !== true && ! $user->{$permission}))) {
             return response()->json(['error' => 'Forbidden'], 403);
         }
         $request->validate(['file' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp,gif,avif', 'max:10240'], 'folder' => ['nullable', 'string', 'max:80']]);

@@ -8,6 +8,7 @@ import { getImageSourceCandidates, IMAGE_PLACEHOLDER_SRC, isValidImageSrc } from
 interface ResilientImageProps extends Omit<ImageProps, "src" | "alt"> {
     src: string | null | undefined;
     fallbackSrc?: string;
+    containerClassName?: string;
     skeletonClassName?: string;
     showSkeleton?: boolean;
     alt?: string;
@@ -20,6 +21,7 @@ const ResilientImage = ({
     onError,
     onLoad,
     className,
+    containerClassName,
     skeletonClassName,
     showSkeleton = true,
     ...imgProps
@@ -38,6 +40,7 @@ const ResilientImage = ({
             onError={onError}
             onLoad={onLoad}
             className={className}
+            containerClassName={containerClassName}
             skeletonClassName={skeletonClassName}
             showSkeleton={showSkeleton}
             imgProps={imgProps}
@@ -52,6 +55,7 @@ interface ResilientImageInnerProps {
     onError?: ImageProps["onError"];
     onLoad?: ImageProps["onLoad"];
     className?: string;
+    containerClassName?: string;
     skeletonClassName?: string;
     showSkeleton?: boolean;
     imgProps: Omit<ImageProps, "src" | "alt">;
@@ -64,6 +68,7 @@ const ResilientImageInner = ({
     onError,
     onLoad,
     className,
+    containerClassName,
     skeletonClassName,
     showSkeleton = true,
     imgProps,
@@ -79,7 +84,7 @@ const ResilientImageInner = ({
     const isPostImg = typeof safeSrc === 'string' && safeSrc.includes('i.postimg.cc');
 
     return (
-        <span className="relative block h-full w-full overflow-hidden">
+        <span className={`relative block h-full w-full overflow-hidden ${containerClassName || ""}`}>
             {/* Background Skeleton Shimmer */}
             {showSkeleton && (
                 <span

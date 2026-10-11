@@ -80,7 +80,17 @@ const text = (enValue: string | null | undefined, arValue: string | null | undef
     return value == null ? fallback[isArabic ? "ar" : "en"] : value.trim();
 };
 
-const image = (value: string | null | undefined, fallback: string) => value?.trim() || fallback;
+const image = (value: string | null | undefined, fallback: string) => {
+    const trimmed = value?.trim();
+    if (!trimmed) return fallback;
+    if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("/")) {
+        return trimmed;
+    }
+    if (trimmed.startsWith("uploads/")) {
+        return `/${trimmed}`;
+    }
+    return trimmed;
+};
 
 export default function AboutUsClient({ settings }: { settings: AboutUsSettings | null }) {
     const { dir, language } = useLanguage();
@@ -133,11 +143,13 @@ export default function AboutUsClient({ settings }: { settings: AboutUsSettings 
                             </Link>}
                         </div>
                     </div>
-                    <div className="relative min-h-[250px] bg-[#e8ece5] sm:min-h-[340px] lg:min-h-[420px]">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#e8ece5] sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[420px]">
                         <ResilientImage
                             src={image(settings?.aboutHeroImage, "/images/redesign/hero-bg.png")}
+                            fallbackSrc="/images/redesign/hero-bg.png"
                             alt={text(settings?.aboutHeroImageAlt, settings?.aboutHeroImageAltAr, { en: "Zad Land wholesale distribution", ar: "مركز زاد لاند للتوزيع" }, isArabic)}
-                            className="absolute inset-0 h-full w-full object-cover"
+                            className="h-full w-full object-cover"
+                            containerClassName="absolute inset-0"
                             sizes="(max-width: 1024px) 100vw, 50vw"
                             priority
                         />
@@ -145,11 +157,13 @@ export default function AboutUsClient({ settings }: { settings: AboutUsSettings 
                 </section>}
 
                 {settings?.aboutNarrativeEnabled !== false && <section aria-labelledby="about-story-title" className="grid items-center gap-8 lg:grid-cols-[.9fr_1.1fr] lg:gap-16">
-                    <div className="relative min-h-[280px] overflow-hidden rounded-[1.25rem] bg-[#e7ebe4] sm:min-h-[390px]">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[1.25rem] bg-[#e7ebe4] shadow-sm sm:aspect-[16/10] lg:aspect-auto lg:h-[460px]">
                         <ResilientImage
                             src={image(settings?.aboutNarrativeImage, "/images/redesign/ad-banner-bg.png")}
+                            fallbackSrc="/images/redesign/ad-banner-bg.png"
                             alt={text(settings?.aboutNarrativeImageAlt, settings?.aboutNarrativeImageAltAr, { en: "Products supplied by Zad Land", ar: "منتجات توزعها زاد لاند" }, isArabic)}
-                            className="absolute inset-0 h-full w-full object-cover"
+                            className="h-full w-full object-cover"
+                            containerClassName="absolute inset-0"
                             sizes="(max-width: 1024px) 100vw, 45vw"
                         />
                     </div>
