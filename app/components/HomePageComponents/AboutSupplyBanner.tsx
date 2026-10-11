@@ -10,16 +10,16 @@ const AboutSupplyBanner = ({ language, dir }: AboutSupplyBannerProps) => {
     const isArabic = language === "ar";
 
     return (
-        <section className="relative isolate z-20 w-full overflow-x-clip bg-[#FFFFFE] dark:bg-[var(--color-surface-dark)] py-4 sm:py-6 md:py-8 md:container-custom" aria-labelledby="about-supply-title">
+        <section className="relative isolate z-20 w-full overflow-x-clip bg-[#FFFFFE] dark:bg-[var(--color-surface-dark)] py-4 sm:py-6 md:py-8 md:container-custom lg:flex lg:min-h-[360px] lg:items-center xl:min-h-[420px]" aria-labelledby="about-supply-title">
             {/* Desktop botanical illustration: Shown on tablet/laptop where there is ample horizontal space; hidden on mobile so it never collides with or obscures the text */}
-            <div className="pointer-events-none absolute -bottom-24 -left-6 z-0 hidden md:block md:h-[340px] md:w-[44%] lg:-left-8 lg:h-[360px] lg:w-[38%]">
+            <div className="pointer-events-none absolute -bottom-24 -left-6 z-0 hidden md:block md:h-[340px] md:w-[44%] lg:bottom-0 lg:-left-8 lg:h-[360px] lg:w-[44%] xl:h-[420px]">
                 <Image
                     src="/images/content.webp"
                     alt=""
                     fill
                     priority={false}
-                    sizes="(max-width: 1024px) 44vw, 38vw"
-                    className="object-contain object-left-bottom"
+                    sizes="(min-width: 1280px) 1260px, (min-width: 1024px) 1080px, 44vw"
+                    className="object-contain object-left-bottom lg:object-cover"
                 />
             </div>
 
