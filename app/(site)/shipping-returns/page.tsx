@@ -3,7 +3,7 @@ import { getSiteSettings } from "@/lib/admin-actions";
 import ShippingReturnsContent from "./ShippingReturnsContent";
 import { Metadata } from "next";
 
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
     title: "الشحن والتوصيل وسياسة التوريد | Shipping & Delivery Terms - Zad Land",

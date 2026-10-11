@@ -30,10 +30,10 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
     return (
         <main className="flex-1 bg-white dark:bg-background-dark" dir={dir}>
             <header className="container-custom text-center py-12 md:py-20">
-                <h1 className="text-4xl md:text-6xl font-display italic mb-6">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-[#153d32] dark:text-white mb-4">
                     {t('shippingReturnsPage.title')}
                 </h1>
-                <p className="text-base md:text-lg text-stone-600 dark:text-stone-400 max-w-2xl mx-auto leading-relaxed px-4">
+                <p className="text-base md:text-lg text-[#56665f] dark:text-stone-300 max-w-2xl mx-auto leading-relaxed px-4">
                     {t('shippingReturnsPage.description')}
                 </p>
             </header>
@@ -46,14 +46,14 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
                             <span className="bg-primary/10 text-primary p-3.5 rounded-full flex-shrink-0">
                                 <MdLocalShipping className="w-6 h-6" />
                             </span>
-                            <h2 className="text-2xl md:text-3xl font-display font-medium">
+                            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#153d32] dark:text-white">
                                 {t('shippingReturnsPage.shipping.title')}
                             </h2>
                         </div>
                         <div className="space-y-8">
                             {/* 1. Verification Section */}
                             <div className={`${dir === 'rtl' ? 'border-r-2 pr-6 pl-0' : 'border-l-2 pl-6'} border-primary/20 py-2`}>
-                                <h3 className="text-xl font-display font-semibold mb-3">
+                                <h3 className="text-lg md:text-xl font-bold text-[#153d32] dark:text-white mb-3">
                                     {getContent('verificationTitle', 'verificationTitleAr', 'shippingReturnsPage.shipping.verification.title')}
                                 </h3>
                                 <p className="text-stone-600 dark:text-stone-400 leading-relaxed">
@@ -63,7 +63,7 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
 
                             {/* 2. Shipping Times */}
                             <div className={`${dir === 'rtl' ? 'border-r-2 pr-6 pl-0' : 'border-l-2 pl-6'} border-primary/20 py-2`}>
-                                <h3 className="text-xl font-display font-semibold mb-3">
+                                <h3 className="text-lg md:text-xl font-bold text-[#153d32] dark:text-white mb-3">
                                     {t('shippingReturnsPage.shipping.timelines.title')}
                                 </h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
@@ -88,7 +88,7 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
 
                             {/* 3. Shipping Review Section */}
                             <div className={`${dir === 'rtl' ? 'border-r-2 pr-6 pl-0' : 'border-l-2 pl-6'} border-primary/20 py-2`}>
-                                <h3 className="text-xl font-display font-semibold mb-3">
+                                <h3 className="text-lg md:text-xl font-bold text-[#153d32] dark:text-white mb-3">
                                     {getContent('shippingTitle', 'shippingTitleAr', 'shippingReturnsPage.shipping.review.title')}
                                 </h3>
                                 <p className="text-stone-600 dark:text-stone-400 leading-relaxed">
@@ -115,7 +115,7 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
                             <span className="bg-primary/10 text-primary p-3.5 rounded-full flex-shrink-0">
                                 <MdAssignmentReturn className="w-6 h-6" />
                             </span>
-                            <h2 className="text-2xl md:text-3xl font-display font-medium">
+                            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#153d32] dark:text-white">
                                 {t('shippingReturnsPage.returns.title')}
                             </h2>
                         </div>
@@ -123,7 +123,7 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
                         {/* Final Sale Section */}
                         <div className="bg-primary text-white p-6 md:p-8 rounded-xl shadow-lg relative overflow-hidden">
                             <div className="relative z-10">
-                                <h3 className="text-2xl font-display font-bold mb-3">
+                                <h3 className="text-xl md:text-2xl font-extrabold text-white mb-3">
                                     {getContent('finalSaleTitle', 'finalSaleTitleAr', 'shippingReturnsPage.returns.finalSale.title')}
                                 </h3>
                                 <p className="text-white/90 text-sm leading-relaxed max-w-md">
@@ -136,7 +136,7 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
                         <div className="space-y-8">
                             {/* Hygiene Section */}
                             <div>
-                                <h3 className={`text-xl font-display font-semibold mb-4 flex items-center ${dir === 'rtl' ? 'space-x-reverse' : ''} space-x-3`}>
+                                <h3 className={`text-lg md:text-xl font-bold text-[#153d32] dark:text-white mb-4 flex items-center ${dir === 'rtl' ? 'space-x-reverse' : ''} space-x-3`}>
                                     <MdVerifiedUser className="text-primary/60 ml-2 text-2xl flex-shrink-0" />
                                     <span>{getContent('hygieneTitle', 'hygieneTitleAr', 'shippingReturnsPage.returns.hygiene.title')}</span>
                                 </h3>
@@ -147,7 +147,7 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
 
                             {/* Returns/Damaged Section */}
                             <div className="bg-primary/5 border border-primary/10 p-6 rounded-xl">
-                                <h3 className="text-xl font-display font-semibold mb-4">
+                                <h3 className="text-lg md:text-xl font-bold text-[#153d32] dark:text-white mb-4">
                                     {getContent('returnsTitle', 'returnsTitleAr', 'shippingReturnsPage.returns.damaged.title')}
                                 </h3>
                                 <p className="text-stone-600 dark:text-stone-400 mb-5 leading-relaxed">
@@ -168,7 +168,7 @@ export default function ShippingReturnsContent({ siteSettings }: ShippingReturns
                         <div className="pt-8 border-t border-primary/10">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                                 <div>
-                                    <h4 className="font-display font-bold text-lg mb-1">
+                                    <h4 className="font-extrabold text-lg text-[#153d32] dark:text-white mb-1">
                                         {t('shippingReturnsPage.support.title')}
                                     </h4>
                                     <p className="text-sm text-stone-500">
