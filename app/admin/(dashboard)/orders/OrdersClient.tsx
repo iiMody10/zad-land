@@ -22,6 +22,14 @@ interface Order {
     streetAddress: string;
     city: string;
     totalAmount: number;
+    discount?: number | string | null;
+    promoCodeId?: string | null;
+    promoCode?: {
+        id?: string;
+        code: string;
+        discountPercentage?: number | null;
+        delegateName?: string | null;
+    } | null;
     status: string;
     createdAt: string;
     items: {
@@ -357,7 +365,14 @@ export default function OrdersClient({ orders }: { orders: Order[] }) {
                                                         </div>
                                                     </td>
                                                     <td className="p-4 text-sm text-text-sub dark:text-gray-400">{new Date(order.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                                                    <td className="p-4 text-sm font-bold text-text-main dark:text-white">${Number(order.totalAmount).toFixed(2)}</td>
+                                                    <td className="p-4 text-sm font-bold text-text-main dark:text-white">
+                                                        <div>${Number(order.totalAmount).toFixed(2)}</div>
+                                                        {Number(order.discount || 0) > 0 && (
+                                                            <div className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                                                {order.promoCode?.code ? `${order.promoCode.code} (-$${Number(order.discount).toFixed(2)})` : `-$${Number(order.discount).toFixed(2)}`}
+                                                            </div>
+                                                        )}
+                                                    </td>
                                                     <td className="p-4">
                                                         <span className="text-xs font-medium text-text-sub bg-background-light dark:bg-gray-800 px-2.5 py-1 rounded-lg border border-black/[0.04] dark:border-white/[0.04] dark:border-white/[0.04] max-w-[150px] truncate block">
                                                             {order.items.map(i => i.product?.name).join(', ') || t('admin.unknown')}

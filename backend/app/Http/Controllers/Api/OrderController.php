@@ -230,7 +230,7 @@ class OrderController extends Controller
         if (! $merchant && ! $admin && ! $this->verifyOrderToken($id, $token)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-        $order = Order::with('items.product')->find($id);
+        $order = Order::with(['items.product', 'promoCode'])->find($id);
         if (! $order) {
             return response()->json(['message' => 'Order not found'], 404);
         }

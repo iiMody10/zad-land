@@ -118,33 +118,40 @@ const FeaturedCollection = ({ newArrivals, bestSellers, settings }: FeaturedColl
                     <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-l from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
                 </div>
 
-                <div className="flex items-center justify-between gap-3">
-                    <div className="tabs-nav min-w-0 flex-1 overflow-x-auto scrollbar-hide" role="tablist">
-                        <div className="flex gap-4 md:gap-2">
+                <div className="flex items-center justify-between gap-2.5">
+                    {tabs.length > 1 ? (
+                        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1 min-w-0 flex-1" role="tablist">
                             {tabs.map((tab, index) => (
                                 <button
                                     key={tab.key}
                                     role="tab"
                                     aria-selected={activeTab === index}
                                     onClick={() => setActiveTab(index)}
-                                    className={`tabs__btn whitespace-nowrap px-6 py-2.5 text-[15px] transition-all border-b-2 ${activeTab === index
-                                        ? 'border-[var(--color-accent)] text-[var(--color-accent)] dark:text-[var(--color-accent-light)] font-bold'
-                                        : 'border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 font-medium'
+                                    className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer ${activeTab === index
+                                        ? 'bg-[var(--color-brand)] text-white shadow-xs dark:bg-[var(--color-accent)] dark:text-slate-900'
+                                        : 'bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300'
                                         }`}
                                 >
                                     {(isArabic ? tab.labelArabic : tab.labelEnglish) || t(tab.labelKey)}
                                 </button>
                             ))}
                         </div>
-                    </div>
+                    ) : (
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-accent)]/25 bg-[var(--color-accent)]/10 px-3.5 py-1.5 text-xs sm:text-sm font-bold text-[var(--color-brand)] dark:border-[var(--color-accent)]/35 dark:text-[var(--color-accent-light)]">
+                            <span className="text-[11px] sm:text-xs">✨</span>
+                            <span>{(isArabic ? tabs[0]?.labelArabic : tabs[0]?.labelEnglish) || t(tabs[0]?.labelKey)}</span>
+                        </div>
+                    )}
 
-                    {activeProducts.length > 0 && <Link
-                        href={allProductsHref}
-                        className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full border border-[var(--color-accent)]/30 bg-[var(--color-canvas)] px-4 py-2 text-xs font-bold text-[var(--color-brand)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] dark:bg-white/5 dark:text-[var(--color-accent-light)]"
-                    >
-                        <span>{allProductsLabel}</span>
-                        <MdChevronRight className={`text-base ${dir === 'rtl' ? 'rotate-180' : ''}`} />
-                    </Link>}
+                    {activeProducts.length > 0 && (
+                        <Link
+                            href={allProductsHref}
+                            className="inline-flex shrink-0 items-center justify-center gap-1 rounded-full border border-[var(--color-accent)]/30 bg-[var(--color-canvas)] px-3.5 py-1.5 text-xs font-bold text-[var(--color-brand)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] dark:bg-white/5 dark:text-[var(--color-accent-light)]"
+                        >
+                            <span>{allProductsLabel}</span>
+                            <MdChevronRight className={`text-base ${dir === 'rtl' ? 'rotate-180' : ''}`} />
+                        </Link>
+                    )}
                 </div>
             </div>
 

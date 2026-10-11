@@ -51,13 +51,13 @@ export default async function SiteLayout({
                     ? siteSettings.footerWhatsappUrl
                     : toWhatsAppUrl(siteSettings?.footerPhone || "+963 933 254 796")}
             >
-                <main className="flex-1 pb-24 md:pb-0">
+                <main className="flex-1">
                     {children}
                 </main>
             </BusinessContactProvider>
 
             {/* Footer */}
-            <Footer t={t} language={language} />
+            <Footer t={t} language={language} initialSettings={siteSettings} />
 
             {/* Mobile Bottom Navigation Bar */}
             <BottomNav />

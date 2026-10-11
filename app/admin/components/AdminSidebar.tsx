@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { LayoutDashboard as MdDashboard, ShoppingBag as MdShoppingBag, Store as MdStorefront, Shapes as MdCategory, GalleryHorizontalEnd as MdViewCarousel, Package as MdInventory2, Tag as MdLocalOffer, FilePenLine as MdEditNote, Users as MdGroup, Settings as MdSettings, X as MdClose, LogOut as MdLogout, GitBranch as MdAccountTree, Phone as MdPhone } from 'lucide-react';
-import { usePathname } from "next/navigation";
+import { LayoutDashboard as MdDashboard, ShoppingBag as MdShoppingBag, Store as MdStorefront, Shapes as MdCategory, GalleryHorizontalEnd as MdViewCarousel, Package as MdInventory2, Tag as MdLocalOffer, FilePenLine as MdEditNote, Users as MdGroup, Settings as MdSettings, X as MdClose, LogOut as MdLogout, GitBranch as MdAccountTree, Phone as MdPhone, Mail as MdMail } from 'lucide-react';
+import { usePathname, useSearchParams } from "next/navigation";
 import { signOutAdmin, useAdminSession } from "../context/AdminSessionContext";
 import { useLanguage } from "@/app/context/LanguageContext";
 
@@ -35,6 +35,7 @@ interface NavSection {
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const { data: session } = useAdminSession();
     const { t, dir, language } = useLanguage();
     const isSuperAdmin = session?.user?.role === 'SUPER_ADMIN';
@@ -62,7 +63,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             items: [
                 { href: "/admin/orders", icon: MdInventory2, label: t('admin.orders'), permission: "canManageOrders" },
                 { href: "/admin/customers", icon: MdGroup, label: isArabic ? "حسابات التجار" : "Merchants", superAdminOnly: true },
-                { href: "/admin/promocodes", icon: MdLocalOffer, label: t('admin.promoCodes'), permission: "canManagePromoCodes" }
+                { href: "/admin/promocodes", icon: MdLocalOffer, label: t('admin.promoCodes'), permission: "canManagePromoCodes" },
+                { href: "/admin/messages", icon: MdMail, label: t('admin.contactMessages') || (isArabic ? "رسائل التواصل" : "Contact Messages"), superAdminOnly: true }
             ]
         },
         {
@@ -151,7 +153,20 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                                         </p>
                                         <div className="flex flex-col gap-0.5">
                                             {visibleItems.map((item) => {
-                                                const isActive = pathname === item.href;
+                                                const currentQueryTab = searchParams.get('tab');
+                                                const itemHasQuery = item.href.includes('?');
+                                                let isActive = false;
+                                                if (itemHasQuery) {
+                                                    const [itemPath, itemQuery] = item.href.split('?');
+                                                    const itemParams = new URLSearchParams(itemQuery);
+                                                    isActive = pathname === itemPath && currentQueryTab === itemParams.get('tab');
+                                                } else {
+                                                    if (item.href === '/admin/site-content') {
+                                                        isActive = pathname === '/admin/site-content' && (!currentQueryTab || currentQueryTab !== 'business');
+                                                    } else {
+                                                        isActive = pathname === item.href;
+                                                    }
+                                                }
                                                 return (
                                                     <Link
                                                         key={item.href}

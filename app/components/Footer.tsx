@@ -11,6 +11,7 @@ import { getSiteSettings } from '@/lib/admin-actions';
 interface FooterProps {
     t: (key: string) => string;
     language: string;
+    initialSettings?: any;
 }
 
 function isExternalUrl(url: string) {
@@ -25,8 +26,8 @@ function getLocalizedValue(language: string, englishValue?: string | null, arabi
     return englishValue || arabicValue || "";
 }
 
-const Footer = async ({ t, language }: FooterProps) => {
-    const settings = await getSiteSettings();
+const Footer = async ({ t, language, initialSettings }: FooterProps) => {
+    const settings = initialSettings ?? (await getSiteSettings());
     const footerCategories = await getFooterCategories([
         settings?.footerCategory1Id || "",
         settings?.footerCategory2Id || "",
@@ -143,67 +144,99 @@ const Footer = async ({ t, language }: FooterProps) => {
             <div className="absolute inset-0 bg-[var(--color-brand)]/45" aria-hidden="true" />
 
             <div className="relative">
-                <div className="container-custom px-4 py-6 sm:py-8 md:py-8">
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.95fr_0.9fr_0.95fr_1.2fr] lg:gap-0">
+                <div className="container-custom px-4 py-7 sm:py-8 md:py-9">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.95fr_0.9fr_0.95fr_1.2fr] lg:gap-0">
                         {/* Brand */}
-                        <div className="flex flex-col items-center text-center sm:col-span-2 lg:col-span-1 lg:items-start lg:border-e lg:border-[var(--color-accent)]/25 lg:pe-10 lg:text-start">
-                            <Link href="/" className="group mb-3 inline-flex">
+                        <div className="flex flex-col items-center border-b border-white/10 pb-6 text-center sm:col-span-2 lg:col-span-1 lg:items-start lg:border-b-0 lg:border-e lg:border-[var(--color-accent)]/25 lg:pb-0 lg:pe-10 lg:text-start">
+                            <Link href="/" className="group mb-2.5 inline-flex flex-col items-center lg:items-start transition-transform hover:opacity-95">
                                 <Image
                                     src="/images/zad-land-white-logo.webp"
-                                    alt={brandTitle}
+                                    alt={brandTitle || "Zad Land"}
                                     width={1535}
                                     height={1025}
-                                    className="h-auto w-32 object-contain sm:w-36"
+                                    className="h-auto w-32 object-contain sm:w-36 drop-shadow-sm"
                                 />
+                                {brandTitle ? (
+                                    <span className="mt-2 text-xl font-black tracking-tight text-[var(--color-accent-light)] transition-colors group-hover:text-amber-300 sm:text-2xl drop-shadow-xs">
+                                        {brandTitle}
+                                    </span>
+                                ) : null}
                             </Link>
-                            <p className="max-w-xs text-xs leading-relaxed text-[var(--color-text-main-dark)]/85 sm:text-sm">
-                                {brandDescription}
-                            </p>
-                            <p className="mt-2 text-xs font-bold text-[var(--color-accent-light)]">
-                                {isArabic ? 'من سوريا .. إلى كل الأسواق' : 'From Syria to every market'}
-                            </p>
+                            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/35 bg-black/20 px-3.5 py-1 text-[11px] font-bold text-[var(--color-accent-light)] shadow-xs">
+                                <span>🌾</span>
+                                <span>{isArabic ? 'من سوريا .. إلى كل الأسواق' : 'From Syria to every market'}</span>
+                                <span>🌾</span>
+                            </div>
+                            {brandDescription ? (
+                                <p className="max-w-xs text-xs leading-relaxed text-[var(--color-text-main-dark)]/90 sm:text-sm">
+                                    {brandDescription}
+                                </p>
+                            ) : null}
                             <div className="mt-4 flex items-center gap-2.5">
-                                {socialLinks.map((social) => {
-                                    return (
-                                        <a
-                                            key={social.label}
-                                            className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-accent)]/35 bg-black/10 text-sm text-[var(--color-accent-light)] transition-all hover:border-[var(--color-accent-light)] hover:bg-[var(--color-accent)] hover:text-white"
-                                            href={social.href}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            aria-label={social.label}
-                                        >
-                                            <PlatformIcon platform={social.platform} className="size-4" />
-                                        </a>
-                                    );
-                                })}
+                                {socialLinks.map((social) => (
+                                    <a
+                                        key={social.label}
+                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-accent)]/35 bg-black/15 text-sm text-[var(--color-accent-light)] transition-all hover:border-[var(--color-accent-light)] hover:bg-[var(--color-accent)] hover:text-white"
+                                        href={social.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label={social.label}
+                                    >
+                                        <PlatformIcon platform={social.platform} className="size-4" />
+                                    </a>
+                                ))}
                             </div>
                         </div>
 
-                        {/* Quick Links */}
-                        <div className="text-center lg:border-e lg:border-[var(--color-accent)]/25 lg:px-5">
-                            <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{companyTitle}</h5>
-                            <ul className="flex flex-col gap-2 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm">
-                                {companyLinks.map((link) => (
-                                    <li key={link.href}>{renderNavLink(link.label, link.href)}</li>
-                                ))}
-                            </ul>
-                        </div>
+                        {/* Navigation Links - 2 Columns on Mobile, native columns on Desktop */}
+                        <div className="grid grid-cols-2 gap-4 sm:col-span-2 sm:gap-6 lg:contents">
+                            {/* Quick Links */}
+                            <div className="text-start lg:border-e lg:border-[var(--color-accent)]/25 lg:px-5 lg:text-center">
+                                <h5 className="mb-3 text-xs sm:text-sm font-extrabold text-[var(--color-accent-light)]">{companyTitle}</h5>
+                                <ul className="flex flex-col gap-2.5 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm">
+                                    {companyLinks.map((link) => (
+                                        <li key={link.href}>{renderNavLink(link.label, link.href)}</li>
+                                    ))}
+                                </ul>
+                            </div>
 
-                        {/* Shipping and privacy policies */}
-                        <div className="text-center lg:border-e lg:border-[var(--color-accent)]/25 lg:px-5">
-                            <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{supportTitle}</h5>
-                            <ul className="flex flex-col gap-2 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm">
-                                {supportLinks.map((link) => (
-                                    <li key={`${link.href}-${link.label}`}>{renderNavLink(link.label, link.href)}</li>
-                                ))}
-                            </ul>
+                            {/* Shipping and privacy policies */}
+                            <div className="text-start lg:border-e lg:border-[var(--color-accent)]/25 lg:px-5 lg:text-center">
+                                <h5 className="mb-3 text-xs sm:text-sm font-extrabold text-[var(--color-accent-light)]">{supportTitle}</h5>
+                                <ul className="flex flex-col gap-2.5 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm">
+                                    {supportLinks.map((link) => (
+                                        <li key={`${link.href}-${link.label}`}>{renderNavLink(link.label, link.href)}</li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
 
                         {/* Shop Categories */}
-                        <div className="text-center lg:border-e lg:border-[var(--color-accent)]/25 lg:px-6">
-                            <h5 className="mb-4 text-sm font-extrabold text-[var(--color-accent-light)]">{shopTitle}</h5>
-                            <ul className="flex flex-col gap-2 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm">
+                        <div className="col-span-1 sm:col-span-2 lg:col-span-1 lg:border-e lg:border-[var(--color-accent)]/25 lg:px-6">
+                            <h5 className="mb-3 text-xs sm:text-sm font-extrabold text-[var(--color-accent-light)] text-start lg:text-center">{shopTitle}</h5>
+                            {/* Mobile & Tablet: Modern touch badge pills */}
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2 lg:hidden">
+                                {footerCategories.length > 0 ? (
+                                    footerCategories.slice(0, 6).map((category) => {
+                                        const catLabel = isArabic ? category.name : (FOOTER_CAT_TRANSLATIONS[category.name] || category.name);
+                                        return (
+                                            <Link
+                                                key={category.id}
+                                                className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] sm:text-xs font-medium text-white/90 transition-colors hover:border-[var(--color-accent-light)] hover:bg-[var(--color-accent)] hover:text-white"
+                                                href={`/categories/${category.slug}`}
+                                            >
+                                                {catLabel}
+                                            </Link>
+                                        );
+                                    })
+                                ) : (
+                                    <Link className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/90 hover:bg-[var(--color-accent)]" href="/products">
+                                        {t('products.allProducts')}
+                                    </Link>
+                                )}
+                            </div>
+                            {/* Desktop: Standard vertical list */}
+                            <ul className="hidden flex-col gap-2.5 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm lg:flex">
                                 {footerCategories.length > 0 ? (
                                     footerCategories.slice(0, 5).map((category) => {
                                         const catLabel = isArabic ? category.name : (FOOTER_CAT_TRANSLATIONS[category.name] || category.name);
@@ -221,40 +254,65 @@ const Footer = async ({ t, language }: FooterProps) => {
                             </ul>
                         </div>
 
-                        {/* Contact */}
-                        <div className="text-start lg:border-e lg:border-[var(--color-accent)]/25 lg:px-6">
-                            <h5 className="mb-3 text-sm font-extrabold text-[var(--color-accent-light)]">{contactTitle}</h5>
-                            <div className="flex w-full flex-col gap-3 text-xs text-[var(--color-text-main-dark)]/90 sm:text-sm">
-                                <CompanyContacts contacts={companyContacts} language={language} compact />
-                                {(contactAddress || contactPhone || contactEmail) && (
-                                    <div className="flex w-full flex-col gap-2 border-t border-white/10 pt-3">
-                                        {contactAddress && <div className="flex min-w-0 items-start gap-2">
-                                            <LuMapPin className="shrink-0 text-[var(--color-accent-light)]" />
-                                            <span className="min-w-0">{contactAddress}</span>
-                                        </div>}
-                                        {contactPhone && <a className="flex min-w-0 items-center gap-2 transition-colors hover:text-[var(--color-accent-light)]" href={`tel:${phoneHref}`}>
-                                            <LuPhone className="shrink-0 text-[var(--color-accent-light)]" />
-                                            <span dir="ltr" className="min-w-0 whitespace-nowrap">{contactPhone}</span>
-                                        </a>}
-                                        {contactEmail && <a className="flex min-w-0 items-start gap-2 transition-colors hover:text-[var(--color-accent-light)]" href={`mailto:${contactEmail}`}>
-                                            <LuMail className="shrink-0 text-[var(--color-accent-light)]" />
-                                            <span className="min-w-0 break-all">{contactEmail}</span>
-                                        </a>}
-                                    </div>
-                                )}
-                                {whatsappUrl !== '#' && whatsappLabel && <a className="mt-1 inline-flex items-center gap-1.5 font-bold text-[var(--color-accent-light)] transition-colors hover:text-white" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                                    <PlatformIcon platform="whatsapp" className="size-4" />
-                                    <span>{whatsappLabel}</span>
-                                </a>}
+                        {/* Contact & B2B Sales Box */}
+                        <div className="col-span-1 sm:col-span-2 lg:col-span-1 text-start">
+                            <div className="rounded-2xl border border-[var(--color-accent)]/30 bg-black/25 p-4 sm:p-5 lg:rounded-none lg:border-none lg:bg-transparent lg:p-0 lg:ps-6">
+                                <h5 className="mb-3 flex items-center gap-2 text-xs sm:text-sm font-extrabold text-[var(--color-accent-light)]">
+                                    <LuPhone className="size-3.5 shrink-0" />
+                                    <span>{contactTitle}</span>
+                                </h5>
+                                <div className="flex w-full flex-col gap-3 text-xs text-[var(--color-text-main-dark)]/90 sm:text-sm">
+                                    <CompanyContacts contacts={companyContacts} language={language} compact />
+                                    {(contactAddress || contactPhone || contactEmail) && (
+                                        <div className="flex w-full flex-col gap-2 border-t border-white/10 pt-3">
+                                            {contactAddress && (
+                                                <div className="flex min-w-0 items-start gap-2">
+                                                    <LuMapPin className="shrink-0 text-[var(--color-accent-light)]" />
+                                                    <span className="min-w-0 text-xs sm:text-sm">{contactAddress}</span>
+                                                </div>
+                                            )}
+                                            {contactPhone && (
+                                                <a className="inline-flex min-w-0 items-center gap-2 font-bold text-[var(--color-accent-light)] transition-colors hover:text-white" href={`tel:${phoneHref}`}>
+                                                    <LuPhone className="shrink-0" />
+                                                    <span dir="ltr" className="min-w-0 whitespace-nowrap">{contactPhone}</span>
+                                                </a>
+                                            )}
+                                            {contactEmail && (
+                                                <a className="flex min-w-0 items-start gap-2 transition-colors hover:text-[var(--color-accent-light)]" href={`mailto:${contactEmail}`}>
+                                                    <LuMail className="shrink-0 text-[var(--color-accent-light)]" />
+                                                    <span className="min-w-0 break-all text-xs sm:text-sm">{contactEmail}</span>
+                                                </a>
+                                            )}
+                                        </div>
+                                    )}
+                                    {whatsappUrl !== '#' && whatsappLabel && (
+                                        <a
+                                            className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-950/40 px-3.5 py-2 text-xs font-bold text-emerald-300 transition-colors hover:bg-emerald-900/60 hover:text-white"
+                                            href={whatsappUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <PlatformIcon platform="whatsapp" className="size-4 shrink-0" />
+                                            <span>{whatsappLabel}</span>
+                                        </a>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
                     </div>
                 </div>
 
-                {/* Copyright strip */}
-                <div className="border-t border-[var(--color-accent)]/55 bg-black/15 px-4 py-3 text-center text-[11px] font-medium text-[var(--color-text-main-dark)]/80 sm:text-xs">
-                    {copyright}
+                {/* Copyright strip with safe padding above mobile BottomNav */}
+                <div className="border-t border-[var(--color-accent)]/40 bg-black/25 px-4 pt-4 pb-[calc(5.25rem+env(safe-area-inset-bottom,0px))] md:py-3.5 text-center text-[11px] font-medium text-[var(--color-text-main-dark)]/85 sm:text-xs">
+                    <div className="container-custom flex flex-col items-center justify-center gap-1.5">
+                        <div className="flex items-center justify-center gap-2 text-[var(--color-accent-light)]/60 text-xs pointer-events-none">
+                            <span className="h-[1px] w-6 bg-gradient-to-r from-transparent to-[var(--color-accent-light)]/40" />
+                            <span>🌾</span>
+                            <span className="h-[1px] w-6 bg-gradient-to-l from-transparent to-[var(--color-accent-light)]/40" />
+                        </div>
+                        <p className="leading-relaxed">{copyright}</p>
+                    </div>
                 </div>
             </div>
         </footer>

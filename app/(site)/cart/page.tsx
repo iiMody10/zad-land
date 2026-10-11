@@ -18,8 +18,8 @@ const CartPage = () => {
     }
 
     return (
-        <main className="grow w-full mx-auto container-custom py-4 lg:py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <main className="grow w-full mx-auto container-custom py-4 pb-28 lg:py-8 lg:pb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
                 <CartItemsList
                     items={items}
                     cartCount={cartCount}

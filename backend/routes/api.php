@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CatalogController;
+use App\Http\Controllers\Api\ContactMessageController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\WishlistController;
@@ -26,6 +27,7 @@ Route::get('/settings', fn () => response()->json(ApiJson::camel(Settings::first
 Route::post('/promotions/validate', [AdminController::class, 'validatePromo'])->middleware('throttle:30,1');
 Route::post('/orders', [OrderController::class, 'store'])->middleware('throttle:20,1');
 Route::get('/orders/{id}', [OrderController::class, 'show']);
+Route::post('/contact', [ContactMessageController::class, 'store'])->middleware('throttle:15,1');
 
 Route::prefix('customer/auth')->group(function () {
     Route::post('/register', [AuthController::class, 'merchantRegister'])->middleware('throttle:10,1');
@@ -68,6 +70,9 @@ Route::prefix('admin')->group(function () {
         Route::get('/orders', [AdminController::class, 'index'])->defaults('resource', 'orders')->middleware('permission:manage_orders');
         Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])->middleware('permission:manage_orders');
         Route::delete('/orders/{id}', [OrderController::class, 'destroy'])->middleware('permission:delete_orders');
+        Route::get('/contact-messages', [ContactMessageController::class, 'index']);
+        Route::patch('/contact-messages/{id}', [ContactMessageController::class, 'update']);
+        Route::delete('/contact-messages/{id}', [ContactMessageController::class, 'destroy']);
         foreach (['brands' => 'manage_brands', 'main-categories' => 'settings', 'categories' => 'manage_categories', 'products' => 'manage_products', 'banners' => 'manage_banners', 'promo-codes' => 'manage_promo_codes'] as $resource => $permission) {
             Route::get('/'.$resource, [AdminController::class, 'index'])->defaults('resource', $resource)->middleware('permission:'.$permission);
             Route::post('/'.$resource, [AdminController::class, 'store'])->defaults('resource', $resource)->middleware('permission:'.$permission);

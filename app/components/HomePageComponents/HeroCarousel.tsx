@@ -55,7 +55,24 @@ function HeroArtwork({
 }
 
 const isDefaultHeroArtwork = (image: string | null | undefined) =>
-    image === '/images/redesign/hero-bg.png' || image === '/images/redesign/hero-bg.webp';
+    Boolean(image && (image.includes('hero-bg') || image.includes('hero-banner')));
+
+const getTitleSizeClass = (text: string) => {
+    const len = text.length;
+    if (len > 38) {
+        return "text-[18px] xs:text-[20px] sm:text-[23px] leading-[1.25]";
+    }
+    if (len > 24) {
+        return "text-[20px] xs:text-[22px] sm:text-[25px] leading-[1.23]";
+    }
+    return "text-[23px] xs:text-[26px] sm:text-[29px] leading-[1.2]";
+};
+
+const getSubtitleSizeClass = (text: string) => {
+    return text.length > 80
+        ? "text-[12px] xs:text-[13px] sm:text-[14px] leading-[1.4]"
+        : "text-[13px] xs:text-[14px] sm:text-[14.5px] leading-[1.42]";
+};
 
 const HeroCarousel = ({ banners }: HeroCarouselProps) => {
     const { dir } = useLanguage();
@@ -99,8 +116,8 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
 
     return (
         <section ref={wrapperRef} className="w-full pt-0 pb-0 md:pb-6 group hero-carousel">
-            {/* Mobile View (< md): High-Definition Swiper Hero with Dynamic Content */}
-            <div className="block md:hidden w-full relative aspect-[390/345] sm:aspect-[420/350] overflow-hidden">
+            {/* Mobile View (< md): High-Definition Swiper Hero with Dynamic Content & Proportional Height */}
+            <div className="block md:hidden w-full relative min-h-[420px] aspect-[390/435] sm:min-h-[460px] sm:aspect-[420/400] overflow-hidden">
                 <Swiper
                     modules={[Autoplay, Pagination]}
                     spaceBetween={0}
@@ -120,47 +137,57 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                     {displayBanners.map((banner, index) => {
                         const mobileImage = banner.imageMobile || banner.image;
                         const isHeroBg = isDefaultHeroArtwork(mobileImage);
+                        const title = getBannerTitle(banner);
+                        const subtitle = getBannerSubtitle(banner);
+                        const badge = getBannerBadge(banner);
+                        const buttonText = getBannerButtonText(banner);
+                        const isDefaultTitle =
+                            title === 'نصل بالعلامات العالمية إلى كل سوق' ||
+                            title === 'Connecting Global Brands to Every Market';
+
                         return (
                             <SwiperSlide key={`mob-${banner.id}`} className="h-full w-full relative">
                                 {/* Slide Image */}
                                 <HeroArtwork
                                     src={mobileImage}
-                                    alt={getBannerTitle(banner)}
+                                    alt={title}
                                     priority={index === 0}
                                     sizes="100vw"
                                     className={`object-cover ${isHeroBg ? 'object-[72%_center]' : 'object-center'}`}
                                 />
 
-                                {/* Brand-toned scrim keeps every line readable across changing imagery. */}
+                                {/* Brand-toned scrim keeps every line readable across changing imagery */}
                                 <div
                                     className={`absolute inset-y-0 pointer-events-none transition-all duration-300 ${
                                         isArabic
-                                            ? 'right-0 w-[85%] sm:w-[78%] max-w-[350px] bg-gradient-to-l from-[var(--color-brand)]/95 via-[var(--color-brand)]/65 to-transparent'
-                                            : 'left-0 w-[85%] sm:w-[78%] max-w-[350px] bg-gradient-to-r from-[var(--color-brand)]/95 via-[var(--color-brand)]/65 to-transparent'
+                                            ? 'right-0 w-[92%] xs:w-[88%] sm:w-[82%] max-w-[390px] bg-gradient-to-l from-[var(--color-brand)]/95 via-[var(--color-brand)]/80 via-60% to-transparent'
+                                            : 'left-0 w-[92%] xs:w-[88%] sm:w-[82%] max-w-[390px] bg-gradient-to-r from-[var(--color-brand)]/95 via-[var(--color-brand)]/80 via-60% to-transparent'
                                     }`}
                                 />
+                                {/* Soft bottom vignette to smooth transition into BrandsRail curve */}
+                                <div className="absolute inset-x-0 bottom-0 h-16 pointer-events-none bg-gradient-to-t from-black/40 to-transparent" />
 
-                                {/* Text & CTA Overlay - Middle Right in AR mode, Middle Left in EN mode */}
+                                {/* Text & CTA Overlay - Positioned with optimal vertical balance above BrandsRail overlap */}
                                 <div
                                     dir={isArabic ? 'rtl' : 'ltr'}
-                                    className={`absolute top-1/2 -translate-y-1/2 z-10 w-[70%] sm:w-[64%] max-w-[280px] sm:max-w-[320px] flex flex-col ${
+                                    className={`absolute top-[48%] -translate-y-1/2 z-10 w-[84%] xs:w-[80%] sm:w-[72%] max-w-[325px] sm:max-w-[360px] flex flex-col ${
                                         isArabic
-                                            ? 'right-4 sm:right-6 items-start text-right'
-                                            : 'left-4 sm:left-6 items-start text-left'
+                                            ? 'right-3.5 xs:right-5 sm:right-6 items-start text-right'
+                                            : 'left-3.5 xs:left-5 sm:left-6 items-start text-left'
                                     }`}
                                 >
-                                    {/* Show Wholesale Badge only on non-hero-bg slides */}
-                                    {!isHeroBg && (
-                                        <div className="mb-2.5">
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] sm:text-xs font-black tracking-wider bg-[var(--color-accent)] text-white shadow-xs">
-                                                {getBannerBadge(banner)}
+                                    {/* Wholesale Badge */}
+                                    {badge && (
+                                        <div className="mb-2 xs:mb-2.5">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 xs:px-3 xs:py-1 rounded-full text-[10.5px] xs:text-[11.5px] sm:text-xs font-black tracking-wider bg-[var(--color-accent)] text-white shadow-xs">
+                                                {badge}
                                             </span>
                                         </div>
                                     )}
 
-                                    {/* Main Headline */}
-                                    {isHeroBg ? (
-                                        <h1 className="text-[27px] sm:text-[32px] font-black text-white leading-[1.12] tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                                    {/* Main Headline - NEVER truncated with ellipsis, adaptive font scaling */}
+                                    {isHeroBg && isDefaultTitle ? (
+                                        <h1 className="text-[23px] xs:text-[26px] sm:text-[30px] font-black text-white leading-[1.2] tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
                                             {isArabic ? (
                                                 <>
                                                     <span className="block">نصل بالعلامات</span>
@@ -176,22 +203,24 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                                             )}
                                         </h1>
                                     ) : (
-                                        <h1 className="text-[24px] sm:text-[28px] font-black text-white leading-[1.14] tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] line-clamp-2">
-                                            {getBannerTitle(banner)}
+                                        <h1 className={`${getTitleSizeClass(title)} font-black text-white tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] whitespace-pre-line`}>
+                                            {title}
                                         </h1>
                                     )}
 
-                                    {/* Subtitle */}
-                                    <p className="text-[13px] sm:text-[14.5px] text-white/95 font-semibold leading-[1.38] mt-2.5 sm:mt-3 drop-shadow-[0_2px_5px_rgba(0,0,0,0.9)] max-w-[260px] sm:max-w-[300px] line-clamp-3">
-                                        {getBannerSubtitle(banner)}
-                                    </p>
+                                    {/* Subtitle - Adaptive sizing with generous line limit */}
+                                    {subtitle && (
+                                        <p className={`${getSubtitleSizeClass(subtitle)} text-white/95 font-semibold mt-2 xs:mt-2.5 sm:mt-3 drop-shadow-[0_2px_5px_rgba(0,0,0,0.9)] max-w-[285px] sm:max-w-[320px] whitespace-pre-line line-clamp-4`}>
+                                            {subtitle}
+                                        </p>
+                                    )}
 
                                     {/* CTA Button */}
                                     <Link
                                         href={banner.link || "/products"}
-                                        className="inline-flex items-center gap-2.5 mt-3.5 sm:mt-4 px-6 sm:px-7 py-2.5 sm:py-3 rounded-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-[13.5px] sm:text-[15px] font-black shadow-[0_5px_15px_rgba(0,0,0,0.45)] transition-colors active:scale-95 border border-white/30 group/btn"
+                                        className="inline-flex items-center gap-2 mt-3 xs:mt-3.5 sm:mt-4 px-5 xs:px-6 py-2 xs:py-2.5 sm:py-3 rounded-full bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-[13px] xs:text-[14px] sm:text-[15px] font-black shadow-[0_5px_15px_rgba(0,0,0,0.45)] transition-colors active:scale-95 border border-white/30 group/btn"
                                     >
-                                        <span>{getBannerButtonText(banner)}</span>
+                                        <span>{buttonText}</span>
                                         <span className="text-base sm:text-lg font-black leading-none transition-transform duration-200 group-hover/btn:-translate-x-0.5 rtl:group-hover/btn:translate-x-0.5">
                                             {isArabic ? '›' : '‹'}
                                         </span>
@@ -202,9 +231,9 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
                     })}
                 </Swiper>
 
-                {/* Mobile Pagination Dots */}
+                {/* Mobile Pagination Dots - Positioned gracefully above BrandsRail curve */}
                 {displayBanners.length > 1 && (
-                    <div className="mobile-hero-pagination absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center pointer-events-none" />
+                    <div className="mobile-hero-pagination absolute bottom-9 xs:bottom-10 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center pointer-events-none" />
                 )}
             </div>
 

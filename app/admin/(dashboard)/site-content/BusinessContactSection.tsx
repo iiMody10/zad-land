@@ -1,6 +1,7 @@
 "use client";
 
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Mail, MessageCircle, Phone } from "lucide-react";
 import PlatformIcon from "@/app/components/PlatformIcon";
 import { useLanguage } from "@/app/context/LanguageContext";
 import CompanyContactsEditor from "./CompanyContactsEditor";
@@ -31,6 +32,29 @@ export default function BusinessContactSection({ value, onChange }: {
     );
 
     return <div className="space-y-6" dir={ar ? "rtl" : "ltr"}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-slate-800 dark:text-slate-200">
+            <div className="flex items-center gap-3">
+                <span className="p-2.5 rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                    <Mail className="size-5" />
+                </span>
+                <div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                        {tx("صندوق رسائل واستفسارات العملاء والتجار", "Customer & Merchant Inquiries")}
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {tx("استعرض ورد على الرسائل الواردة من صفحة تواصل معنا ومتابعة حالاتها.", "Review and manage incoming messages from the contact page.")}
+                    </p>
+                </div>
+            </div>
+            <Link
+                href="/admin/messages"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl bg-[var(--color-brand)] text-white hover:opacity-90 transition-opacity whitespace-nowrap shrink-0 shadow-xs"
+            >
+                <span>{tx("عرض الرسائل الواردة", "View Messages")}</span>
+                <ArrowRight className={`size-3.5 ${ar ? "rotate-180" : ""}`} />
+            </Link>
+        </div>
+
         <CompanyContactsEditor value={value.companyContacts} onChange={(next) => onChange("companyContacts", next)} language={ar ? "ar" : "en"} />
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-white/10 dark:bg-[var(--color-surface-dark)] md:p-8">
             <div className="mb-6 flex items-start gap-3">

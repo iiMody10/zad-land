@@ -12,6 +12,14 @@ interface Order {
     streetAddress: string;
     city: string;
     totalAmount: number;
+    discount?: number | string | null;
+    promoCodeId?: string | null;
+    promoCode?: {
+        id?: string;
+        code: string;
+        discountPercentage?: number | null;
+        delegateName?: string | null;
+    } | null;
     status: string;
     createdAt: string;
     items: {
@@ -63,6 +71,14 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
     });
     const printOrder = () => window.print();
 
+    const itemsSubtotal = order.items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+    const rawDiscount = Number(order.discount || 0);
+    const computedDiscount = rawDiscount > 0 ? rawDiscount : Math.max(0, itemsSubtotal - Number(order.totalAmount));
+    const hasDiscount = computedDiscount > 0.005;
+    const promoCodeLabel = order.promoCode?.code
+        ? `${order.promoCode.code}${order.promoCode.discountPercentage ? ` (${order.promoCode.discountPercentage}%)` : ''}`
+        : null;
+
     return (
         <div className="order-details-overlay fixed inset-0 z-100 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-text-main/40 dark:bg-black/60 backdrop-blur-[2px]" onClick={onClose}></div>
@@ -104,7 +120,20 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                         </div>
                         <div className={`space-y-1 ${dir === 'rtl' ? 'text-start' : 'text-end'}`}>
                             <p className="text-[10px] font-bold uppercase tracking-wider text-text-sub dark:text-gray-500">{t('admin.totalAmount')}</p>
-                            <p className="text-2xl font-black text-primary" dir="ltr">{currency.format(Number(order.totalAmount))}</p>
+                            <div className={`flex items-baseline gap-2 ${dir === 'rtl' ? 'justify-start' : 'justify-end'}`}>
+                                {hasDiscount && (
+                                    <span className="text-xs font-semibold text-text-sub line-through opacity-70" dir="ltr">
+                                        {currency.format(itemsSubtotal)}
+                                    </span>
+                                )}
+                                <p className="text-2xl font-black text-primary" dir="ltr">{currency.format(Number(order.totalAmount))}</p>
+                            </div>
+                            {hasDiscount && (
+                                <p className={`text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 ${dir === 'rtl' ? 'justify-start' : 'justify-end'}`}>
+                                    <span>🏷️ {dir === 'rtl' ? 'تم تطبيق خصم' : 'Discount applied'}</span>
+                                    {promoCodeLabel && <span className="font-mono">({promoCodeLabel})</span>}
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -235,6 +264,41 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                             <p className="order-print-brand-name">ZAD LAND</p>
                             <p className="order-print-brand-caption">{dir === 'rtl' ? 'توريد وتوزيع للمتاجر والشركات' : 'Wholesale supply & distribution'}</p>
                         </div>
+
+                        {/* Invoice Financial Breakdown */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-4 pt-1">
+                            {hasDiscount ? (
+                                <div className="flex items-center gap-2 p-3 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-300 text-xs self-start">
+                                    <span className="font-bold">🏷️ {dir === 'rtl' ? 'كود الخصم المطبق:' : 'Applied Promo Code:'}</span>
+                                    <span className="font-mono font-extrabold px-2.5 py-0.5 rounded-lg bg-emerald-200/80 dark:bg-emerald-900/60 tracking-wider">
+                                        {order.promoCode?.code || (dir === 'rtl' ? 'كود خصم' : 'Promo')}
+                                    </span>
+                                    {order.promoCode?.discountPercentage ? (
+                                        <span className="font-semibold text-[11px]">({order.promoCode.discountPercentage}%)</span>
+                                    ) : null}
+                                </div>
+                            ) : <div />}
+
+                            <div className="ms-auto w-full sm:w-80 rounded-2xl bg-gray-50/80 dark:bg-gray-800/40 p-4 border border-black/[0.04] dark:border-white/[0.04] space-y-2.5 text-xs">
+                                <div className="flex items-center justify-between text-text-sub dark:text-gray-400 font-medium">
+                                    <span>{dir === 'rtl' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
+                                    <span className="font-bold text-text-main dark:text-white" dir="ltr">{currency.format(itemsSubtotal)}</span>
+                                </div>
+                                {hasDiscount && (
+                                    <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
+                                        <span className="flex items-center gap-1">
+                                            {dir === 'rtl' ? 'قيمة الخصم' : 'Discount'}
+                                            {order.promoCode?.code ? ` (${order.promoCode.code})` : ''}:
+                                        </span>
+                                        <span className="font-bold" dir="ltr">-{currency.format(computedDiscount)}</span>
+                                    </div>
+                                )}
+                                <div className="border-t border-black/[0.06] dark:border-white/[0.06] pt-2.5 flex items-center justify-between text-sm font-black text-text-main dark:text-white">
+                                    <span>{t('admin.totalAmount')}:</span>
+                                    <span className="text-base text-primary font-black" dir="ltr">{currency.format(Number(order.totalAmount))}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className="order-print-title">
                         <p>{t('admin.orderSheet')}</p>
@@ -290,10 +354,25 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
                     </table>
                 </section>
 
-                <footer className="order-print-total">
-                    <span>{t('admin.totalAmount')}</span>
-                    <strong dir="ltr">{currency.format(Number(order.totalAmount))}</strong>
-                </footer>
+                <section className="order-print-summary">
+                    <div className="order-print-summary-row">
+                        <span>{dir === 'rtl' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
+                        <strong dir="ltr">{currency.format(itemsSubtotal)}</strong>
+                    </div>
+                    {hasDiscount && (
+                        <div className="order-print-summary-row order-print-discount-row">
+                            <span>
+                                {dir === 'rtl' ? 'الخصم' : 'Discount'}
+                                {order.promoCode?.code ? ` (${dir === 'rtl' ? 'كود' : 'Code'}: ${order.promoCode.code}${order.promoCode.discountPercentage ? ` - ${order.promoCode.discountPercentage}%` : ''})` : ''}:
+                            </span>
+                            <strong dir="ltr">-{currency.format(computedDiscount)}</strong>
+                        </div>
+                    )}
+                    <footer className="order-print-total">
+                        <span>{t('admin.totalAmount')}</span>
+                        <strong dir="ltr">{currency.format(Number(order.totalAmount))}</strong>
+                    </footer>
+                </section>
                 <p className="order-print-footnote">{dir === 'rtl' ? 'تم إنشاء كشف الطلب من لوحة إدارة زاد لاند.' : 'Order sheet generated from the Zad Land admin dashboard.'}</p>
             </article>
         </div>

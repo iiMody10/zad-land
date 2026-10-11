@@ -28,16 +28,41 @@ export default function ContactClient({ language, dir, content, settings }: Cont
     const companyContacts = parseCompanyContacts(settings?.companyContacts);
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [form, setForm] = useState({ name: '', businessName: '', phone: '', message: '' });
     const copy = (key: string) => content[`${key}${isAr ? 'Ar' : 'En'}` as keyof ContactPageContent] as string;
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        setError(null);
         setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: form.name,
+                    business_name: form.businessName,
+                    phone: form.phone,
+                    message: form.message,
+                }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                const message = data?.message || data?.error || (isAr ? 'حدث خطأ أثناء إرسال الرسالة، يرجى المحاولة مرة أخرى.' : 'Failed to send message, please try again.');
+                throw new Error(message);
+            }
             setSubmitted(true);
-        }, 600);
+            setForm({ name: '', businessName: '', phone: '', message: '' });
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : (isAr ? 'حدث خطأ أثناء إرسال الرسالة.' : 'Failed to send message.');
+            setError(msg);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const facebookUrl = settings?.footerFacebookUrl;
@@ -92,6 +117,11 @@ export default function ContactClient({ language, dir, content, settings }: Cont
                             <h3 className="text-lg font-bold text-emerald-900 dark:text-emerald-200">{copy('successTitle')}</h3>
                             <p className="mx-auto max-w-md text-xs text-emerald-700 dark:text-emerald-300 sm:text-sm">{copy('successDescription')}</p>
                         </div> : <form onSubmit={handleSubmit} className="space-y-4">
+                            {error && (
+                                <div className="rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-semibold text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300">
+                                    {error}
+                                </div>
+                            )}
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <TextField label={copy('nameLabel')} placeholder={copy('namePlaceholder')} value={form.name} onChange={(name) => setForm((current) => ({ ...current, name }))} />
                                 <TextField label={copy('businessLabel')} placeholder={copy('businessPlaceholder')} value={form.businessName} onChange={(businessName) => setForm((current) => ({ ...current, businessName }))} />

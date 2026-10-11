@@ -39,7 +39,7 @@ class AdminController extends Controller
         if ($resource === 'orders') {
             $page = max(1, min((int) $request->query('page', 1), 10000));
             $limit = max(1, min((int) $request->query('limit', 50), 200));
-            $query = Order::with('items.product')->orderByDesc('created_at');
+            $query = Order::with(['items.product', 'promoCode'])->orderByDesc('created_at');
             $total = (clone $query)->count();
 
             return response()->json(['orders' => ApiJson::camel($query->skip(($page - 1) * $limit)->take($limit)->get()), 'pagination' => ['total' => $total, 'pages' => (int) ceil($total / $limit), 'page' => $page, 'limit' => $limit]]);
@@ -676,12 +676,14 @@ class AdminController extends Controller
         $totalRevenue = (float) $delivered->sum('total_amount');
         $deliveredCount = (int) $delivered->count();
         $outOfStockCount = Product::where('stock', '<=', 0)->count();
-        $recentOrders = Order::with('items.product')->orderByDesc('created_at')->take(10)->get()->map(fn (Order $order) => [
+        $recentOrders = Order::with(['items.product', 'promoCode'])->orderByDesc('created_at')->take(10)->get()->map(fn (Order $order) => [
             'id' => $order->id, 'Name' => $order->name, 'customer' => $order->shop_name ?: $order->name,
             'phone' => $order->phone, 'streetAddress' => $order->street_address, 'city' => $order->city,
             'product' => $order->items->first()?->product?->name,
             'date' => $order->created_at?->toDateString(), 'createdAt' => $order->created_at?->toISOString(),
             'amount' => number_format((float) $order->total_amount, 2).' USD', 'totalAmount' => (float) $order->total_amount,
+            'discount' => (float) $order->discount,
+            'promoCode' => $order->promoCode ? ApiJson::camel($order->promoCode) : null,
             'status' => $order->status, 'statusColor' => match ($order->status) {
                 'PENDING' => 'amber', 'PROCESSING' => 'blue', 'SHIPPED' => 'indigo', 'DELIVERED' => 'emerald', 'CANCELLED' => 'red', default => 'slate'
             },

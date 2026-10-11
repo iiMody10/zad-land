@@ -18,12 +18,12 @@ const CartItemsList = ({ items, cartCount, removeItem, updateQuantity }: CartIte
     const { t, dir } = useLanguage();
 
     return (
-        <div className="lg:col-span-8 flex flex-col gap-8">
+        <div className="flex flex-col gap-6 sm:gap-8 lg:col-span-8">
             <div className="flex flex-col gap-1 pb-4 border-b border-gray-200 dark:border-white/10">
                 <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[var(--color-brand)] dark:text-white">{t('cart.yourCart')}</h1>
                 <p className="text-xs font-semibold text-gray-400">{cartCount} {t('orderComplete.items')}</p>
             </div>
-            <div className="flex flex-col border-y border-gray-200 dark:border-white/10 divide-y divide-gray-200 dark:divide-white/10">
+            <div className="flex flex-col gap-3 md:gap-0 md:border-y md:border-gray-200 md:dark:border-white/10 md:divide-y md:divide-gray-200 md:dark:divide-white/10">
                 {items.map(item => {
                     const itemKey = `${item.id}:${item.selectedOption || ''}`;
                     return (

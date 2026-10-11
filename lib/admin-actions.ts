@@ -90,11 +90,12 @@ async function request<T = any>(path: string, method = "GET", body?: unknown): P
 }
 
 function invalidateAdminData() {
+    revalidatePath("/", "layout");
     for (const path of [
-        "/", "/products", "/brands", "/categories", "/about-us", "/contact", "/admin",
+        "/", "/products", "/brands", "/categories", "/about-us", "/contact", "/shipping-returns", "/privacy-policy", "/admin",
         "/admin/banners", "/admin/site-content", "/admin/settings", "/admin/users",
         "/admin/customers", "/admin/brands", "/admin/categories", "/admin/main-categories",
-        "/admin/products", "/admin/orders", "/admin/promocodes", "/admin/reviews",
+        "/admin/products", "/admin/orders", "/admin/promocodes", "/admin/reviews", "/admin/messages",
     ]) {
         revalidatePath(path);
     }
@@ -326,3 +327,34 @@ export async function bulkToggleTrending(ids: string[], isTrending: boolean) { r
 export async function bulkRemoveSale(ids: string[]) { return bulk("removeSale", ids); }
 export async function bulkDeleteProducts(ids: string[]) { return bulk("deleteProducts", ids); }
 export async function bulkDeleteCategories(ids: string[]) { return bulk("deleteCategories", ids); }
+
+export interface ContactMessageItem {
+    id: string;
+    name: string;
+    businessName: string | null;
+    phone: string;
+    message: string;
+    status: 'unread' | 'read' | 'archived';
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ContactMessagesResponse {
+    messages: ContactMessageItem[];
+    unreadCount: number;
+    totalCount: number;
+}
+
+export async function getAdminContactMessages(status?: string): Promise<ContactMessagesResponse> {
+    const query = status && status !== 'all' ? `?status=${encodeURIComponent(status)}` : '';
+    return request<ContactMessagesResponse>(`/admin/contact-messages${query}`);
+}
+
+export async function updateAdminContactMessageStatus(id: string, status: 'unread' | 'read' | 'archived') {
+    return mutation(`/admin/contact-messages/${encodeURIComponent(id)}`, "PATCH", { status });
+}
+
+export async function deleteAdminContactMessage(id: string) {
+    return mutation(`/admin/contact-messages/${encodeURIComponent(id)}`, "DELETE");
+}
+

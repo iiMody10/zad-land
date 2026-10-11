@@ -395,26 +395,56 @@ export default function CatalogClient({ initialCategories, initialSubcategories,
                             </button>
                         </form>
 
-                        <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 lg:flex lg:justify-end">
-                            <button type="button" onClick={() => setMobileFiltersOpen(true)} className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 text-sm font-semibold text-[var(--color-brand)] transition-colors hover:border-[var(--color-brand-hover)] dark:border-white/15 dark:bg-zinc-900 dark:text-white lg:hidden sm:px-3" aria-label={isArabic ? "افتح الفلاتر" : "Open filters"}>
-                                <MdFilterList aria-hidden="true" className="text-lg" />
-                                <span>{isArabic ? "تصفية" : "Filters"}</span>{activeFilterCount > 0 && <span className="min-w-5 rounded-full bg-[var(--color-brand)] px-1.5 text-center text-[11px] leading-5 text-white">{activeFilterCount}</span>}
+                        <div className="flex w-full items-center gap-2 lg:w-auto lg:justify-end">
+                            <button
+                                type="button"
+                                onClick={() => setMobileFiltersOpen(true)}
+                                className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-[var(--color-brand)] transition-colors hover:border-[var(--color-brand-hover)] dark:border-white/15 dark:bg-zinc-900 dark:text-white sm:text-sm lg:hidden"
+                                aria-label={isArabic ? "افتح الفلاتر" : "Open filters"}
+                            >
+                                <MdFilterList aria-hidden="true" className="text-base sm:text-lg" />
+                                <span>{isArabic ? "تصفية" : "Filters"}</span>
+                                {activeFilterCount > 0 && (
+                                    <span className="min-w-4 rounded-full bg-[var(--color-brand)] px-1.5 text-center text-[11px] leading-4 text-white">
+                                        {activeFilterCount}
+                                    </span>
+                                )}
                             </button>
-                            <div role="group" aria-label={isArabic ? "طريقة العرض" : "Catalog view"} className="flex h-11 items-center rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-white/15 dark:bg-zinc-900">
-                                <button type="button" onClick={() => updateFilters({ view: "grid" })} aria-label={isArabic ? "عرض الشبكة" : "Grid view"} aria-pressed={view === "grid"} className={`flex size-8 items-center justify-center rounded-lg text-lg transition-colors ${view === "grid" ? "bg-white text-[var(--color-brand)] shadow-sm dark:bg-zinc-700" : "text-slate-500 hover:text-[var(--color-brand)]"}`}><MdGridView /></button>
-                                <button type="button" onClick={() => updateFilters({ view: "list" })} aria-label={isArabic ? "عرض قائمة الجملة" : "Wholesale list view"} aria-pressed={view === "list"} className={`flex size-8 items-center justify-center rounded-lg text-lg transition-colors ${view === "list" ? "bg-white text-[var(--color-brand)] shadow-sm dark:bg-zinc-700" : "text-slate-500 hover:text-[var(--color-brand)]"}`}><MdViewList /></button>
+                            <div
+                                role="group"
+                                aria-label={isArabic ? "طريقة العرض" : "Catalog view"}
+                                className="flex h-11 shrink-0 items-center rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-white/15 dark:bg-zinc-900"
+                            >
+                                <button
+                                    type="button"
+                                    onClick={() => updateFilters({ view: "grid" })}
+                                    aria-label={isArabic ? "عرض الشبكة" : "Grid view"}
+                                    aria-pressed={view === "grid"}
+                                    className={`flex size-8 items-center justify-center rounded-lg text-lg transition-colors ${view === "grid" ? "bg-white text-[var(--color-brand)] shadow-sm dark:bg-zinc-700" : "text-slate-500 hover:text-[var(--color-brand)]"}`}
+                                >
+                                    <MdGridView />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => updateFilters({ view: "list" })}
+                                    aria-label={isArabic ? "عرض قائمة الجملة" : "Wholesale list view"}
+                                    aria-pressed={view === "list"}
+                                    className={`flex size-8 items-center justify-center rounded-lg text-lg transition-colors ${view === "list" ? "bg-white text-[var(--color-brand)] shadow-sm dark:bg-zinc-700" : "text-slate-500 hover:text-[var(--color-brand)]"}`}
+                                >
+                                    <MdViewList />
+                                </button>
                             </div>
-                            <label className="flex h-11 min-w-0 items-center gap-2 text-xs font-medium text-slate-500 dark:text-zinc-300 sm:text-sm">
-                                <span className="hidden shrink-0 sm:inline">{isArabic ? "ترتيب حسب" : "Sort by"}</span>
+                            <label className="flex h-11 min-w-0 flex-1 items-center gap-2 text-xs font-medium text-slate-500 dark:text-zinc-300 sm:text-sm lg:flex-initial">
+                                <span className="hidden shrink-0 xl:inline">{isArabic ? "ترتيب حسب" : "Sort by"}</span>
                                 <select
                                     value={sort}
                                     onChange={(event) => updateFilters({ sort: event.target.value as CatalogSort })}
                                     aria-label={isArabic ? "ترتيب حسب" : "Sort by"}
-                                    className="h-11 w-full min-w-0 max-w-[170px] cursor-pointer rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-semibold text-[var(--color-brand)] outline-none transition-colors focus:border-[var(--color-brand-hover)] dark:border-white/15 dark:bg-zinc-900 dark:text-white sm:px-3 sm:text-sm sm:max-w-none"
+                                    className="h-11 w-full min-w-0 cursor-pointer rounded-xl border border-slate-200 bg-white px-2.5 text-xs font-semibold text-[var(--color-brand)] outline-none transition-colors focus:border-[var(--color-brand-hover)] dark:border-white/15 dark:bg-zinc-900 dark:text-white sm:px-3 sm:text-sm lg:w-[170px]"
                                 >
-                                <option value="newest">{t("products.newestArrivals")}</option>
-                                <option value="bestselling">{t("products.bestSellers")}</option>
-                                <option value="price_asc">{t("products.priceLowHigh")}</option>
+                                    <option value="newest">{t("products.newestArrivals")}</option>
+                                    <option value="bestselling">{t("products.bestSellers")}</option>
+                                    <option value="price_asc">{t("products.priceLowHigh")}</option>
                                     <option value="price_desc">{t("products.priceHighLow")}</option>
                                 </select>
                             </label>

@@ -399,8 +399,8 @@ const HeaderSearch = ({ onSearchSelect, onClose, placeholder, autoFocus = false,
                                         >
                                             <span>
                                                 {isArabic
-                                                    ? `عرض كل ${totalCount} العناصر`
-                                                    : `View all ${totalCount} items`}
+                                                    ? 'عرض كل العناصر'
+                                                    : 'View all items'}
                                             </span>
                                             <MdArrowForward className={`text-lg ${isArabic ? 'rotate-180' : ''}`} />
                                         </button>

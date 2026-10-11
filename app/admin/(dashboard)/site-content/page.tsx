@@ -23,7 +23,9 @@ export default async function SiteContentPage({
     const activeMainCategories = mainCategories.filter((category: { isActive?: boolean }) => category.isActive !== false);
     const headerNavItems = getConfiguredHeaderNavItems(siteSettings?.headerNavItems, activeMainCategories);
     const params = await searchParams;
-    const initialTab = params?.tab === "business" ? "business" : undefined;
+    const tabParam = Array.isArray(params?.tab) ? params?.tab[0] : params?.tab;
+    const validTabs = ["navigation", "business", "footer", "banners", "shipping", "about", "contact", "featured"] as const;
+    const initialTab = tabParam && validTabs.includes(tabParam as any) ? (tabParam as typeof validTabs[number]) : undefined;
     
     return (
         <SiteContentClient

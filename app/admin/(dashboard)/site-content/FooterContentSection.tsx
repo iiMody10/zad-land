@@ -221,7 +221,21 @@ export default function FooterContentSection({
                     <div className="pointer-events-none absolute inset-0 bg-[url('/images/footer-bg.webp')] bg-cover bg-center opacity-25" />
                     <div className="relative grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-6 lg:gap-5">
                         <div className="text-center lg:text-start">
-                            <div className="mb-3 text-xl font-black text-amber-300">{localized('footerBrandTitle', 'footerBrandTitleAr', 'زاد لاند')}</div>
+                            <div className="mb-2 inline-flex flex-col items-center lg:items-start">
+                                <img
+                                    src="/images/zad-land-white-logo.webp"
+                                    alt={localized('footerBrandTitle', 'footerBrandTitleAr', 'زاد لاند')}
+                                    className="h-auto w-28 object-contain sm:w-32 drop-shadow-sm"
+                                />
+                                <span className="mt-2 text-xl font-black text-amber-300">
+                                    {localized('footerBrandTitle', 'footerBrandTitleAr', 'زاد لاند')}
+                                </span>
+                            </div>
+                            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-300/35 bg-black/20 px-3 py-1 text-[11px] font-bold text-amber-200">
+                                <span>🌾</span>
+                                <span>{previewArabic ? 'من سوريا .. إلى كل الأسواق' : 'From Syria to every market'}</span>
+                                <span>🌾</span>
+                            </div>
                             <p className="text-xs leading-6 text-white/75">{localized('footerBrandDescription', 'footerBrandDescriptionAr')}</p>
                             {previewSocialLinks.length > 0 ? (
                                 <div className="mt-3 flex justify-center gap-2 lg:justify-start">

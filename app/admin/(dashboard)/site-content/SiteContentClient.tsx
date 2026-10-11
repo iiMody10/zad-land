@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Image as MdImage, Truck as MdLocalShipping, ArrowLeftRight as MdCurrencyExchange, GalleryHorizontalEnd as MdViewCarousel, Info as MdInfoOutline, ListOrdered, Save as MdSave, Store as MdStorefront } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Image as MdImage, Truck as MdLocalShipping, GalleryHorizontalEnd as MdViewCarousel, Info as MdInfoOutline, ListOrdered, Save as MdSave, Store as MdStorefront } from 'lucide-react';
 import AdminHeader from "../../components/AdminHeader";
 import { useAdminSidebar } from "../../context/AdminSidebarContext";
 import { updateSiteSettings } from "../../../../lib/admin-actions";
@@ -15,6 +16,7 @@ import BusinessContactSection from "./BusinessContactSection";
 import type { HeaderNavItemRef } from "@/lib/header-navigation";
 import { parseContactPageContent, type ContactPageContent } from "@/lib/contact-page-content";
 import { parseCompanyContacts } from "@/lib/business-contact";
+import ImageUploadField from "../../components/ImageUploadField";
 
 interface FooterCategoryOption {
     id: string;
@@ -188,7 +190,7 @@ interface SiteSettings {
     featuredCollectionAllProductsUrl: string | null;
 }
 
-type TabType = "currency" | "navigation" | "business" | "footer" | "banners" | "shipping" | "about" | "contact" | "featured";
+type TabType = "navigation" | "business" | "footer" | "banners" | "shipping" | "about" | "contact" | "featured";
 
 export default function SiteContentClient({ 
     initialSettings,
@@ -204,8 +206,29 @@ export default function SiteContentClient({
     initialTab?: TabType;
 }) {
     const { t, dir, language } = useLanguage();
+    const isArabic = language === 'ar';
     const { openSidebar } = useAdminSidebar();
-    const [activeTab, setActiveTab] = useState<TabType>(initialTab || "currency");
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const [activeTab, setActiveTab] = useState<TabType>(initialTab || "navigation");
+
+    useEffect(() => {
+        const queryTab = searchParams.get('tab') as TabType | null;
+        const validTabs: TabType[] = ["navigation", "business", "footer", "banners", "shipping", "about", "contact", "featured"];
+        if (queryTab && validTabs.includes(queryTab)) {
+            setActiveTab(queryTab);
+        } else if (!queryTab && initialTab) {
+            setActiveTab(initialTab);
+        }
+    }, [searchParams, initialTab]);
+
+    const handleSelectTab = (tabId: TabType) => {
+        setActiveTab(tabId);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('tab', tabId);
+        router.replace(`/admin/site-content?${params.toString()}`, { scroll: false });
+    };
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [headerNavItems, setHeaderNavItems] = useState<HeaderNavItemRef[]>(initialHeaderNavItems);
     const [contactContent, setContactContent] = useState<ContactPageContent>(() => parseContactPageContent(initialSettings?.contactPageContent));
@@ -426,7 +449,6 @@ export default function SiteContentClient({
     };
 
     const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
-        { id: "currency", label: t('admin.tabCurrency') || "Currency & Rates", icon: <MdCurrencyExchange className="text-lg" /> },
         { id: "navigation", label: t('admin.tabNavigation') || "Header Navigation", icon: <ListOrdered className="text-lg" /> },
         { id: "business", label: language === "ar" ? "بيانات التواصل العامة" : "Global Contact Details", icon: <MdStorefront className="text-lg" /> },
         { id: "footer", label: t('admin.tabFooter') || "Footer", icon: <MdStorefront className="text-lg" /> },
@@ -478,7 +500,7 @@ export default function SiteContentClient({
                         return (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
+                                onClick={() => handleSelectTab(tab.id)}
                                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all whitespace-nowrap ${
                                     isActive
                                         ? 'bg-[var(--color-brand)] text-white shadow-xs'
@@ -496,30 +518,6 @@ export default function SiteContentClient({
             {/* Tab Contents */}
             <div className="flex-1 overflow-y-auto p-6 md:p-10">
                 <div className="max-w-6xl mx-auto pb-12">
-                    {/* TAB 1: CURRENCY & EXCHANGE RATES */}
-                    {activeTab === "currency" && (
-                        <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs animate-in fade-in-50 duration-200">
-                            <div className="mb-6 flex items-start gap-4">
-                                <div className="p-3 bg-amber-50 dark:bg-amber-950/40 text-[var(--color-accent)] dark:text-[var(--color-accent-light)] rounded-xl">
-                                    <MdCurrencyExchange className="text-2xl" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                                        {t('admin.currencySettings')}
-                                    </h3>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                                        {t('admin.currencySettingsDesc')}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="max-w-xl rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-100">
-                                <p className="font-bold">{t('admin.usdOnlyTitle')}</p>
-                                <p className="mt-1 leading-6">{t('admin.usdOnlyDescription')}</p>
-                                <span className="mt-3 inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-extrabold text-emerald-800 shadow-xs dark:bg-white/10 dark:text-emerald-100">$ USD</span>
-                            </div>
-                        </div>
-                    )}
 
                     {activeTab === "navigation" && (
                         <HeaderNavigationSection
@@ -821,6 +819,70 @@ export default function SiteContentClient({
                                 </div>
                             </div>
 
+                            {/* Shipping Section Illustration Image */}
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                        {isArabic ? "صورة قسم الشحن والتوزيع" : "Shipping & Delivery Image"}
+                                    </h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                        {isArabic
+                                            ? "صورة طرود وبضائع الشحن التوضيحية المعروضة في صفحة الشحن والتوزيع. يمكنك رفع صورة من جهازك أو وضع رابط خارجي."
+                                            : "The packaging and delivery image displayed in the Shipping & Returns page. Upload from your device or specify an image URL."}
+                                    </p>
+                                </div>
+
+                                <div className="max-w-xl">
+                                    <ImageUploadField
+                                        label={isArabic ? "صورة طرود الشحن" : "Shipping Packaging Image"}
+                                        folder="shipping"
+                                        value={shippingReturnsImage}
+                                        onChange={setShippingReturnsImage}
+                                        placeholder="https://... or /uploads/..."
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Order Verification */}
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                        {isArabic ? "سياسة معاينة وتأكيد الطلبات" : "Order Verification Policy"}
+                                    </h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                        {isArabic
+                                            ? "تعليمات مطابقة الشحنة والاتصال مع فريق الخدمات اللوجستية قبل الانطلاق."
+                                            : "Instructions for confirming shipments with logistics before dispatch."}
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇬🇧 English</span>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">{isArabic ? "العنوان بالإنجليزية" : "Title"}</label>
+                                            <input type="text" value={verificationTitle} onChange={(e) => setVerificationTitle(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" placeholder="Order Verification" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">{isArabic ? "الوصف بالإنجليزية" : "Description"}</label>
+                                            <textarea rows={3} value={verificationDesc} onChange={(e) => setVerificationDesc(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4" dir="rtl">
+                                        <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇸🇦 العربية</span>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">العنوان بالعربية</label>
+                                            <input type="text" value={verificationTitleAr} onChange={(e) => setVerificationTitleAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" placeholder="تأكيد الطلبات مباشرة" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">الوصف بالعربية</label>
+                                            <textarea rows={3} value={verificationDescAr} onChange={(e) => setVerificationDescAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Returns Policy */}
                             <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
                                 <div className="mb-6">
@@ -854,6 +916,86 @@ export default function SiteContentClient({
                                         <div>
                                             <label className="text-xs font-bold text-slate-500 uppercase">نص السياسة</label>
                                             <textarea rows={4} value={returnsDescAr} onChange={(e) => setReturnsDescAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Wholesale Terms (Final Sale) */}
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                        {isArabic ? "شروط بضائع وطرود الجملة" : "Wholesale Packaging Terms"}
+                                    </h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                        {isArabic
+                                            ? "الشروط الخاصة بتسليم البضائع بعبوات وكراتين المصنع الأصلية."
+                                            : "Terms for delivering wholesale merchandise in original factory cases."}
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇬🇧 English</span>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">{isArabic ? "العنوان بالإنجليزية" : "Title"}</label>
+                                            <input type="text" value={finalSaleTitle} onChange={(e) => setFinalSaleTitle(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" placeholder="Wholesale Terms" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">{isArabic ? "الوصف بالإنجليزية" : "Description"}</label>
+                                            <textarea rows={3} value={finalSaleDesc} onChange={(e) => setFinalSaleDesc(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4" dir="rtl">
+                                        <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇸🇦 العربية</span>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">العنوان بالعربية</label>
+                                            <input type="text" value={finalSaleTitleAr} onChange={(e) => setFinalSaleTitleAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" placeholder="شروط الجملة" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">الوصف بالعربية</label>
+                                            <textarea rows={3} value={finalSaleDescAr} onChange={(e) => setFinalSaleDescAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Safety & Hygiene Protocols */}
+                            <div className="bg-white dark:bg-[var(--color-surface-dark)] rounded-2xl border border-slate-200/80 dark:border-white/10 p-6 md:p-8 shadow-xs">
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                        {isArabic ? "بروتوكولات السلامة والتخزين" : "Safety & Storage Protocols"}
+                                    </h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                        {isArabic
+                                            ? "معايير التخزين والتبريد وضمان سلامة الشحنات أثناء النقل والتوزيع."
+                                            : "Storage, refrigeration, and handling standards during transportation."}
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇬🇧 English</span>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">{isArabic ? "العنوان بالإنجليزية" : "Title"}</label>
+                                            <input type="text" value={hygieneTitle} onChange={(e) => setHygieneTitle(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" placeholder="Safety Protocols" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">{isArabic ? "الوصف بالإنجليزية" : "Description"}</label>
+                                            <textarea rows={3} value={hygieneDesc} onChange={(e) => setHygieneDesc(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4" dir="rtl">
+                                        <span className="inline-block px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-xs font-bold rounded-md text-slate-700 dark:text-slate-300">🇸🇦 العربية</span>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">العنوان بالعربية</label>
+                                            <input type="text" value={hygieneTitleAr} onChange={(e) => setHygieneTitleAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm" placeholder="بروتوكولات السلامة والتخزين" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-slate-500 uppercase">الوصف بالعربية</label>
+                                            <textarea rows={3} value={hygieneDescAr} onChange={(e) => setHygieneDescAr(e.target.value)} className="w-full mt-1 px-4 py-2.5 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-gray-800 text-slate-900 dark:text-white outline-none text-sm resize-none" />
                                         </div>
                                     </div>
                                 </div>

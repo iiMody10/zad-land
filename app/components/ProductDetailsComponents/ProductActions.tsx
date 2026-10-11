@@ -128,9 +128,6 @@ const ProductActions = ({ product, stock }: ProductActionsProps) => {
         if (!addSelectedQuantity()) return;
         router.push("/place-order");
     };
-
-    const displayStock = stock ?? 0;
-
     if (product.pricingNeedsReview) return <p role="status" className="my-3 rounded-xl bg-amber-50 px-5 py-3.5 text-center text-sm font-bold text-amber-900">{language === 'ar' ? 'سعر الطرد قيد المراجعة، ولا يمكن طلبه حالياً.' : 'The package price is under review and this product cannot be ordered yet.'}</p>;
     if (product.price == null) return <Link href="/account/login" className="my-3 inline-flex w-full justify-center rounded-xl bg-[var(--color-brand-hover)] px-5 py-3.5 text-sm font-bold text-white hover:bg-[var(--color-brand-hover)]">{language === 'ar' ? 'سجل الدخول لعرض السعر والطلب' : 'Sign in to view prices and order'}</Link>;
     if (stock != null && stock < (product.minOrder || 1)) return <div className="my-3 space-y-3"><p className="rounded-xl bg-amber-50 px-5 py-3.5 text-center text-sm font-bold text-amber-900">{language === 'ar' ? 'الكمية المطلوبة غير متوفرة حالياً' : 'Not enough packages available right now'}</p><WishlistButton productId={product.id} showLabel className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-[var(--color-brand-hover)] dark:border-white/10" /></div>;
@@ -186,17 +183,8 @@ const ProductActions = ({ product, stock }: ProductActionsProps) => {
                     </span>
                 </div>
 
-                {displayStock > 0 && (
-                    <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-gray-300 font-semibold pt-2 border-t border-[var(--color-accent)]/15 dark:border-white/5">
-                        <span>
-                            {language === 'ar' 
-                                ? `${formatPackageQuantity(displayStock, product.packaging, 'ar')} متاح للطلب`
-                                : `${formatPackageQuantity(displayStock, product.packaging, 'en')} available to order`}
-                        </span>
-                    </div>
-                )}
                 {product.itemsPerPackage && (
-                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                    <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 pt-2 border-t border-[var(--color-accent)]/15 dark:border-white/5">
                         {language === 'ar' ? 'محتويات وحدة البيع: ' : 'Package contents: '}
                         {formatItemsPerPackage(product.itemsPerPackage, product.packaging, language)}
                     </p>
