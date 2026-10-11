@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLanguage } from "@/app/context/LanguageContext";
 import { X as MdClose, UserRound as MdPerson, MapPin as MdLocationOn, Package as MdInventory2, RefreshCw as MdSync, Trash2 as MdDelete, Printer as MdPrinter } from 'lucide-react';
 
@@ -259,45 +260,10 @@ export default function OrderDetailsModal({ isOpen, onClose, order, canDelete, o
             <article className="order-print-sheet" dir={dir} aria-label={t('admin.orderDetails')}>
                 <header className="order-print-header">
                     <div className="order-print-brand">
-                        <span className="order-print-brand-mark" aria-hidden="true">Z</span>
+                        <Image src="/logo.png" alt="Zad Land" width={80} height={80} unoptimized className="order-print-logo" />
                         <div>
                             <p className="order-print-brand-name">ZAD LAND</p>
                             <p className="order-print-brand-caption">{dir === 'rtl' ? 'توريد وتوزيع للمتاجر والشركات' : 'Wholesale supply & distribution'}</p>
-                        </div>
-
-                        {/* Invoice Financial Breakdown */}
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-4 pt-1">
-                            {hasDiscount ? (
-                                <div className="flex items-center gap-2 p-3 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/40 text-emerald-800 dark:text-emerald-300 text-xs self-start">
-                                    <span className="font-bold">🏷️ {dir === 'rtl' ? 'كود الخصم المطبق:' : 'Applied Promo Code:'}</span>
-                                    <span className="font-mono font-extrabold px-2.5 py-0.5 rounded-lg bg-emerald-200/80 dark:bg-emerald-900/60 tracking-wider">
-                                        {order.promoCode?.code || (dir === 'rtl' ? 'كود خصم' : 'Promo')}
-                                    </span>
-                                    {order.promoCode?.discountPercentage ? (
-                                        <span className="font-semibold text-[11px]">({order.promoCode.discountPercentage}%)</span>
-                                    ) : null}
-                                </div>
-                            ) : <div />}
-
-                            <div className="ms-auto w-full sm:w-80 rounded-2xl bg-gray-50/80 dark:bg-gray-800/40 p-4 border border-black/[0.04] dark:border-white/[0.04] space-y-2.5 text-xs">
-                                <div className="flex items-center justify-between text-text-sub dark:text-gray-400 font-medium">
-                                    <span>{dir === 'rtl' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
-                                    <span className="font-bold text-text-main dark:text-white" dir="ltr">{currency.format(itemsSubtotal)}</span>
-                                </div>
-                                {hasDiscount && (
-                                    <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-semibold">
-                                        <span className="flex items-center gap-1">
-                                            {dir === 'rtl' ? 'قيمة الخصم' : 'Discount'}
-                                            {order.promoCode?.code ? ` (${order.promoCode.code})` : ''}:
-                                        </span>
-                                        <span className="font-bold" dir="ltr">-{currency.format(computedDiscount)}</span>
-                                    </div>
-                                )}
-                                <div className="border-t border-black/[0.06] dark:border-white/[0.06] pt-2.5 flex items-center justify-between text-sm font-black text-text-main dark:text-white">
-                                    <span>{t('admin.totalAmount')}:</span>
-                                    <span className="text-base text-primary font-black" dir="ltr">{currency.format(Number(order.totalAmount))}</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div className="order-print-title">

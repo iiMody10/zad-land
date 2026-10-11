@@ -396,18 +396,42 @@
 
   body:has(.order-print-sheet) .order-print-sheet {
     display: block !important;
-    position: fixed !important;
+    position: static !important;
     inset: 0 !important;
     z-index: 999999 !important;
     width: 100% !important;
     padding: 0 !important;
     color: #17211d !important;
     background: #fff !important;
-    direction: inherit;
     font-family: Arial, "Noto Sans Arabic", sans-serif !important;
-    font-size: 10pt !important;
-    line-height: 1.5 !important;
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
     page: orderSheet;
+  }
+
+  /* Remove non-print content from layout so long orders can paginate. */
+  body:has(.order-print-sheet) *:not(:has(.order-print-sheet)):not(.order-print-sheet):not(.order-print-sheet *) {
+    display: none !important;
+  }
+
+  body:has(.order-print-sheet) *:has(.order-print-sheet) {
+    display: block !important;
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    transform: none !important;
+  }
+
+  .order-print-logo {
+    width: 22mm !important;
+    height: 22mm !important;
+    object-fit: contain !important;
+    flex-shrink: 0 !important;
   }
 
   .order-print-header {
@@ -415,7 +439,8 @@
     align-items: center !important;
     justify-content: space-between !important;
     gap: 16px !important;
-    padding-bottom: 18px !important;
+    padding-bottom: 16px !important;
+    break-inside: avoid !important;
     border-bottom: 2px solid #174b3a !important;
   }
 
@@ -423,19 +448,6 @@
     display: flex !important;
     align-items: center !important;
     gap: 10px !important;
-  }
-
-  .order-print-brand-mark {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 38px !important;
-    height: 38px !important;
-    border: 2px solid #b88727 !important;
-    border-radius: 50% !important;
-    color: #174b3a !important;
-    font-size: 18pt !important;
-    font-weight: 800 !important;
   }
 
   .order-print-brand-name,
@@ -452,16 +464,18 @@
     font-size: 15pt !important;
     font-weight: 800 !important;
     letter-spacing: .06em !important;
+    white-space: nowrap !important;
   }
 
   .order-print-brand-caption,
   .order-print-title p {
     color: #66746d !important;
-    font-size: 8pt !important;
+    font-size: 9pt !important;
   }
 
   .order-print-title {
     text-align: end !important;
+    flex-shrink: 0 !important;
   }
 
   .order-print-title h1 {
@@ -472,9 +486,10 @@
 
   .order-print-meta {
     display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, .8fr) !important;
     gap: 12px !important;
-    margin: 18px 0 !important;
+    margin: 20px 0 !important;
+    break-inside: avoid !important;
     padding: 14px !important;
     border: 1px solid #dce5df !important;
     border-radius: 8px !important;
@@ -493,7 +508,7 @@
   .order-print-items h2,
   .order-print-total span {
     color: #66746d !important;
-    font-size: 8pt !important;
+    font-size: 9pt !important;
     font-weight: 700 !important;
   }
 
@@ -535,8 +550,12 @@
   }
 
   .order-print-ltr {
-    text-align: start !important;
+    text-align: left !important;
     direction: ltr !important;
+  }
+
+  .order-print-sheet[dir="rtl"] .order-print-ltr {
+    text-align: right !important;
   }
 
   .order-print-notes {
@@ -564,7 +583,7 @@
     border-block: 1px solid #dce5df !important;
     background: #f1f5f2 !important;
     color: #174b3a !important;
-    font-size: 8pt !important;
+    font-size: 9pt !important;
     font-weight: 800 !important;
     text-align: start !important;
   }
@@ -597,7 +616,10 @@
   }
 
   .order-print-summary {
-    margin-top: 14px !important;
+    width: 100mm !important;
+    max-width: 100% !important;
+    margin-inline-start: auto !important;
+    margin-top: 18px !important;
     border: 1px solid #dce5df !important;
     border-radius: 8px !important;
     overflow: hidden !important;
@@ -658,7 +680,7 @@
     padding-top: 8px !important;
     border-top: 1px solid #dce5df !important;
     color: #7b8881 !important;
-    font-size: 8pt !important;
+    font-size: 9pt !important;
     text-align: center !important;
   }
 }
