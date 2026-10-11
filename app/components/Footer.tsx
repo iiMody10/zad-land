@@ -44,7 +44,7 @@ const Footer = async ({ t, language, initialSettings }: FooterProps) => {
     const contactPhone = settings?.footerPhone || '';
     const companyContacts = parseCompanyContacts(settings?.companyContacts);
     const contactEmail = settings?.footerEmail || '';
-    const whatsappLabel = getLocalizedValue(language, settings?.footerWhatsappLabel, settings?.footerWhatsappLabelAr);
+    const whatsappLabel = getLocalizedValue(language, settings?.footerWhatsappLabel, settings?.footerWhatsappLabelAr) || (language === 'ar' ? 'تواصل معنا عبر واتساب' : 'Contact us on WhatsApp');
     const whatsappUrl = settings?.footerWhatsappUrl && settings.footerWhatsappUrl !== '#'
         ? settings.footerWhatsappUrl
         : toWhatsAppUrl(contactPhone);
@@ -60,11 +60,6 @@ const Footer = async ({ t, language, initialSettings }: FooterProps) => {
             href: settings?.footerFacebookUrl || "#",
             platform: 'facebook' as const,
             label: "Facebook",
-        },
-        {
-            href: whatsappUrl,
-            platform: 'whatsapp' as const,
-            label: "WhatsApp",
         },
     ].filter((link) => link.href && link.href !== "#");
 
@@ -145,7 +140,7 @@ const Footer = async ({ t, language, initialSettings }: FooterProps) => {
 
             <div className="relative">
                 <div className="container-custom px-4 py-7 sm:py-8 md:py-9">
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.95fr_0.9fr_0.95fr_1.2fr] lg:gap-0">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1.1fr_1.2fr] lg:gap-0">
                         {/* Brand */}
                         <div className="flex flex-col items-center border-b border-white/10 pb-6 text-center sm:col-span-2 lg:col-span-1 lg:items-start lg:border-b-0 lg:border-e lg:border-[var(--color-accent)]/25 lg:pb-0 lg:pe-10 lg:text-start">
                             <Link href="/" className="group mb-2.5 inline-flex flex-col items-center lg:items-start transition-transform hover:opacity-95">
@@ -172,7 +167,7 @@ const Footer = async ({ t, language, initialSettings }: FooterProps) => {
                                     {brandDescription}
                                 </p>
                             ) : null}
-                            <div className="mt-4 flex items-center gap-2.5">
+                            {socialLinks.length > 0 && <div className="mt-4 flex items-center gap-2.5">
                                 {socialLinks.map((social) => (
                                     <a
                                         key={social.label}
@@ -185,7 +180,7 @@ const Footer = async ({ t, language, initialSettings }: FooterProps) => {
                                         <PlatformIcon platform={social.platform} className="size-4" />
                                     </a>
                                 ))}
-                            </div>
+                            </div>}
                         </div>
 
                         {/* Navigation Links - 2 Columns on Mobile, native columns on Desktop */}
@@ -198,6 +193,48 @@ const Footer = async ({ t, language, initialSettings }: FooterProps) => {
                                         <li key={link.href}>{renderNavLink(link.label, link.href)}</li>
                                     ))}
                                 </ul>
+                                {/* Shop Categories */}
+                                <div className="mt-6 border-t border-white/10 pt-5">
+                                    <h5 className="mb-3 text-xs sm:text-sm font-extrabold text-[var(--color-accent-light)] text-start lg:text-center">{shopTitle}</h5>
+                                    {/* Mobile & Tablet: Modern touch badge pills */}
+                                    <div className="flex flex-wrap gap-1.5 sm:gap-2 lg:hidden">
+                                        {footerCategories.length > 0 ? (
+                                            footerCategories.slice(0, 6).map((category) => {
+                                                const catLabel = isArabic ? category.name : (FOOTER_CAT_TRANSLATIONS[category.name] || category.name);
+                                                return (
+                                                    <Link
+                                                        key={category.id}
+                                                        className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] sm:text-xs font-medium text-white/90 transition-colors hover:border-[var(--color-accent-light)] hover:bg-[var(--color-accent)] hover:text-white"
+                                                        href={`/categories/${category.slug}`}
+                                                    >
+                                                        {catLabel}
+                                                    </Link>
+                                                );
+                                            })
+                                        ) : (
+                                            <Link className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/90 hover:bg-[var(--color-accent)]" href="/products">
+                                                {t('products.allProducts')}
+                                            </Link>
+                                        )}
+                                    </div>
+                                    {/* Desktop: Standard vertical list */}
+                                    <ul className="hidden flex-col gap-2.5 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm lg:flex">
+                                        {footerCategories.length > 0 ? (
+                                            footerCategories.slice(0, 5).map((category) => {
+                                                const catLabel = isArabic ? category.name : (FOOTER_CAT_TRANSLATIONS[category.name] || category.name);
+                                                return (
+                                                    <li key={category.id}>
+                                                        <Link className="transition-colors hover:text-[var(--color-accent-light)]" href={`/categories/${category.slug}`}>
+                                                            {catLabel}
+                                                        </Link>
+                                                    </li>
+                                                );
+                                            })
+                                        ) : (
+                                            <li><Link className="transition-colors hover:text-[var(--color-accent-light)]" href="/products">{t('products.allProducts')}</Link></li>
+                                        )}
+                                    </ul>
+                                </div>
                             </div>
 
                             {/* Shipping and privacy policies */}
@@ -211,60 +248,24 @@ const Footer = async ({ t, language, initialSettings }: FooterProps) => {
                             </div>
                         </div>
 
-                        {/* Shop Categories */}
-                        <div className="col-span-1 sm:col-span-2 lg:col-span-1 lg:border-e lg:border-[var(--color-accent)]/25 lg:px-6">
-                            <h5 className="mb-3 text-xs sm:text-sm font-extrabold text-[var(--color-accent-light)] text-start lg:text-center">{shopTitle}</h5>
-                            {/* Mobile & Tablet: Modern touch badge pills */}
-                            <div className="flex flex-wrap gap-1.5 sm:gap-2 lg:hidden">
-                                {footerCategories.length > 0 ? (
-                                    footerCategories.slice(0, 6).map((category) => {
-                                        const catLabel = isArabic ? category.name : (FOOTER_CAT_TRANSLATIONS[category.name] || category.name);
-                                        return (
-                                            <Link
-                                                key={category.id}
-                                                className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] sm:text-xs font-medium text-white/90 transition-colors hover:border-[var(--color-accent-light)] hover:bg-[var(--color-accent)] hover:text-white"
-                                                href={`/categories/${category.slug}`}
-                                            >
-                                                {catLabel}
-                                            </Link>
-                                        );
-                                    })
-                                ) : (
-                                    <Link className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium text-white/90 hover:bg-[var(--color-accent)]" href="/products">
-                                        {t('products.allProducts')}
-                                    </Link>
-                                )}
+                        {/* Company representatives */}
+                        {companyContacts.some((contact) => contact.enabled) && (
+                            <div className="text-start lg:border-e lg:border-[var(--color-accent)]/25 lg:px-5">
+                                <h5 className="mb-3 text-xs font-extrabold text-[var(--color-accent-light)] sm:text-sm">{contactTitle}</h5>
+                                <CompanyContacts contacts={companyContacts} language={language} compact />
                             </div>
-                            {/* Desktop: Standard vertical list */}
-                            <ul className="hidden flex-col gap-2.5 text-xs font-medium text-[var(--color-text-main-dark)]/85 sm:text-sm lg:flex">
-                                {footerCategories.length > 0 ? (
-                                    footerCategories.slice(0, 5).map((category) => {
-                                        const catLabel = isArabic ? category.name : (FOOTER_CAT_TRANSLATIONS[category.name] || category.name);
-                                        return (
-                                            <li key={category.id}>
-                                                <Link className="transition-colors hover:text-[var(--color-accent-light)]" href={`/categories/${category.slug}`}>
-                                                    {catLabel}
-                                                </Link>
-                                            </li>
-                                        );
-                                    })
-                                ) : (
-                                    <li><Link className="transition-colors hover:text-[var(--color-accent-light)]" href="/products">{t('products.allProducts')}</Link></li>
-                                )}
-                            </ul>
-                        </div>
+                        )}
 
-                        {/* Contact & B2B Sales Box */}
-                        <div className="col-span-1 sm:col-span-2 lg:col-span-1 text-start">
+                        {/* Office contact details */}
+                        <div className="col-span-1 text-start">
                             <div className="rounded-2xl border border-[var(--color-accent)]/30 bg-black/25 p-4 sm:p-5 lg:rounded-none lg:border-none lg:bg-transparent lg:p-0 lg:ps-6">
                                 <h5 className="mb-3 flex items-center gap-2 text-xs sm:text-sm font-extrabold text-[var(--color-accent-light)]">
                                     <LuPhone className="size-3.5 shrink-0" />
-                                    <span>{contactTitle}</span>
+                                    <span>{isArabic ? "العنوان والتواصل" : "Office & Contact"}</span>
                                 </h5>
                                 <div className="flex w-full flex-col gap-3 text-xs text-[var(--color-text-main-dark)]/90 sm:text-sm">
-                                    <CompanyContacts contacts={companyContacts} language={language} compact />
                                     {(contactAddress || contactPhone || contactEmail) && (
-                                        <div className="flex w-full flex-col gap-2 border-t border-white/10 pt-3">
+                                        <div className="flex w-full flex-col gap-3">
                                             {contactAddress && (
                                                 <div className="flex min-w-0 items-start gap-2">
                                                     <LuMapPin className="shrink-0 text-[var(--color-accent-light)]" />
