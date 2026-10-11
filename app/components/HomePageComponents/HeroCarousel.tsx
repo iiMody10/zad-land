@@ -117,7 +117,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
     return (
         <section ref={wrapperRef} className="w-full pt-0 pb-0 md:pb-6 group hero-carousel">
             {/* Mobile View (< md): High-Definition Swiper Hero with Dynamic Content & Proportional Height */}
-            <div className="block md:hidden w-full relative min-h-[420px] aspect-[390/435] sm:min-h-[460px] sm:aspect-[420/400] overflow-hidden">
+            <div className="block md:hidden w-full relative min-h-[380px] aspect-[390/380] sm:min-h-[410px] sm:aspect-[420/360] overflow-hidden">
                 <Swiper
                     modules={[Autoplay, Pagination]}
                     spaceBetween={0}
