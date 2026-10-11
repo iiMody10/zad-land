@@ -10,7 +10,7 @@ const AboutSupplyBanner = ({ language, dir }: AboutSupplyBannerProps) => {
     const isArabic = language === "ar";
 
     return (
-        <section className="relative isolate z-20 w-full overflow-x-clip bg-[#FFFFFE] dark:bg-[var(--color-surface-dark)] pt-8 pb-0 sm:pt-10 sm:pb-0 md:py-8 md:container-custom lg:flex lg:min-h-[360px] lg:items-center xl:min-h-[420px]" aria-labelledby="about-supply-title">
+        <section className="relative isolate z-20 w-full overflow-x-clip bg-[#FFFFFE] dark:bg-[var(--color-surface-dark)] pt-6 pb-0 sm:pt-8 sm:pb-0 md:py-8 md:container-custom lg:flex lg:min-h-[360px] lg:items-center xl:min-h-[420px]" aria-labelledby="about-supply-title">
             {/* Desktop botanical artwork. */}
             <div className="pointer-events-none absolute -left-6 z-0 hidden md:block md:-bottom-24 md:h-[340px] md:w-[44%] lg:bottom-0 lg:-left-8 lg:h-[360px] lg:w-[44%] xl:h-[420px]" aria-hidden="true">
                 <Image
@@ -57,31 +57,22 @@ const AboutSupplyBanner = ({ language, dir }: AboutSupplyBannerProps) => {
 
                         <Link
                             href="/about-us"
-                            className="mt-6 hidden md:inline-flex min-h-11 min-w-[160px] items-center justify-center rounded-full border-2 border-[var(--color-accent-light)] px-8 py-2 text-sm font-extrabold text-[var(--color-brand)] transition-colors hover:bg-[var(--color-accent-light)] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)] md:mt-3 md:min-h-0 md:py-1.5 dark:text-white"
+                            className="mt-4 inline-flex min-h-11 min-w-[160px] items-center justify-center rounded-full border-2 border-[var(--color-accent-light)] px-8 py-2 text-sm font-extrabold text-[var(--color-brand)] transition-colors hover:bg-[var(--color-accent-light)] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)] md:mt-3 md:min-h-0 md:py-1.5 dark:text-white"
                         >
                             {isArabic ? "اقرأ المزيد" : "Read More"}
                         </Link>
                     </div>
                 </div>
             </div>
-            {/* Leaves and CTA share a compact mobile composition. */}
-            <div dir="ltr" className="relative mt-4 flex h-[160px] items-center justify-end overflow-hidden px-6 sm:h-[180px] sm:px-10 md:hidden">
-                <div className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
-                    <Image
-                        src="/images/content.webp"
-                        alt=""
-                        fill
-                        sizes="(min-width: 640px) 640px, 540px"
-                        className="object-cover object-left-bottom"
-                    />
-                </div>
-                <Link
-                    href="/about-us"
-                    dir={dir}
-                    className="relative mb-6 inline-flex min-h-11 items-center justify-center rounded-full border-2 border-[var(--color-accent-light)] bg-[#FFFFFE] px-6 py-2 text-sm font-extrabold text-[var(--color-brand)] transition-colors hover:bg-[var(--color-accent-light)] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)] dark:bg-[var(--color-surface-dark)] dark:text-white"
-                >
-                    {isArabic ? "اقرأ المزيد" : "Read More"}
-                </Link>
+            {/* A shallow botanical edge supports the centered mobile content. */}
+            <div className="relative h-24 overflow-hidden sm:h-28 md:hidden" aria-hidden="true">
+                <Image
+                    src="/images/content.webp"
+                    alt=""
+                    fill
+                    sizes="(min-width: 640px) 640px, 100vw"
+                    className="pointer-events-none object-cover object-left-top"
+                />
             </div>
         </section>
     );
