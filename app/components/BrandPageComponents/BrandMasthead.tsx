@@ -68,7 +68,7 @@ export default function BrandMasthead({ brand, totalProducts = 0 }: BrandMasthea
 
             <div className="overflow-hidden rounded-xl border border-slate-200/80 border-s-[4px] border-s-[var(--color-brand)] bg-white shadow-xs dark:border-white/10 dark:border-s-[var(--color-accent)] dark:bg-[var(--color-surface-dark)]">
                 <div className="flex min-h-[88px] items-center gap-4 px-4 py-3 sm:px-5">
-                    {showLogo && brand.image && (
+                    {showLogo && brand.image ? (
                         <div className="relative size-14 shrink-0 overflow-hidden rounded-lg border border-slate-200/80 bg-white p-1.5 dark:border-white/10 dark:bg-zinc-800 sm:size-16">
                             <ResilientImage
                                 src={brand.image}
@@ -79,6 +79,12 @@ export default function BrandMasthead({ brand, totalProducts = 0 }: BrandMasthea
                                 priority
                                 onError={() => setShowLogo(false)}
                             />
+                        </div>
+                    ) : (
+                        <div className="relative size-14 shrink-0 rounded-lg bg-gradient-to-br from-[var(--color-brand)]/10 via-[var(--color-accent)]/15 to-[var(--color-brand)]/5 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 shadow-xs flex items-center justify-center select-none sm:size-16" aria-hidden="true">
+                            <span className="text-xl sm:text-2xl font-extrabold text-[var(--color-brand)] dark:text-[var(--color-accent)]">
+                                {primaryName.charAt(0)}
+                            </span>
                         </div>
                     )}
 

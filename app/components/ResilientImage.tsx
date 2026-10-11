@@ -107,7 +107,7 @@ const ResilientImageInner = ({
                 decoding={imgProps.decoding || "async"}
                 unoptimized={imgProps.unoptimized ?? (typeof safeSrc === 'string' && (safeSrc.startsWith('/image-proxy') || isPostImg))}
                 sizes={imgProps.sizes || "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"}
-                className={`${className || ""} block relative z-10`}
+                className={`${className || ""} block z-10`}
                 onLoad={(event) => {
                     setIsLoaded(true);
                     onLoad?.(event);

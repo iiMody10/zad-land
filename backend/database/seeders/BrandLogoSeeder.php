@@ -26,6 +26,7 @@ class BrandLogoSeeder extends Seeder
             'هايجين' => 'higeen.webp',
             'ميلاف' => 'milaf.webp',
             'ماستر براوني' => 'mr-brownie.webp',
+            'ماستر شيف' => 'master.webp',
             'نبيل' => 'nabil.webp',
             'اوتيما' => 'ottima.webp',
             'بيبسي' => 'pepsi.webp',

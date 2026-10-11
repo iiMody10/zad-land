@@ -25,7 +25,7 @@ class CatalogController extends Controller
         $limit = min((int) ($data['limit'] ?? 32), 32);
         $page = (int) ($data['page'] ?? 1);
         $query = Product::query()->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))
-            ->with(['brand:id,name,slug,group', 'category:id,name']);
+            ->with(['brand:id,name,slug,description,image,group', 'category:id,name']);
         $categoryIds = $this->csvIds($data['categoryIds'] ?? '');
         $brandIds = $this->csvIds($data['brandIds'] ?? '');
         if ($categoryIds) {
@@ -94,7 +94,7 @@ class CatalogController extends Controller
     {
         $banners = Banner::where('is_active', true)->orderByDesc('created_at')->get();
         $homeCategories = Category::whereHas('products', fn ($q) => $q->where('is_active', true))->whereHas('brand', fn ($q) => $q->where('is_active', true))
-            ->with('brand:id,name,slug')->withCount(['products' => fn ($q) => $q->where('is_active', true)])
+            ->with('brand:id,name,slug,image')->withCount(['products' => fn ($q) => $q->where('is_active', true)])
             ->orderByDesc('is_featured')->orderByDesc('products_count')->orderBy('name')->take(8)->get();
         $featuredCategories = $homeCategories->map(function (Category $category): array {
             $product = Product::where('category_id', $category->id)->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))->orderByDesc('is_trending')->orderByDesc('created_at')->first();
@@ -104,7 +104,7 @@ class CatalogController extends Controller
                 'id' => $category->id, 'name' => $category->name, 'nameEn' => $category->description ?: $category->name,
                 'description' => $category->description, 'image' => $image, 'slug' => $category->slug,
                 'brandId' => $category->brand_id, 'isFeatured' => $category->is_featured,
-                'brand' => $category->brand ? ['id' => $category->brand->id, 'name' => trim(explode('-', $category->brand->name)[0]), 'slug' => $category->brand->slug] : null,
+                'brand' => $category->brand ? ['id' => $category->brand->id, 'name' => trim(explode('-', $category->brand->name)[0]), 'slug' => $category->brand->slug, 'image' => $category->brand->image] : null,
                 'createdAt' => $category->created_at?->toISOString(), 'updatedAt' => $category->updated_at?->toISOString(),
             ];
         });
@@ -115,13 +115,13 @@ class CatalogController extends Controller
         $sections = $homeCategories->take(6)
             ->map(function (Category $category): ?array {
                 $products = Product::where('category_id', $category->id)->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))
-                    ->with('brand:id,name,slug,group')->orderByDesc('is_trending')->orderByDesc('created_at')->take(18)->get();
+                    ->with('brand:id,name,slug,description,image,group')->orderByDesc('is_trending')->orderByDesc('created_at')->take(18)->get();
                 if ($products->isEmpty()) {
                     return null;
                 }
 
                 return ['category' => ['id' => $category->id, 'name' => trim($category->name), 'slug' => $category->slug, 'description' => $category->description ? trim($category->description) : null, 'image' => $category->image, 'productCount' => Product::where('category_id', $category->id)->where('is_active', true)->whereHas('brand', fn ($q) => $q->where('is_active', true))->count()],
-                    'products' => $products->map(fn (Product $p) => ['id' => $p->id, 'slug' => $p->slug, 'name' => $p->name, 'description' => $p->description, 'price' => $p->price !== null ? (float) $p->price : null, 'discountPrice' => $p->discount_price !== null ? (float) $p->discount_price : null, 'images' => $p->images, 'categoryId' => $p->category_id, 'stock' => $p->stock, 'minOrder' => $p->min_order, 'packaging' => $p->packaging, 'itemsPerPackage' => $p->items_per_package, 'pricingNeedsReview' => $p->pricing_needs_review, 'isTrending' => $p->is_trending, 'brand' => $p->brand ? ApiJson::camel($p->brand->only(['id', 'name', 'slug', 'group'])) : null])->values()];
+                    'products' => $products->map(fn (Product $p) => ['id' => $p->id, 'slug' => $p->slug, 'name' => $p->name, 'description' => $p->description, 'price' => $p->price !== null ? (float) $p->price : null, 'discountPrice' => $p->discount_price !== null ? (float) $p->discount_price : null, 'images' => $p->images, 'categoryId' => $p->category_id, 'stock' => $p->stock, 'minOrder' => $p->min_order, 'packaging' => $p->packaging, 'itemsPerPackage' => $p->items_per_package, 'pricingNeedsReview' => $p->pricing_needs_review, 'isTrending' => $p->is_trending, 'brand' => $p->brand ? ApiJson::camel($p->brand->only(['id', 'name', 'slug', 'description', 'image', 'group'])) : null])->values()];
             })->filter()->values();
 
         return response()->json(['banners' => ApiJson::camel($banners), 'featuredCategories' => $featuredCategories, 'featuredMainBrands' => $featuredBrands, 'collectionSections' => $sections])
@@ -131,7 +131,7 @@ class CatalogController extends Controller
     public function categories(Request $request)
     {
         $data = $request->validate(['limit' => ['nullable', 'integer', 'min:1', 'max:1000'], 'brandId' => ['nullable', 'string', 'max:191']]);
-        $query = Category::query()->whereHas('brand', fn ($q) => $q->where('is_active', true))->whereHas('products', fn ($q) => $q->where('is_active', true))->with('brand:id,name,slug,group')->orderByDesc('is_featured')->orderBy('name');
+        $query = Category::query()->whereHas('brand', fn ($q) => $q->where('is_active', true))->whereHas('products', fn ($q) => $q->where('is_active', true))->with('brand:id,name,slug,description,image,group')->orderByDesc('is_featured')->orderBy('name');
         if (! empty($data['brandId'])) {
             $query->where('brand_id', $data['brandId']);
         }
