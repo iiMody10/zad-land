@@ -60,18 +60,18 @@ const isDefaultHeroArtwork = (image: string | null | undefined) =>
 const getTitleSizeClass = (text: string) => {
     const len = text.length;
     if (len > 38) {
-        return "text-[18px] xs:text-[20px] sm:text-[23px] leading-[1.25]";
+        return "text-[20px] xs:text-[22px] sm:text-[25px] leading-[1.25]";
     }
     if (len > 24) {
-        return "text-[20px] xs:text-[22px] sm:text-[25px] leading-[1.23]";
+        return "text-[22px] xs:text-[24px] sm:text-[27px] leading-[1.23]";
     }
-    return "text-[23px] xs:text-[26px] sm:text-[29px] leading-[1.2]";
+    return "text-[25px] xs:text-[28px] sm:text-[31px] leading-[1.2]";
 };
 
 const getSubtitleSizeClass = (text: string) => {
     return text.length > 80
-        ? "text-[12px] xs:text-[13px] sm:text-[14px] leading-[1.4]"
-        : "text-[13px] xs:text-[14px] sm:text-[14.5px] leading-[1.42]";
+        ? "text-[13px] xs:text-[14px] sm:text-[15px] leading-[1.4]"
+        : "text-[14px] xs:text-[15px] sm:text-[15.5px] leading-[1.42]";
 };
 
 const HeroCarousel = ({ banners }: HeroCarouselProps) => {
@@ -187,7 +187,7 @@ const HeroCarousel = ({ banners }: HeroCarouselProps) => {
 
                                     {/* Main Headline - NEVER truncated with ellipsis, adaptive font scaling */}
                                     {isHeroBg && isDefaultTitle ? (
-                                        <h1 className="text-[23px] xs:text-[26px] sm:text-[30px] font-black text-white leading-[1.2] tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
+                                        <h1 className="text-[25px] xs:text-[28px] sm:text-[32px] font-black text-white leading-[1.2] tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
                                             {isArabic ? (
                                                 <>
                                                     <span className="block">نصل بالعلامات</span>
