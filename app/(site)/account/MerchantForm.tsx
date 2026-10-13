@@ -5,11 +5,18 @@ import { laravelClientFetch, laravelLogin, SessionVerificationError } from "@/li
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useLanguage } from "@/app/context/LanguageContext";
+import { useBusinessContact } from "@/app/context/BusinessContactContext";
+import { toWhatsAppUrl } from "@/lib/business-contact";
+import { merchantAuthError, passwordSupportUrl } from "@/lib/merchant-auth-messages";
 import { validateMerchantForm, type MerchantFormErrors } from "@/lib/merchant-validation";
+
+class MerchantResponseError extends Error {}
 
 export default function MerchantForm({ mode }: { mode: "login" | "register" }) {
     const { language } = useLanguage();
     const ar = language === "ar";
+    const { whatsappUrl, whatsappNumber } = useBusinessContact();
+    const supportUrl = passwordSupportUrl(whatsappUrl && whatsappUrl !== "#" ? whatsappUrl : toWhatsAppUrl(whatsappNumber), language);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
     const [fieldErrors, setFieldErrors] = useState<MerchantFormErrors>({});
@@ -35,7 +42,7 @@ export default function MerchantForm({ mode }: { mode: "login" | "register" }) {
             const data = await response.json();
             if (!response.ok) {
                 if (data.errors) setFieldErrors(data.errors);
-                throw new Error(data.error === "ACCOUNT_PENDING" ? (ar ? "حسابك بانتظار موافقة الإدارة." : "Your account is awaiting approval.") : data.error || "Request failed");
+                throw new MerchantResponseError(merchantAuthError(data.error, response.status, language));
             }
             if (mode === "register") setSuccess(true);
             else {
@@ -46,7 +53,8 @@ export default function MerchantForm({ mode }: { mode: "login" | "register" }) {
         } catch (cause) {
             setError(cause instanceof SessionVerificationError
                 ? (ar ? "تعذر تأكيد جلسة الدخول. يرجى المحاولة مرة أخرى." : cause.message)
-                : cause instanceof Error ? cause.message : "Request failed");
+                : cause instanceof MerchantResponseError ? cause.message
+                    : (ar ? "تعذر الاتصال. يرجى المحاولة مرة أخرى." : "Couldn't connect. Please try again."));
             setBusy(false);
         }
         if (mode === "register") setBusy(false);
@@ -93,6 +101,9 @@ export default function MerchantForm({ mode }: { mode: "login" | "register" }) {
                 {field("phone", "رقم الجوال", "Mobile number", { type: "tel", autoComplete: "tel" })}
                 {mode === "register" && <>{field("city", "المدينة", "City", { autoComplete: "address-level2" })}{field("address", "العنوان", "Address", { autoComplete: "street-address" })}{field("notes", "ملاحظات (اختياري)", "Notes (optional)", { required: false })}</>}
                 {field("password", "كلمة المرور", "Password", { type: "password", autoComplete: mode === "login" ? "current-password" : "new-password" })}
+                {mode === "login" && <a href={supportUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--color-brand-hover)] underline underline-offset-4 hover:text-[var(--color-brand)] focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-4 dark:text-white">
+                    {ar ? "هل نسيت كلمة المرور؟" : "Forgot your password?"}
+                </a>}
                 {error && <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
                 <button disabled={busy} type="submit" className="w-full rounded-xl bg-[var(--color-brand-hover)] px-5 py-3.5 text-sm font-bold text-white hover:bg-[var(--color-brand-hover)] disabled:opacity-60">{busy ? (ar ? "يرجى الانتظار..." : "Please wait...") : mode === "login" ? (ar ? "تسجيل الدخول" : "Sign in") : (ar ? "إرسال الطلب" : "Send application")}</button>
             </form>}
