@@ -65,7 +65,7 @@ const AboutSupplyBanner = ({ language, dir }: AboutSupplyBannerProps) => {
                 </div>
             </div>
             {/* A shallow botanical edge supports the centered mobile content. */}
-            <div className="relative h-20 overflow-hidden sm:h-24 md:hidden" aria-hidden="true">
+            <div className="relative -top-4 h-20 overflow-hidden sm:h-24 md:hidden" aria-hidden="true">
                 <Image
                     src="/images/content.webp"
                     alt=""
