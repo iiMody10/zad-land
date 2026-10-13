@@ -10,7 +10,7 @@ const AboutSupplyBanner = ({ language, dir }: AboutSupplyBannerProps) => {
     const isArabic = language === "ar";
 
     return (
-        <section className="relative isolate z-20 w-full overflow-x-clip bg-[#FFFFFE] dark:bg-[var(--color-surface-dark)] pt-6 pb-0 sm:pt-8 sm:pb-0 md:py-8 md:container-custom lg:flex lg:min-h-[360px] lg:items-center xl:min-h-[420px]" aria-labelledby="about-supply-title">
+        <section className="relative isolate z-20 w-full overflow-x-clip bg-[#FFFFFE] dark:bg-[var(--color-surface-dark)] pt-5 pb-0 sm:pt-6 sm:pb-0 md:py-8 md:container-custom lg:flex lg:min-h-[360px] lg:items-center xl:min-h-[420px]" aria-labelledby="about-supply-title">
             {/* Desktop botanical artwork. */}
             <div className="pointer-events-none absolute -left-6 z-0 hidden md:block md:-bottom-24 md:h-[340px] md:w-[44%] lg:bottom-0 lg:-left-8 lg:h-[360px] lg:w-[44%] xl:h-[420px]" aria-hidden="true">
                 <Image
@@ -29,7 +29,7 @@ const AboutSupplyBanner = ({ language, dir }: AboutSupplyBannerProps) => {
             >
                 <div className="mx-auto flex w-full max-w-[480px] items-center justify-center px-6 py-2 text-center md:ml-auto md:max-w-[760px] md:w-[68%] md:px-8 lg:w-[64%]">
                     <div className="w-full">
-                        <div className="mb-5 flex items-center justify-center gap-3 text-[var(--color-accent)] sm:gap-4 md:mb-4 md:gap-6">
+                        <div className="mb-4 flex items-center justify-center gap-3 text-[var(--color-accent)] sm:gap-4 md:mb-4 md:gap-6">
                             <div className="h-[1.5px] flex-1 max-w-[36px] bg-gradient-to-r from-transparent via-[var(--color-accent-light)]/40 to-[var(--color-accent)] sm:max-w-[90px] md:max-w-[200px] dark:to-[var(--color-accent-light)]" />
                             <svg className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M12 2C11.5 4 10.5 6 9 7.5C10.5 9 11.5 11 12 13C12.5 11 13.5 9 15 7.5C13.5 6 12.5 4 12 2Z" opacity="0.9" />
@@ -57,7 +57,7 @@ const AboutSupplyBanner = ({ language, dir }: AboutSupplyBannerProps) => {
 
                         <Link
                             href="/about-us"
-                            className="mt-4 inline-flex min-h-11 min-w-[160px] items-center justify-center rounded-full border-2 border-[var(--color-accent-light)] px-8 py-2 text-sm font-extrabold text-[var(--color-brand)] transition-colors hover:bg-[var(--color-accent-light)] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)] md:mt-3 md:min-h-0 md:py-1.5 dark:text-white"
+                            className="mt-3 inline-flex min-h-11 min-w-[160px] items-center justify-center rounded-full border-2 border-[var(--color-accent-light)] px-8 py-2 text-sm font-extrabold text-[var(--color-brand)] transition-colors hover:bg-[var(--color-accent-light)] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)] md:mt-3 md:min-h-0 md:py-1.5 dark:text-white"
                         >
                             {isArabic ? "اقرأ المزيد" : "Read More"}
                         </Link>
@@ -65,7 +65,7 @@ const AboutSupplyBanner = ({ language, dir }: AboutSupplyBannerProps) => {
                 </div>
             </div>
             {/* A shallow botanical edge supports the centered mobile content. */}
-            <div className="relative h-24 overflow-hidden sm:h-28 md:hidden" aria-hidden="true">
+            <div className="relative h-20 overflow-hidden sm:h-24 md:hidden" aria-hidden="true">
                 <Image
                     src="/images/content.webp"
                     alt=""
